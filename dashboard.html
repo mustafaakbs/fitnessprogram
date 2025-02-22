@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Fitness Tracker Pro</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-dark text-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-dumbbell"></i> Fitness Tracker Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="dashboard.html">Genel Bakış</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="workouts.html">Antrenmanlar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="nutrition.html">Beslenme</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="progress.html">İlerleme</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span class="me-3" id="userName">Kullanıcı</span>
+                    <button class="btn btn-outline-light" id="logoutBtn">Çıkış</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-4">
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-3" id="welcomeMessage">Hoş Geldiniz</h2>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 0%" id="dailyProgress"></div>
+                </div>
+                <small class="text-muted">Günlük İlerleme</small>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card bg-surface text-light">
+                    <div class="card-body">
+                        <h5 class="card-title">Tamamlanan Antrenman</h5>
+                        <p class="card-text display-6" id="completedWorkouts">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-surface text-light">
+                    <div class="card-body">
+                        <h5 class="card-title">Kalori Yakımı</h5>
+                        <p class="card-text display-6" id="caloriesBurned">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-surface text-light">
+                    <div class="card-body">
+                        <h5 class="card-title">Aktif Günler</h5>
+                        <p class="card-text display-6" id="activeDays">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-surface text-light">
+                    <div class="card-body">
+                        <h5 class="card-title">Başarı Puanı</h5>
+                        <p class="card-text display-6" id="achievementScore">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Workout -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3 class="mb-3">Bugünkü Antrenman</h3>
+                <div id="workoutList" class="row g-4">
+                    <!-- Workout cards will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Chart -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card bg-surface text-light">
+                    <div class="card-body">
+                        <h3 class="card-title">İlerleme Grafiği</h3>
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html> 
