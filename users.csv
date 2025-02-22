@@ -1,0 +1,5 @@
+id ,username ,password ,name         ,role
+ 1 ,admin    ,admin123 ,Admin User   ,admin
+ 2 ,user1    ,user123  ,John Doe     ,user
+ 3 ,user2    ,user123  ,Jane Smith   ,user
+ 4 ,user3    ,user123  ,Mike Johnson ,user
