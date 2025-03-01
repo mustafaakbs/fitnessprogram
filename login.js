@@ -1,47 +1,29 @@
-class Login {
-    constructor() {
-        this.db = new Database();
-        this.initEventListeners();
-    }
+import { db } from './firebase-config.js';
+import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    initEventListeners() {
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm) {
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleLogin();
-            });
-        }
-    }
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-    handleLogin() {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+    try {
+        // Users verisini al
+        const snapshot = await get(ref(db, 'users'));
+        const users = snapshot.val();
 
-        // Kullanıcıları kontrol et
-        const users = this.db.getUsers();
-        const user = users.find(u => u.username === username);
+        // Kullanıcıyı bul
+        const user = users.find(u => u.username === username && u.password === password);
 
-        // Basit giriş kontrolü
         if (user) {
-            if (user.username === 'admin' && password === 'admin123') {
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                window.location.href = 'dashboard.html';
-            } else if (password === 'user123') {
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                window.location.href = 'dashboard.html';
-            } else {
-                alert('Şifre hatalı!');
-            }
+            // Giriş başarılı
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+            window.location.href = 'dashboard.html';
         } else {
-            alert('Kullanıcı bulunamadı!');
+            alert('Hatalı kullanıcı adı veya şifre!');
         }
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Giriş yapılırken bir hata oluştu!');
     }
-}
-
-// Login sayfasını başlat
-window.onload = () => {
-    new Login();
-    // localStorage'ı temizlemek için yorum satırını kaldırın
-    // localStorage.clear();
-}; 
+});
