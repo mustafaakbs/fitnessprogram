@@ -24,13 +24,24 @@ class AdminPanel {
         }
 
         this.currentAdmin = user;
-        document.getElementById('currentAdmin').textContent = user.username;
+        document.getElementById('currentUser').textContent = `Kullanıcı: ${user.username}`;
     }
 
     updateDateTime() {
         const now = new Date();
-        document.getElementById('currentDateTime').textContent = 
-            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${now.toISOString().slice(0, 19).replace('T', ' ')}`;
+        const options = { 
+            year: 'numeric', 
+            month: '2-digit', 
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        };
+        
+        const formattedDate = now.toLocaleString('tr-TR', options)
+            .replace(',', '');
+        document.getElementById('currentDateTime').textContent = formattedDate;
     }
 
     async loadUsers() {
@@ -81,11 +92,7 @@ class AdminPanel {
                                     <option value="pazar">Pazar</option>
                                 </select>
                             </div>
-                            <div class="program-exercises" id="program-${userId}"></div>
-                            <div class="program-actions">
-                                <button class="action-btn add-btn" onclick="adminPanel.addExercise('${userId}')">Yeni Egzersiz</button>
-                                <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">Programı Kaydet</button>
-                            </div>
+                            <div id="program-${userId}" class="program-content"></div>
                         </div>
                     </td>
                 `;
@@ -95,6 +102,165 @@ class AdminPanel {
             });
         } catch (error) {
             console.error('Error loading users:', error);
+        }
+    }
+
+    async loadDayProgram(userId, day) {
+        this.currentDay = day;
+        try {
+            const snapshot = await get(ref(db, `userPrograms/${userId}/${day}`));
+            const program = snapshot.val() || { title: '', exercises: [] };
+            const container = document.getElementById(`program-${userId}`);
+            
+            let html = `
+                <div class="program-title-container">
+                    <input type="text" class="program-title-input" value="${program.title || ''}" 
+                           placeholder="Program Başlığı (örn: Karın + Cardio)">
+                </div>
+                <div class="exercises-container">
+            `;
+
+            if (program.exercises && program.exercises.length > 0) {
+                program.exercises.forEach((exercise, index) => {
+                    html += `
+                        <div class="exercise-card" data-index="${index}">
+                            <div class="exercise-header">
+                                <input type="text" class="exercise-name" value="${exercise.name || ''}" 
+                                       placeholder="Egzersiz Adı">
+                            </div>
+                            <div class="sets-container">
+                                ${exercise.sets ? exercise.sets.map((set, setIndex) => `
+                                    <div class="set-item">
+                                        <span>Set ${setIndex + 1}:</span>
+                                        <input type="number" class="set-input" value="${set.reps}" min="1">
+                                        <span>tekrar</span>
+                                    </div>
+                                `).join('') : ''}
+                            </div>
+                            <input type="text" class="video-url" value="${exercise.videoUrl || ''}" 
+                                   placeholder="Video URL">
+                            <div class="exercise-actions">
+                                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${index})">
+                                    Set Ekle
+                                </button>
+                                <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">
+                                    Egzersizi Sil
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `
+                </div>
+                <div class="program-actions">
+                    <button class="action-btn add-btn" onclick="adminPanel.addExercise('${userId}')">
+                        Yeni Egzersiz
+                    </button>
+                    <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">
+                        Programı Kaydet
+                    </button>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading program:', error);
+        }
+    }
+
+    async saveProgram(userId) {
+        try {
+            const container = document.getElementById(`program-${userId}`);
+            const programTitle = container.querySelector('.program-title-input').value;
+            const exercises = [];
+            
+            container.querySelectorAll('.exercise-card').forEach(card => {
+                const sets = [];
+                card.querySelectorAll('.set-item').forEach((setItem, index) => {
+                    sets.push({
+                        number: index + 1,
+                        reps: parseInt(setItem.querySelector('.set-input').value) || 0
+                    });
+                });
+
+                exercises.push({
+                    name: card.querySelector('.exercise-name').value,
+                    sets: sets,
+                    videoUrl: card.querySelector('.video-url').value
+                });
+            });
+
+            await set(ref(db, `userPrograms/${userId}/${this.currentDay}`), {
+                title: programTitle,
+                exercises: exercises
+            });
+
+            alert('Program başarıyla kaydedildi');
+        } catch (error) {
+            console.error('Error saving program:', error);
+            alert('Program kaydedilirken hata oluştu');
+        }
+    }
+
+    async addExercise(userId) {
+        const container = document.getElementById(`program-${userId}`);
+        const exercisesContainer = container.querySelector('.exercises-container');
+        const exerciseCount = exercisesContainer.children.length;
+
+        const exerciseDiv = document.createElement('div');
+        exerciseDiv.className = 'exercise-card';
+        exerciseDiv.dataset.index = exerciseCount;
+
+        exerciseDiv.innerHTML = `
+            <div class="exercise-header">
+                <input type="text" class="exercise-name" placeholder="Egzersiz Adı">
+            </div>
+            <div class="sets-container">
+                <div class="set-item">
+                    <span>Set 1:</span>
+                    <input type="number" class="set-input" value="12" min="1">
+                    <span>tekrar</span>
+                </div>
+            </div>
+            <input type="text" class="video-url" placeholder="Video URL">
+            <div class="exercise-actions">
+                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${exerciseCount})">
+                    Set Ekle
+                </button>
+                <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${exerciseCount})">
+                    Egzersizi Sil
+                </button>
+            </div>
+        `;
+
+        exercisesContainer.appendChild(exerciseDiv);
+    }
+
+    async addSet(userId, exerciseIndex) {
+        const exerciseCard = document.querySelector(`#program-${userId} .exercise-card[data-index="${exerciseIndex}"]`);
+        const setsContainer = exerciseCard.querySelector('.sets-container');
+        const setCount = setsContainer.children.length;
+
+        const setDiv = document.createElement('div');
+        setDiv.className = 'set-item';
+        setDiv.innerHTML = `
+            <span>Set ${setCount + 1}:</span>
+            <input type="number" class="set-input" value="12" min="1">
+            <span>tekrar</span>
+        `;
+
+        setsContainer.appendChild(setDiv);
+    }
+
+    async deleteExercise(userId, exerciseIndex) {
+        if (!confirm('Bu egzersizi silmek istediğinize emin misiniz?')) return;
+
+        const container = document.getElementById(`program-${userId}`);
+        const exerciseCard = container.querySelector(`.exercise-card[data-index="${exerciseIndex}"]`);
+        if (exerciseCard) {
+            exerciseCard.remove();
         }
     }
 
@@ -163,141 +329,9 @@ class AdminPanel {
         
         if (programRow.style.display === 'none') {
             programRow.style.display = 'table-row';
-            const daySelect = programRow.querySelector('.day-select');
-            this.currentDay = daySelect.value;
             await this.loadDayProgram(userId, this.currentDay);
         } else {
             programRow.style.display = 'none';
-        }
-    }
-
-    async loadDayProgram(userId, day) {
-        this.currentDay = day;
-        try {
-            const snapshot = await get(ref(db, `userPrograms/${userId}/${day}`));
-            const program = snapshot.val() || { exercises: [] };
-            const container = document.getElementById(`program-${userId}`);
-            
-            let html = '';
-            if (program.exercises && program.exercises.length > 0) {
-                program.exercises.forEach((exercise, index) => {
-                    html += `
-                        <div class="exercise-card" data-index="${index}">
-                            <input type="text" class="exercise-name" value="${exercise.name || ''}" placeholder="Egzersiz Adı">
-                            <div class="sets-container">
-                                ${exercise.sets ? exercise.sets.map((set, setIndex) => `
-                                    <div class="set-item">
-                                        <span>Set ${setIndex + 1}:</span>
-                                        <input type="number" class="set-input" value="${set.reps}" min="1">
-                                        <span>tekrar</span>
-                                    </div>
-                                `).join('') : ''}
-                            </div>
-                            <input type="text" class="video-url" value="${exercise.videoUrl || ''}" placeholder="Video URL">
-                            <div class="exercise-actions">
-                                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${index})">Set Ekle</button>
-                                <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">Egzersizi Sil</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            container.innerHTML = html;
-        } catch (error) {
-            console.error('Error loading program:', error);
-        }
-    }
-
-    async addExercise(userId) {
-        const container = document.getElementById(`program-${userId}`);
-        const newExercise = {
-            name: '',
-            sets: [{number: 1, reps: 12}],
-            videoUrl: ''
-        };
-
-        try {
-            const programRef = ref(db, `userPrograms/${userId}/${this.currentDay}`);
-            const snapshot = await get(programRef);
-            const currentProgram = snapshot.val() || { exercises: [] };
-            
-            currentProgram.exercises.push(newExercise);
-            await set(programRef, currentProgram);
-            await this.loadDayProgram(userId, this.currentDay);
-        } catch (error) {
-            console.error('Error adding exercise:', error);
-        }
-    }
-
-    async addSet(userId, exerciseIndex) {
-        try {
-            const programRef = ref(db, `userPrograms/${userId}/${this.currentDay}`);
-            const snapshot = await get(programRef);
-            const program = snapshot.val();
-            
-            if (program && program.exercises[exerciseIndex]) {
-                const exercise = program.exercises[exerciseIndex];
-                exercise.sets = exercise.sets || [];
-                exercise.sets.push({
-                    number: exercise.sets.length + 1,
-                    reps: 12
-                });
-                
-                await set(programRef, program);
-                await this.loadDayProgram(userId, this.currentDay);
-            }
-        } catch (error) {
-            console.error('Error adding set:', error);
-        }
-    }
-
-    async deleteExercise(userId, exerciseIndex) {
-        if (!confirm('Bu egzersizi silmek istediğinize emin misiniz?')) return;
-
-        try {
-            const programRef = ref(db, `userPrograms/${userId}/${this.currentDay}`);
-            const snapshot = await get(programRef);
-            const program = snapshot.val();
-            
-            if (program && program.exercises) {
-                program.exercises.splice(exerciseIndex, 1);
-                await set(programRef, program);
-                await this.loadDayProgram(userId, this.currentDay);
-            }
-        } catch (error) {
-            console.error('Error deleting exercise:', error);
-        }
-    }
-
-    async saveProgram(userId) {
-        try {
-            const container = document.getElementById(`program-${userId}`);
-            const exercises = [];
-            
-            container.querySelectorAll('.exercise-card').forEach(card => {
-                const sets = [];
-                card.querySelectorAll('.set-item').forEach((setItem, index) => {
-                    sets.push({
-                        number: index + 1,
-                        reps: parseInt(setItem.querySelector('.set-input').value)
-                    });
-                });
-
-                exercises.push({
-                    name: card.querySelector('.exercise-name').value,
-                    sets: sets,
-                    videoUrl: card.querySelector('.video-url').value
-                });
-            });
-
-            await set(ref(db, `userPrograms/${userId}/${this.currentDay}`), {
-                exercises: exercises
-            });
-
-            alert('Program başarıyla kaydedildi');
-        } catch (error) {
-            console.error('Error saving program:', error);
-            alert('Program kaydedilirken hata oluştu');
         }
     }
 
