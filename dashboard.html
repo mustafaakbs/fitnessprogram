@@ -3,33 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitness Program - Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="dashboard-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <header class="dashboard-header">
         <div class="header-content">
-            <h1>FITNESS PROGRAMI</h1>
+            <h1>Dashboard</h1>
             <div class="user-info">
-                <span class="user-name" id="currentUser"></span>
-                <span class="date-time" id="currentDateTime"></span>
-                <button id="logoutBtn">Çıkış Yap</button>
+                <span id="currentDateTime"></span>
+                <span id="currentUser"></span>
+                <button id="logoutBtn" class="action-btn">Çıkış Yap</button>
             </div>
         </div>
     </header>
 
     <main class="dashboard-content">
         <div class="days-container">
-            <!-- Günler dinamik olarak eklenecek -->
+            <button class="day-button active" data-day="pazartesi">Pazartesi</button>
+            <button class="day-button" data-day="sali">Salı</button>
+            <button class="day-button" data-day="carsamba">Çarşamba</button>
+            <button class="day-button" data-day="persembe">Perşembe</button>
+            <button class="day-button" data-day="cuma">Cuma</button>
+            <button class="day-button" data-day="cumartesi">Cumartesi</button>
+            <button class="day-button" data-day="pazar">Pazar</button>
         </div>
-        
-        <div id="programCards">
-            <!-- Program başlığı ve egzersizler buraya gelecek -->
+
+        <div class="program-container">
+            <div class="program-header">
+                <h2 class="program-title"></h2>
+            </div>
+            <div id="exercisesContainer" class="exercises-container">
+                <!-- Egzersizler buraya yüklenecek -->
+            </div>
         </div>
     </main>
 
-    <script type="module" src="firebase-config.js"></script>
     <script type="module" src="dashboard.js"></script>
 </body>
 </html>
