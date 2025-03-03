@@ -6,7 +6,7 @@ class AdminPanel {
         this.currentAdmin = null;
         this.checkAdminAccess();
         this.initializeInterface();
-        this.loadUsers(); // Sayfa yüklendiğinde kullanıcıları yükle
+        this.loadUsers();
     }
 
     checkAdminAccess() {
@@ -23,98 +23,169 @@ class AdminPanel {
         }
 
         this.currentAdmin = user;
+        document.getElementById('currentAdmin').textContent = user.name;
+    }
+
+    updateDateTime() {
+        const now = new Date();
+        const dateTimeStr = now.toISOString().slice(0, 19).replace('T', ' ');
+        document.getElementById('currentDateTime').textContent = dateTimeStr;
     }
 
     async loadUsers() {
         try {
             const snapshot = await get(ref(db, 'users'));
             const users = snapshot.val();
-            const usersList = document.getElementById('usersList');
+            const tbody = document.getElementById('usersTableBody');
             
-            if (!users || !usersList) return;
+            if (!tbody) return;
 
-            usersList.innerHTML = Object.values(users).map(user => `
-                <div class="list-item user-item">
-                    <h3>${user.name}</h3>
-                    <p>Kullanıcı Adı: ${user.username}</p>
-                    <p>Rol: ${user.role}</p>
-                    <div class="item-actions">
-                        <button onclick="window.adminPanel.editUserPassword(${user.id})" class="edit-btn">Şifre Değiştir</button>
-                        <button onclick="window.adminPanel.editUserProgram(${user.id})" class="edit-btn">Program Düzenle</button>
-                    </div>
-                </div>
-            `).join('');
+            tbody.innerHTML = '';
+            
+            Object.values(users).forEach(user => {
+                const tr = document.createElement('tr');
+                tr.dataset.id = user.id;
+                
+                tr.innerHTML = `
+                    <td>${user.id}</td>
+                    <td><input type="text" class="table-input" name="name" value="${user.name || ''}"></td>
+                    <td><input type="text" class="table-input" name="username" value="${user.username || ''}"></td>
+                    <td><input type="text" class="table-input" name="password" value="${user.password || ''}"></td>
+                    <td>
+                        <select class="table-input" name="role">
+                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>Kullanıcı</option>
+                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button onclick="window.adminPanel.editUserProgram(${user.id})" class="action-btn edit-btn">Program</button>
+                    </td>
+                    <td>
+                        <button onclick="window.adminPanel.saveUser(${user.id})" class="action-btn save-btn">Kaydet</button>
+                        <button onclick="window.adminPanel.deleteUser(${user.id})" class="action-btn delete-btn">Sil</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
         } catch (error) {
             console.error('Error loading users:', error);
         }
     }
 
-    async editUserPassword(userId) {
-        const newPassword = prompt("Yeni şifreyi girin:");
-        if (!newPassword) return;
+    async saveUser(userId) {
+        const row = document.querySelector(`tr[data-id="${userId}"]`);
+        const userData = {
+            id: userId,
+            name: row.querySelector('[name="name"]').value,
+            username: row.querySelector('[name="username"]').value,
+            password: row.querySelector('[name="password"]').value,
+            role: row.querySelector('[name="role"]').value
+        };
 
         try {
-            await update(ref(db, `users/${userId}`), {
-                password: newPassword
-            });
-            alert('Şifre başarıyla güncellendi');
+            await set(ref(db, `users/${userId}`), userData);
+            alert('Kullanıcı kaydedildi');
         } catch (error) {
-            console.error('Error updating password:', error);
-            alert('Şifre güncellenirken hata oluştu');
+            console.error('Error saving user:', error);
+            alert('Kullanıcı kaydedilirken hata oluştu');
+        }
+    }
+
+    async deleteUser(userId) {
+        if (!confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) return;
+
+        try {
+            await remove(ref(db, `users/${userId}`));
+            await remove(ref(db, `userPrograms/${userId}`));
+            this.loadUsers();
+            alert('Kullanıcı silindi');
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            alert('Kullanıcı silinirken hata oluştu');
         }
     }
 
     async editUserProgram(userId) {
+        const days = ['pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi', 'pazar'];
+        const day = prompt(`Hangi gün için düzenleme yapacaksınız?\n${days.join(', ')}`);
+        
+        if (!days.includes(day)) {
+            alert('Geçersiz gün seçimi');
+            return;
+        }
+
         try {
-            const programSnapshot = await get(ref(db, `userPrograms/${userId}`));
-            const userPrograms = programSnapshot.val();
-            
-            const day = prompt("Hangi gün için düzenleme yapacaksınız? (pazartesi, sali, carsamba, persembe, cuma, cumartesi, pazar)");
-            if (!day || !userPrograms[day]) return;
+            const programRef = ref(db, `userPrograms/${userId}/${day}`);
+            const title = prompt('Program başlığı:', 'Antrenman');
+            const exerciseName = prompt('Egzersiz adı:');
+            const setCount = parseInt(prompt('Set sayısı:'));
+            const videoUrl = prompt('Video URL:');
 
-            const exercise = {
-                name: prompt("Egzersiz adı:"),
-                sets: []
-            };
-
-            const setCount = parseInt(prompt("Kaç set eklemek istiyorsunuz?"));
+            const sets = [];
             for(let i = 1; i <= setCount; i++) {
                 const reps = parseInt(prompt(`${i}. set için tekrar sayısı:`));
-                exercise.sets.push({
-                    number: i,
-                    reps: reps
-                });
+                sets.push({ number: i, reps });
             }
 
-            exercise.videoUrl = prompt("Egzersiz video URL'si:");
+            const exercise = {
+                name: exerciseName,
+                sets,
+                videoUrl
+            };
 
-            // Mevcut egzersizleri al ve yenisini ekle
-            const currentExercises = userPrograms[day].exercises || [];
-            currentExercises.push(exercise);
-
-            // Güncelle
-            await update(ref(db, `userPrograms/${userId}/${day}`), {
-                exercises: currentExercises
+            await set(programRef, {
+                title,
+                exercises: [exercise]
             });
 
-            alert('Program başarıyla güncellendi');
+            alert('Program güncellendi');
         } catch (error) {
             console.error('Error updating program:', error);
             alert('Program güncellenirken hata oluştu');
         }
     }
 
+    addNewUser() {
+        const tbody = document.getElementById('usersTableBody');
+        const newId = Date.now();
+        
+        const tr = document.createElement('tr');
+        tr.dataset.id = newId;
+        
+        tr.innerHTML = `
+            <td>${newId}</td>
+            <td><input type="text" class="table-input" name="name"></td>
+            <td><input type="text" class="table-input" name="username"></td>
+            <td><input type="text" class="table-input" name="password"></td>
+            <td>
+                <select class="table-input" name="role">
+                    <option value="user">Kullanıcı</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </td>
+            <td>
+                <button onclick="window.adminPanel.editUserProgram(${newId})" class="action-btn edit-btn">Program</button>
+            </td>
+            <td>
+                <button onclick="window.adminPanel.saveUser(${newId})" class="action-btn save-btn">Kaydet</button>
+                <button onclick="window.adminPanel.deleteUser(${newId})" class="action-btn delete-btn">Sil</button>
+            </td>
+        `;
+        
+        tbody.insertBefore(tr, tbody.firstChild);
+    }
+
     initializeInterface() {
-        // Çıkış butonu için event listener
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                sessionStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
-            });
-        }
+        document.getElementById('addUserBtn').addEventListener('click', () => this.addNewUser());
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
+        
+        this.updateDateTime();
+        setInterval(() => this.updateDateTime(), 1000);
     }
 }
 
-// Global erişim için
 window.adminPanel = new AdminPanel();
