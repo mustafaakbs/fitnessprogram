@@ -21,7 +21,52 @@ class Dashboard {
 
         // Arayüzü başlat
         this.initializeInterface();
+    }
+
+    async initializeInterface() {
+        // Kullanıcı adını göster
+        const userNameElement = document.getElementById('userName');
+        if (userNameElement) {
+            userNameElement.textContent = this.currentUser.name || 'Kullanıcı';
+        }
+
+        // Düzenleme modu butonu
+        const editModeBtn = document.getElementById('editModeBtn');
+        if (editModeBtn) {
+            editModeBtn.addEventListener('click', () => {
+                this.showPasswordModal();
+            });
+        }
+
+        // Çıkış butonu
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            });
+        }
+
+        // Günleri oluştur
+        await this.createDayButtons();
         
+        // İlk programı göster
+        await this.renderPrograms();
+
+        // Şifre modalı için event listeners
+        document.getElementById('confirmPassword')?.addEventListener('click', () => {
+            this.checkAdminPassword();
+        });
+
+        document.getElementById('cancelPassword')?.addEventListener('click', () => {
+            document.getElementById('passwordModal').style.display = 'none';
+        });
+
+        // Form submit olayını dinle
+        document.getElementById('exerciseForm')?.addEventListener('submit', (e) => {
+            this.saveExercise(e);
+        });
+
         // Tarih ve kullanıcı bilgisini güncelle
         this.updateDateTime();
         setInterval(() => this.updateDateTime(), 1000);
@@ -36,55 +81,122 @@ class Dashboard {
             `Current User's Login: ${this.currentUser.username}`;
     }
 
-    // ... (gönderdiğiniz tüm diğer metodlar aynen kalacak, sadece veritabanı işlemleri Firebase'e uyarlanacak)
-
-    async getProgramByDay(day) {
-        try {
-            const snapshot = await get(ref(db, `programs/${day}`));
-            return snapshot.val();
-        } catch (error) {
-            console.error('Error getting program:', error);
-            return null;
-        }
+    async createDayButtons() {
+        const days = ['pazartesi', 'carsamba', 'cuma'];
+        const container = document.querySelector('.days-container');
+        
+        if (!container) return;
+        
+        container.innerHTML = ''; // Container'ı temizle
+        
+        days.forEach(day => {
+            const btn = document.createElement('button');
+            btn.className = `day-btn ${day === this.currentDay ? 'active' : ''}`;
+            btn.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+            btn.onclick = () => this.changeDay(day);
+            container.appendChild(btn);
+        });
     }
 
-    async updateProgram(day, exerciseName, updatedExercise) {
+    async changeDay(day) {
+        this.currentDay = day;
+        document.querySelectorAll('.day-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent.toLowerCase() === day);
+        });
+        await this.renderPrograms();
+    }
+
+    async renderPrograms() {
         try {
-            const snapshot = await get(ref(db, `programs/${day}`));
+            const snapshot = await get(ref(db, `programs/${this.currentDay}`));
             const program = snapshot.val();
-            const exerciseIndex = program.exercises.findIndex(e => e.name === exerciseName);
-            
-            if (exerciseIndex !== -1) {
-                program.exercises[exerciseIndex] = updatedExercise;
-                await update(ref(db), {
-                    [`programs/${day}`]: program
-                });
-                return true;
+
+            if (!program) {
+                console.error('Program not found for day:', this.currentDay);
+                return;
             }
+
+            const container = document.getElementById('programCards');
+            if (!container) return;
+
+            let html = `
+                <div class="program-title">
+                    <h2>${program.title}</h2>
+                    ${this.editMode ? `
+                        <button onclick="dashboard.addNewExercise()" class="add-btn">
+                            <i class="fas fa-plus"></i> Yeni Egzersiz
+                        </button>
+                    ` : ''}
+                </div>
+                <div class="exercises-container">
+            `;
+
+            if (program.exercises && Array.isArray(program.exercises)) {
+                program.exercises.forEach(exercise => {
+                    html += this.renderExercise(exercise);
+                });
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+
         } catch (error) {
-            console.error('Error updating program:', error);
+            console.error('Error rendering programs:', error);
+            document.getElementById('programCards').innerHTML = `
+                <div class="error-message">
+                    Programlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.
+                </div>
+            `;
         }
-        return false;
     }
 
-    async deleteExercise(day, exerciseName) {
-        try {
-            const snapshot = await get(ref(db, `programs/${day}`));
-            const program = snapshot.val();
-            const exerciseIndex = program.exercises.findIndex(e => e.name === exerciseName);
-            
-            if (exerciseIndex !== -1) {
-                program.exercises.splice(exerciseIndex, 1);
-                await update(ref(db), {
-                    [`programs/${day}`]: program
-                });
-                return true;
-            }
-        } catch (error) {
-            console.error('Error deleting exercise:', error);
-        }
-        return false;
+    renderExercise(exercise) {
+        return `
+            <div class="exercise-card">
+                <h3>${exercise.name}</h3>
+                <div class="exercise-info">
+                    <div class="weight-selector">
+                        <input type="number" 
+                               value="${exercise.weight}" 
+                               onchange="dashboard.updateWeight('${exercise.name}', this.value)"
+                               min="0" 
+                               step="1"
+                               ${!this.editMode ? 'readonly' : ''}>
+                        <span>KG</span>
+                    </div>
+                </div>
+                <div class="sets-container">
+                    ${exercise.sets.map(set => `
+                        <div class="set-box">
+                            <span>${set.number}. Set: ${set.reps} Tekrar</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="video-section">
+                    <div class="video-container">
+                        <iframe
+                            src="https://www.youtube.com/embed/${this.getYoutubeVideoId(exercise.videoUrl)}?rel=0"
+                            frameborder="0"
+                            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+                ${this.editMode ? `
+                    <div class="exercise-controls">
+                        <button onclick="dashboard.editExercise('${exercise.name}')" class="edit-btn">
+                            <i class="fas fa-edit"></i> Düzenle
+                        </button>
+                        <button onclick="dashboard.deleteExercise('${exercise.name}')" class="delete-btn">
+                            <i class="fas fa-trash"></i> Sil
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
     }
+
+    // ... (diğer metodlar aynen kalacak)
 }
 
 // Dashboard'ı başlat
@@ -94,7 +206,7 @@ window.onload = () => {
 
 // Escape tuşu ile videoyu kapatma
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && window.dashboard.currentVideo) {
+    if (e.key === 'Escape' && window.dashboard?.currentVideo) {
         window.dashboard.closeVideo();
     }
 });
