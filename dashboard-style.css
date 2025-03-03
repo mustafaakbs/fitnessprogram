@@ -1,3 +1,4 @@
+/* Mevcut stiller */
 * {
     margin: 0;
     padding: 0;
@@ -9,6 +10,7 @@ body {
     background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
     color: #fff;
     min-height: 100vh;
+    padding-bottom: 50px;
 }
 
 .dashboard-header {
@@ -37,17 +39,21 @@ body {
 .dashboard-content {
     margin-top: 100px;
     padding: 20px;
-    max-width: 1400px;
+    max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
 }
 
+/* Günler menüsü */
 .days-container {
     display: flex;
-    justify-content: center;
-    gap: 10px;
+    justify-content: space-between;
     margin-bottom: 30px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 10px;
     flex-wrap: wrap;
+    gap: 10px;
 }
 
 .day-button {
@@ -58,105 +64,125 @@ body {
     color: #fff;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 16px;
 }
 
 .day-button:hover {
     background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
 }
 
 .day-button.active {
     background: #4CAF50;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
 }
 
+/* Program container */
 .program-container {
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 20px;
-}
-
-.program-header {
-    margin-bottom: 20px;
-    padding: 15px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
+    border-radius: 15px;
+    padding: 25px;
 }
 
 .program-title {
-    font-size: 24px;
+    font-size: 28px;
+    color: #4CAF50;
     text-align: center;
-    color: #fff;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
+/* Egzersiz kartları */
 .exercise-card {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
     padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.exercise-card:hover {
+    transform: translateY(-5px);
+}
+
+.exercise-header {
     margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
 }
 
 .exercise-name {
-    font-size: 18px;
-    margin-bottom: 15px;
+    font-size: 20px;
     color: #4CAF50;
 }
 
+/* Setler */
 .sets-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
 .set-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
     display: flex;
     justify-content: space-between;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
-}
-
-.video-container {
-    margin-top: 15px;
-    text-align: right;
-}
-
-.video-link {
-    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: #4CAF50;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background 0.3s;
 }
 
-.video-link:hover {
-    background: #45a049;
+.set-number {
+    font-weight: bold;
+    color: #4CAF50;
 }
 
-.no-program {
+/* Video önizleme */
+.video-preview {
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.video-preview iframe {
+    width: 100%;
+    height: 250px;
+    border: none;
+}
+
+/* Hata ve boş durum mesajları */
+.no-program, .error-message {
     text-align: center;
     padding: 40px;
-    color: rgba(255, 255, 255, 0.6);
+    font-size: 18px;
+    color: rgba(255,255,255,0.7);
 }
 
 .error-message {
     color: #ff6b6b;
-    text-align: center;
-    padding: 20px;
 }
 
-.action-btn {
-    padding: 8px 16px;
-    background: #4CAF50;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
-}
+/* Duyarlı tasarım */
+@media (max-width: 768px) {
+    .days-container {
+        flex-direction: column;
+    }
+    
+    .day-button {
+        width: 100%;
+    }
 
-.action-btn:hover {
-    background: #45a049;
+    .exercise-card {
+        padding: 15px;
+    }
+
+    .sets-container {
+        grid-template-columns: 1fr;
+    }
+
+    .video-preview iframe {
+        height: 200px;
+    }
 }
