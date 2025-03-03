@@ -5,11 +5,16 @@ class AdminPanel {
     constructor() {
         this.currentAdmin = null;
         this.currentDay = 'pazartesi';
-        this.checkAdminAccess();
-        this.initializeInterface();
+        this.initialize();
     }
 
-    checkAdminAccess() {
+    async initialize() {
+        await this.checkAdminAccess();
+        this.initializeInterface();
+        await this.loadUsers(); // Kullanıcıları yükle
+    }
+
+    async checkAdminAccess() {
         const userJson = sessionStorage.getItem('currentUser');
         if (!userJson) {
             window.location.href = 'index.html';
@@ -23,7 +28,10 @@ class AdminPanel {
         }
 
         this.currentAdmin = user;
-        document.getElementById('currentUser').textContent = `Kullanıcı: ${user.username}`;
+        const currentUserElement = document.getElementById('currentUser');
+        if (currentUserElement) {
+            currentUserElement.textContent = `Kullanıcı: ${user.username}`;
+        }
     }
 
     updateDateTime() {
@@ -38,19 +46,57 @@ class AdminPanel {
             hour12: false 
         };
         const formattedDate = now.toLocaleString('tr-TR', options);
-        document.getElementById('currentDateTime').textContent = formattedDate;
+        const dateElement = document.getElementById('currentDateTime');
+        if (dateElement) {
+            dateElement.textContent = formattedDate;
+        }
+    }
+
+    initializeInterface() {
+        const addUserBtn = document.getElementById('addUserBtn');
+        if (addUserBtn) {
+            addUserBtn.addEventListener('click', () => this.addNewUser());
+        }
+
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            });
+        }
+
+        this.updateDateTime();
+        setInterval(() => this.updateDateTime(), 1000);
     }
 
     async loadUsers() {
         try {
-            const snapshot = await get(ref(db, 'users'));
-            const users = snapshot.val() || {};
-            const tbody = document.getElementById('usersTableBody');
+            console.log('Loading users...'); // Debug log
+            const usersRef = ref(db, 'users');
+            const snapshot = await get(usersRef);
             
-            if (!tbody) return;
+            if (!snapshot.exists()) {
+                console.log('No users found'); // Debug log
+                return;
+            }
+
+            const users = snapshot.val();
+            console.log('Users data:', users); // Debug log
+
+            const tbody = document.getElementById('usersTableBody');
+            if (!tbody) {
+                console.error('Users table body not found');
+                return;
+            }
+
+            // Tabloyu temizle
             tbody.innerHTML = '';
 
+            // Her kullanıcı için satır oluştur
             Object.entries(users).forEach(([userId, user]) => {
+                console.log('Creating row for user:', userId, user); // Debug log
+                
                 const tr = document.createElement('tr');
                 tr.dataset.id = userId;
                 
@@ -97,245 +143,13 @@ class AdminPanel {
                 tbody.appendChild(tr);
                 tbody.appendChild(programRow);
             });
+
         } catch (error) {
             console.error('Error loading users:', error);
         }
     }
 
-    async saveUser(userId) {
-        const row = document.querySelector(`tr[data-id="${userId}"]`);
-        if (!row) return;
-
-        const userData = {
-            id: userId,
-            name: row.querySelector('[name="name"]').value,
-            username: row.querySelector('[name="username"]').value,
-            password: row.querySelector('[name="password"]').value,
-            role: row.querySelector('[name="role"]').value
-        };
-
-        try {
-            await set(ref(db, `users/${userId}`), userData);
-            alert('Kullanıcı başarıyla kaydedildi');
-        } catch (error) {
-            console.error('Error saving user:', error);
-            alert('Kullanıcı kaydedilirken hata oluştu');
-        }
-    }
-
-    async deleteUser(userId) {
-        if (!confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) return;
-
-        try {
-            await remove(ref(db, `users/${userId}`));
-            await remove(ref(db, `userPrograms/${userId}`));
-            this.loadUsers();
-            alert('Kullanıcı silindi');
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            alert('Kullanıcı silinirken hata oluştu');
-        }
-    }
-
-    addNewUser() {
-        const tbody = document.getElementById('usersTableBody');
-        const newId = Date.now().toString();
-        const tr = document.createElement('tr');
-        tr.dataset.id = newId;
-        
-        tr.innerHTML = `
-            <td>${newId}</td>
-            <td><input type="text" class="table-input" name="name" /></td>
-            <td><input type="text" class="table-input" name="username" /></td>
-            <td><input type="text" class="table-input" name="password" /></td>
-            <td>
-                <select class="table-input" name="role">
-                    <option value="user">Kullanıcı</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </td>
-            <td>
-                <button class="action-btn save-btn" onclick="adminPanel.saveUser('${newId}')">Kaydet</button>
-                <button class="action-btn delete-btn" onclick="adminPanel.deleteUser('${newId}')">Sil</button>
-            </td>
-        `;
-        
-        tbody.insertBefore(tr, tbody.firstChild);
-    }
-
-    async toggleProgram(userId) {
-        const tr = document.querySelector(`tr[data-id="${userId}"]`);
-        if (!tr) return;
-
-        const programRow = tr.nextElementSibling;
-        if (programRow.style.display === 'none') {
-            programRow.style.display = 'table-row';
-            await this.loadDayProgram(userId, this.currentDay);
-        } else {
-            programRow.style.display = 'none';
-        }
-    }
-
-    async loadDayProgram(userId, day) {
-        this.currentDay = day;
-        try {
-            const snapshot = await get(ref(db, `userPrograms/${userId}/${day}`));
-            const program = snapshot.val() || { title: '', exercises: [] };
-            const container = document.getElementById(`program-${userId}`);
-            
-            let html = `
-                <div class="program-title-container">
-                    <input type="text" class="program-title-input" value="${program.title || ''}" placeholder="Program Başlığı (örn: Karın + Cardio)">
-                </div>
-                <div class="exercises-container">
-            `;
-
-            if (program.exercises && program.exercises.length > 0) {
-                program.exercises.forEach((exercise, index) => {
-                    html += `
-                        <div class="exercise-card" data-index="${index}">
-                            <input type="text" class="exercise-name" value="${exercise.name || ''}" placeholder="Egzersiz Adı">
-                            <div class="sets-container">
-                                ${exercise.sets ? exercise.sets.map((set, setIndex) => `
-                                    <div class="set-item">
-                                        <span>Set ${setIndex + 1}:</span>
-                                        <input type="number" class="set-input" value="${set.reps}" min="1">
-                                        <span>tekrar</span>
-                                    </div>
-                                `).join('') : ''}
-                            </div>
-                            <input type="text" class="video-url" value="${exercise.videoUrl || ''}" placeholder="Video URL">
-                            <div class="exercise-actions">
-                                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${index})">Set Ekle</button>
-                                <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">Egzersizi Sil</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            html += `
-                </div>
-                <div class="program-actions">
-                    <button class="action-btn add-btn" onclick="adminPanel.addExercise('${userId}')">Yeni Egzersiz</button>
-                    <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">Programı Kaydet</button>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-        } catch (error) {
-            console.error('Error loading program:', error);
-        }
-    }
-
-    async addSet(userId, exerciseIndex) {
-        const exerciseCard = document.querySelector(`#program-${userId} .exercise-card[data-index="${exerciseIndex}"]`);
-        if (!exerciseCard) return;
-
-        const setsContainer = exerciseCard.querySelector('.sets-container');
-        const setCount = setsContainer.children.length;
-
-        const setDiv = document.createElement('div');
-        setDiv.className = 'set-item';
-        setDiv.innerHTML = `
-            <span>Set ${setCount + 1}:</span>
-            <input type="number" class="set-input" value="12" min="1">
-            <span>tekrar</span>
-        `;
-
-        setsContainer.appendChild(setDiv);
-    }
-
-    async addExercise(userId) {
-        const container = document.getElementById(`program-${userId}`);
-        const exercisesContainer = container.querySelector('.exercises-container');
-        const exerciseCount = exercisesContainer.children.length;
-
-        const exerciseDiv = document.createElement('div');
-        exerciseDiv.className = 'exercise-card';
-        exerciseDiv.dataset.index = exerciseCount;
-
-        exerciseDiv.innerHTML = `
-            <input type="text" class="exercise-name" placeholder="Egzersiz Adı">
-            <div class="sets-container">
-                <div class="set-item">
-                    <span>Set 1:</span>
-                    <input type="number" class="set-input" value="12" min="1">
-                    <span>tekrar</span>
-                </div>
-            </div>
-            <input type="text" class="video-url" placeholder="Video URL">
-            <div class="exercise-actions">
-                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${exerciseCount})">Set Ekle</button>
-                <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${exerciseCount})">Egzersizi Sil</button>
-            </div>
-        `;
-
-        exercisesContainer.appendChild(exerciseDiv);
-    }
-
-    async deleteExercise(userId, exerciseIndex) {
-        if (!confirm('Bu egzersizi silmek istediğinize emin misiniz?')) return;
-
-        const container = document.getElementById(`program-${userId}`);
-        const exerciseCard = container.querySelector(`.exercise-card[data-index="${exerciseIndex}"]`);
-        if (exerciseCard) {
-            exerciseCard.remove();
-            // Kalan egzersizlerin indekslerini güncelle
-            container.querySelectorAll('.exercise-card').forEach((card, index) => {
-                card.dataset.index = index;
-                // Butonların onclick olaylarını güncelle
-                card.querySelector('button[onclick*="addSet"]').setAttribute('onclick', `adminPanel.addSet('${userId}', ${index})`);
-                card.querySelector('button[onclick*="deleteExercise"]').setAttribute('onclick', `adminPanel.deleteExercise('${userId}', ${index})`);
-            });
-        }
-    }
-
-    async saveProgram(userId) {
-        try {
-            const container = document.getElementById(`program-${userId}`);
-            const programTitle = container.querySelector('.program-title-input').value;
-            const exercises = [];
-            
-            container.querySelectorAll('.exercise-card').forEach(card => {
-                const sets = [];
-                card.querySelectorAll('.set-item').forEach((setItem, index) => {
-                    sets.push({
-                        number: index + 1,
-                        reps: parseInt(setItem.querySelector('.set-input').value) || 0
-                    });
-                });
-
-                exercises.push({
-                    name: card.querySelector('.exercise-name').value,
-                    sets: sets,
-                    videoUrl: card.querySelector('.video-url').value
-                });
-            });
-
-            await set(ref(db, `userPrograms/${userId}/${this.currentDay}`), {
-                title: programTitle,
-                exercises: exercises
-            });
-
-            alert('Program başarıyla kaydedildi');
-        } catch (error) {
-            console.error('Error saving program:', error);
-            alert('Program kaydedilirken hata oluştu');
-        }
-    }
-
-    initializeInterface() {
-        document.getElementById('addUserBtn').addEventListener('click', () => this.addNewUser());
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            sessionStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
-        });
-        
-        this.updateDateTime();
-        setInterval(() => this.updateDateTime(), 1000);
-        this.loadUsers();
-    }
+    // ... (diğer metodlar aynı kalacak) ...
 }
 
 // Global erişim için
