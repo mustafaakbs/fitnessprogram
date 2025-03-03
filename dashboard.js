@@ -18,12 +18,20 @@ class Dashboard {
         }
 
         this.currentUser = JSON.parse(userJson);
-        document.getElementById('currentUser').textContent = `Hoş Geldin ${this.currentUser.username}`;
+        document.getElementById('currentUser').innerHTML = `Hoş Geldin<br>name: "${this.currentUser.name}"`;
     }
 
     updateDateTime() {
         const now = new Date();
-        document.getElementById('currentDateTime').textContent = now.toLocaleString('tr-TR');
+        document.getElementById('currentDateTime').textContent = now.toLocaleString('tr-TR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
     }
 
     async loadUserProgram(day) {
@@ -34,7 +42,6 @@ class Dashboard {
             const snapshot = await get(programRef);
             const program = snapshot.val();
 
-            // Program başlığını göster
             const titleElement = document.querySelector('.program-title');
             if (titleElement && program && program.title) {
                 titleElement.textContent = program.title;
@@ -42,7 +49,6 @@ class Dashboard {
                 titleElement.textContent = 'Program';
             }
 
-            // Program içeriğini temizle
             const exercisesContainer = document.getElementById('exercisesContainer');
             if (!exercisesContainer) return;
             exercisesContainer.innerHTML = '';
@@ -52,7 +58,6 @@ class Dashboard {
                 return;
             }
 
-            // Egzersizleri listele
             program.exercises.forEach((exercise, index) => {
                 const exerciseDiv = document.createElement('div');
                 exerciseDiv.className = 'exercise-card';
@@ -69,7 +74,6 @@ class Dashboard {
                     });
                 }
 
-                // Video önizleme için iframe
                 let videoPreview = '';
                 if (exercise.videoUrl) {
                     if (exercise.videoUrl.includes('youtube.com') || exercise.videoUrl.includes('youtu.be')) {
@@ -120,7 +124,6 @@ class Dashboard {
     }
 
     initializeInterface() {
-        // Günleri seçme işlemleri
         const dayButtons = document.querySelectorAll('.day-button');
         dayButtons.forEach(button => {
             button.addEventListener('click', (e) => {
@@ -132,17 +135,14 @@ class Dashboard {
             });
         });
 
-        // Çıkış butonu
         document.getElementById('logoutBtn').addEventListener('click', () => {
             sessionStorage.removeItem('currentUser');
             window.location.href = 'index.html';
         });
 
-        // Tarih ve saat güncelleme
         this.updateDateTime();
         setInterval(() => this.updateDateTime(), 1000);
     }
 }
 
-// Global erişim için
 window.dashboard = new Dashboard();
