@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Fitness Program</title>
+    <link rel="stylesheet" href="admin-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="admin-header">
+        <div class="header-content">
+            <h1>ADMİN PANELİ</h1>
+            <div class="admin-info">
+                <span class="admin-name" id="currentAdmin"></span>
+                <span class="date-time" id="currentDateTime"></span>
+                <button id="logoutBtn">Çıkış Yap</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-content">
+        <div class="admin-sidebar">
+            <button class="sidebar-btn active" data-section="users">Kullanıcılar</button>
+            <button class="sidebar-btn" data-section="programs">Programlar</button>
+            <button class="sidebar-btn" data-section="exercises">Egzersizler</button>
+        </div>
+
+        <div class="admin-main">
+            <div id="users-section" class="admin-section active">
+                <h2>Kullanıcı Yönetimi</h2>
+                <div class="action-bar">
+                    <button id="addUserBtn" class="action-btn">Yeni Kullanıcı Ekle</button>
+                    <input type="text" id="userSearch" placeholder="Kullanıcı Ara..." class="search-input">
+                </div>
+                <div class="users-list" id="usersList">
+                    <!-- Kullanıcılar dinamik olarak buraya eklenecek -->
+                </div>
+            </div>
+
+            <div id="programs-section" class="admin-section">
+                <h2>Program Yönetimi</h2>
+                <div class="action-bar">
+                    <select id="userSelect" class="user-select">
+                        <option value="">Kullanıcı Seçin</option>
+                    </select>
+                    <select id="daySelect" class="day-select">
+                        <option value="">Gün Seçin</option>
+                    </select>
+                    <button id="addProgramBtn" class="action-btn">Program Ekle</button>
+                </div>
+                <div class="programs-list" id="programsList">
+                    <!-- Programlar dinamik olarak buraya eklenecek -->
+                </div>
+            </div>
+
+            <div id="exercises-section" class="admin-section">
+                <h2>Egzersiz Yönetimi</h2>
+                <div class="action-bar">
+                    <button id="addExerciseBtn" class="action-btn">Yeni Egzersiz Ekle</button>
+                    <input type="text" id="exerciseSearch" placeholder="Egzersiz Ara..." class="search-input">
+                </div>
+                <div class="exercises-list" id="exercisesList">
+                    <!-- Egzersizler dinamik olarak buraya eklenecek -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal pencereler -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <h3>Kullanıcı Ekle/Düzenle</h3>
+            <form id="userForm">
+                <input type="text" id="userName" placeholder="Ad Soyad" required>
+                <input type="text" id="userUsername" placeholder="Kullanıcı Adı" required>
+                <input type="password" id="userPassword" placeholder="Şifre" required>
+                <select id="userRole" required>
+                    <option value="user">Kullanıcı</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <div class="modal-buttons">
+                    <button type="submit" class="save-btn">Kaydet</button>
+                    <button type="button" class="cancel-btn">İptal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
