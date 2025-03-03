@@ -34,6 +34,25 @@ body {
     gap: 20px;
 }
 
+#currentDateTime {
+    color: #aaa;
+    font-size: 0.9em;
+}
+
+.admin-name {
+    color: #00bcd4;
+    font-weight: bold;
+}
+
+.logout-btn {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
 .admin-content {
     margin-top: 100px;
     padding: 20px;
@@ -53,7 +72,6 @@ body {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     overflow: hidden;
-    margin-bottom: 20px;
 }
 
 table {
@@ -81,9 +99,221 @@ th {
     border-radius: 4px;
 }
 
+.table-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
+}
+
 .action-btn {
-    padding: 8px 16px
-.program-title-select {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.add-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.save-btn {
+    background: #2196F3;
+    color: white;
+}
+
+.delete-btn {
+    background: #f44336;
+    color: white;
+}
+
+.program-row {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.program-container {
+    padding: 20px;
+}
+
+.program-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.day-select {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.program-exercises {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.exercise-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.exercise-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.exercise-sets {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.set-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.video-url-input {
+    width: 100%;
+    margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .admin-content {
+        padding: 10px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+}
+/* Açılır menü (select) stilleri için güncelleme */
+.day-select {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    min-width: 150px;
+}
+
+.day-select option {
+    background: #2d2d2d;
+    color: #fff;
+    padding: 8px;
+}
+
+/* Program container stilleri */
+.program-container {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.program-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.program-exercises {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.exercise-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.exercise-name {
+    font-size: 16px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: #fff;
+    width: 100%;
+}
+
+.sets-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.set-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.set-input {
+    width: 60px;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: #fff;
+    text-align: center;
+}
+
+.video-url {
+    width: 100%;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: #fff;
+}
+
+.exercise-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.program-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+/* Mevcut CSS'e eklenecek stiller */
+.program-title-container {
+    margin-bottom: 20px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.program-title-input {
     width: 100%;
     padding: 12px;
     font-size: 16px;
@@ -91,17 +321,17 @@ th {
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 4px;
     color: #fff;
-    cursor: pointer;
 }
 
-.program-title-select:focus {
+.program-title-input:focus {
     outline: none;
     border-color: rgba(255, 255, 255, 0.4);
     background: rgba(255, 255, 255, 0.15);
 }
 
-.program-title-select option {
-    background: #2d2d2d;
-    color: #fff;
-    padding: 8px;
+.exercises-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
 }
