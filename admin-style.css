@@ -83,3 +83,25 @@ th {
 
 .action-btn {
     padding: 8px 16px
+.program-title-select {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.program-title-select:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.program-title-select option {
+    background: #2d2d2d;
+    color: #fff;
+    padding: 8px;
+}
