@@ -1,4 +1,3 @@
-/* Genel Stiller */
 * {
     margin: 0;
     padding: 0;
@@ -12,7 +11,6 @@ body {
     min-height: 100vh;
 }
 
-/* Header Stili */
 .admin-header {
     background: rgba(0, 0, 0, 0.5);
     padding: 20px;
@@ -42,187 +40,100 @@ body {
     font-weight: bold;
 }
 
-/* Ana İçerik */
-.admin-content {
-    display: flex;
-    margin-top: 80px;
-    padding: 20px;
-    max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
-    gap: 30px;
+.date-time {
+    color: #aaa;
 }
 
-/* Sidebar */
-.admin-sidebar {
-    width: 250px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-}
-
-.sidebar-btn {
-    width: 100%;
-    padding: 15px;
-    margin-bottom: 10px;
-    background: transparent;
+#logoutBtn {
+    background: linear-gradient(45deg, #ff4081, #ff6b6b);
+    color: white;
+    padding: 10px 20px;
     border: none;
-    color: #fff;
-    text-align: left;
-    cursor: pointer;
     border-radius: 8px;
-    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-.sidebar-btn:hover {
+.admin-content {
+    margin-top: 100px;
+    padding: 20px;
+}
+
+.table-container {
+    margin-top: 20px;
     background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow-x: auto;
+    padding: 20px;
 }
 
-.sidebar-btn.active {
-    background: linear-gradient(45deg, #007bff, #00bcd4);
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #fff;
 }
 
-/* Ana Bölüm */
-.admin-main {
-    flex: 1;
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+th {
+    background: rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+}
+
+tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.table-input {
+    width: 100%;
     background: rgba(255, 255, 255, 0.1);
-    padding: 30px;
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
+    border: none;
+    padding: 8px;
+    color: #fff;
+    border-radius: 4px;
 }
 
-.admin-section {
-    display: none;
-}
-
-.admin-section.active {
-    display: block;
-}
-
-/* Aksiyon Çubuğu */
-.action-bar {
-    display: flex;
-    gap: 15px;
-    margin: 20px 0;
+.table-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .action-btn {
     background: linear-gradient(45deg, #007bff, #00bcd4);
     color: white;
-    padding: 12px 25px;
+    padding: 10px 20px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.3s ease;
-}
-
-.action-btn:hover {
-    transform: translateY(-2px);
-}
-
-.search-input, .user-select, .day-select {
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    min-width: 200px;
-}
-
-/* Liste Stilleri */
-.users-list, .programs-list, .exercises-list {
-    margin-top: 20px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-.list-item {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 10px;
-    transition: transform 0.3s ease;
-}
-
-.list-item:hover {
-    transform: translateY(-5px);
-}
-
-/* Modal Stili */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1100;
-}
-
-.modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #2d2d2d;
-    padding: 30px;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 500px;
-}
-
-.modal input, .modal select {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-}
-
-.modal-buttons {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
+    margin: 5px;
 }
 
 .save-btn {
-    background: linear-gradient(45deg, #007bff, #00bcd4);
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    background: #4CAF50;
 }
 
-.cancel-btn {
-    background: linear-gradient(45deg, #ff4081, #ff6b6b);
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+.delete-btn {
+    background: #f44336;
 }
 
-/* Responsive Tasarım */
+.edit-btn {
+    background: #2196F3;
+}
+
+.action-bar {
+    margin-bottom: 20px;
+}
+
 @media (max-width: 768px) {
-    .admin-content {
-        flex-direction: column;
-    }
-
-    .admin-sidebar {
-        width: 100%;
-    }
-
-    .action-bar {
-        flex-direction: column;
-    }
-
     .header-content {
         flex-direction: column;
         gap: 15px;
+    }
+
+    .table-container {
+        overflow-x: scroll;
     }
 }
