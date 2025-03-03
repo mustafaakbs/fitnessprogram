@@ -11,28 +11,21 @@
     <header>
         <h1>FITNESS PROGRAMI</h1>
         <div class="user-info">
-            <span id="currentDateTime">
-                Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-03-03 08:36:17
-            </span>
-            <span id="currentUser">
-                Current User's Login: mustafaakbs
-            </span>
+            <span id="currentDateTime"></span>
+            <span id="currentUser"></span>
             <button id="logoutBtn">Çıkış</button>
         </div>
     </header>
 
     <div class="container">
-        <!-- Edit Mode Button -->
         <button id="editModeBtn" class="edit-mode-btn">
             <i class="fas fa-edit"></i> Düzenleme Modu
         </button>
 
-        <!-- Günlerin butonları -->
         <div class="days-container">
             <!-- Günler dinamik olarak eklenecek -->
         </div>
 
-        <!-- Program Cards -->
         <div id="programCards">
             <!-- Programlar dinamik olarak eklenecek -->
         </div>
@@ -48,58 +41,10 @@
                 </div>
             </div>
         </div>
-
-        <!-- Exercise Modal -->
-        <div id="exerciseModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h3>Egzersiz</h3>
-                <form id="exerciseForm">
-                    <div class="form-group">
-                        <label for="exerciseName">Egzersiz Adı:</label>
-                        <input type="text" id="exerciseName" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="exerciseWeight">Ağırlık (kg):</label>
-                        <input type="number" id="exerciseWeight" min="0" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Setler:</label>
-                        <div id="setsList">
-                            <div class="set-row" data-set="1">
-                                <input type="number" value="1" class="set-number" readonly>
-                                <input type="number" placeholder="Tekrar" class="set-reps" required>
-                                <button type="button" class="delete-btn" onclick="dashboard.removeSet(1)">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <button type="button" id="addSetBtn" onclick="dashboard.addSet()">
-                            <i class="fas fa-plus"></i> Set Ekle
-                        </button>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="exerciseVideo">Video URL:</label>
-                        <input type="url" id="exerciseVideo" required>
-                    </div>
-
-                    <div class="form-buttons">
-                        <button type="submit" class="save-btn">Kaydet</button>
-                        <button type="button" class="cancel-btn" onclick="document.getElementById('exerciseModal').style.display='none'">
-                            İptal
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
 
     <!-- Firebase SDK -->
     <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="database.js"></script>
     <script type="module" src="dashboard.js"></script>
 </body>
 </html>
