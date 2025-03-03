@@ -24,7 +24,7 @@ class AdminPanel {
         }
 
         this.currentAdmin = user;
-        document.getElementById('currentAdmin').textContent = user.username;
+        document.getElementById('currentAdmin').textContent = `Current User's Login: ${user.username}`;
     }
 
     updateDateTime() {
@@ -81,11 +81,7 @@ class AdminPanel {
                                     <option value="pazar">Pazar</option>
                                 </select>
                             </div>
-                            <div class="program-exercises" id="program-${userId}"></div>
-                            <div class="program-actions">
-                                <button class="action-btn add-btn" onclick="adminPanel.addExercise('${userId}')">Yeni Egzersiz</button>
-                                <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">Programı Kaydet</button>
-                            </div>
+                            <div id="program-${userId}" class="program-content"></div>
                         </div>
                     </td>
                 `;
@@ -163,8 +159,6 @@ class AdminPanel {
         
         if (programRow.style.display === 'none') {
             programRow.style.display = 'table-row';
-            const daySelect = programRow.querySelector('.day-select');
-            this.currentDay = daySelect.value;
             await this.loadDayProgram(userId, this.currentDay);
         } else {
             programRow.style.display = 'none';
@@ -175,10 +169,17 @@ class AdminPanel {
         this.currentDay = day;
         try {
             const snapshot = await get(ref(db, `userPrograms/${userId}/${day}`));
-            const program = snapshot.val() || { exercises: [] };
+            const program = snapshot.val() || { title: '', exercises: [] };
             const container = document.getElementById(`program-${userId}`);
             
-            let html = '';
+            let html = `
+                <div class="program-title-container">
+                    <input type="text" class="program-title-input" value="${program.title || ''}" 
+                           placeholder="Program Başlığı (örn: Karın + Cardio)">
+                </div>
+                <div class="program-exercises">
+            `;
+
             if (program.exercises && program.exercises.length > 0) {
                 program.exercises.forEach((exercise, index) => {
                     html += `
@@ -202,6 +203,15 @@ class AdminPanel {
                     `;
                 });
             }
+
+            html += `
+                </div>
+                <div class="program-actions">
+                    <button class="action-btn add-btn" onclick="adminPanel.addExercise('${userId}')">Yeni Egzersiz</button>
+                    <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">Programı Kaydet</button>
+                </div>
+            `;
+            
             container.innerHTML = html;
         } catch (error) {
             console.error('Error loading program:', error);
@@ -272,6 +282,7 @@ class AdminPanel {
     async saveProgram(userId) {
         try {
             const container = document.getElementById(`program-${userId}`);
+            const programTitle = container.querySelector('.program-title-input').value;
             const exercises = [];
             
             container.querySelectorAll('.exercise-card').forEach(card => {
@@ -291,6 +302,7 @@ class AdminPanel {
             });
 
             await set(ref(db, `userPrograms/${userId}/${this.currentDay}`), {
+                title: programTitle,
                 exercises: exercises
             });
 
