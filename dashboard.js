@@ -18,7 +18,7 @@ class Dashboard {
         }
 
         this.currentUser = JSON.parse(userJson);
-        document.getElementById('currentUser').textContent = this.currentUser.username;
+        document.getElementById('currentUser').textContent = `Hoş Geldin ${this.currentUser.username}`;
     }
 
     updateDateTime() {
@@ -69,22 +69,22 @@ class Dashboard {
                     });
                 }
 
-                // Video önizleme için iframe veya resim
+                // Video önizleme için iframe
                 let videoPreview = '';
                 if (exercise.videoUrl) {
                     if (exercise.videoUrl.includes('youtube.com') || exercise.videoUrl.includes('youtu.be')) {
                         const videoId = this.getYoutubeVideoId(exercise.videoUrl);
                         if (videoId) {
                             videoPreview = `
-                                <div class="video-preview">
-                                    <iframe 
-                                        width="100%" 
-                                        height="200" 
-                                        src="https://www.youtube.com/embed/${videoId}" 
-                                        frameborder="0" 
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                        allowfullscreen
-                                    ></iframe>
+                                <div class="video-preview-container">
+                                    <div class="video-preview">
+                                        <iframe 
+                                            src="https://www.youtube.com/embed/${videoId}" 
+                                            frameborder="0" 
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                            allowfullscreen
+                                        ></iframe>
+                                    </div>
                                 </div>
                             `;
                         }
