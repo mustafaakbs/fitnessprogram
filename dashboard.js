@@ -22,6 +22,9 @@ class Dashboard {
     }
 
     initializeInterface() {
+        // Günleri oluştur
+        this.createDayButtons();
+        
         // Event listener'ları ekle
         this.setupEventListeners();
         
@@ -31,6 +34,23 @@ class Dashboard {
         // Tarih ve kullanıcı bilgisini güncelle
         this.updateDateTime();
         setInterval(() => this.updateDateTime(), 1000);
+
+        // Düzenleme modu butonu
+        const editModeBtn = document.getElementById('editModeBtn');
+        if (editModeBtn) {
+            editModeBtn.addEventListener('click', () => {
+                this.showPasswordModal();
+            });
+        }
+
+        // Şifre modalı için event listeners
+        document.getElementById('confirmPassword')?.addEventListener('click', () => {
+            this.checkAdminPassword();
+        });
+
+        document.getElementById('cancelPassword')?.addEventListener('click', () => {
+            document.getElementById('passwordModal').style.display = 'none';
+        });
     }
 
     updateDateTime() {
@@ -42,6 +62,24 @@ class Dashboard {
             `Current User's Login: ${this.currentUser.username}`;
     }
 
+    createDayButtons() {
+        const days = ['pazartesi', 'carsamba', 'cuma'];
+        const container = document.querySelector('.days-container');
+        
+        if (!container) return;
+        
+        container.innerHTML = ''; // Container'ı temizle
+        
+        days.forEach(day => {
+            const btn = document.createElement('button');
+            btn.className = `day-btn ${day === this.currentDay ? 'active' : ''}`;
+            btn.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+            btn.dataset.day = day;
+            btn.onclick = () => this.changeDay(day);
+            container.appendChild(btn);
+        });
+    }
+
     setupEventListeners() {
         // Çıkış butonu
         const logoutBtn = document.getElementById('logoutBtn');
@@ -51,13 +89,39 @@ class Dashboard {
                 window.location.href = 'index.html';
             });
         }
+    }
 
-        // Gün butonları
-        document.querySelectorAll('.day-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                this.changeDay(e.target.dataset.day);
-            });
-        });
+    showPasswordModal() {
+        const modal = document.getElementById('passwordModal');
+        if (modal) {
+            modal.style.display = 'block';
+            const adminPassword = document.getElementById('adminPassword');
+            if (adminPassword) {
+                adminPassword.value = '';
+                adminPassword.focus();
+            }
+        }
+    }
+
+    async checkAdminPassword() {
+        const password = document.getElementById('adminPassword').value;
+        try {
+            const snapshot = await get(ref(db, 'users'));
+            const users = snapshot.val();
+            const adminUser = users.find(u => u.role === 'admin');
+            
+            if (password === adminUser.password) {
+                this.editMode = !this.editMode;
+                document.getElementById('passwordModal').style.display = 'none';
+                document.getElementById('editModeBtn').classList.toggle('active', this.editMode);
+                this.loadPrograms(); // Programları yeniden yükle
+            } else {
+                alert('Yanlış şifre!');
+            }
+        } catch (error) {
+            console.error('Error checking admin password:', error);
+            alert('Bir hata oluştu!');
+        }
     }
 
     async loadPrograms() {
@@ -96,6 +160,11 @@ class Dashboard {
         let html = `
             <div class="program-title">
                 <h2>${program.title}</h2>
+                ${this.editMode ? `
+                    <button onclick="dashboard.addNewExercise()" class="add-btn">
+                        <i class="fas fa-plus"></i> Yeni Egzersiz
+                    </button>
+                ` : ''}
             </div>
             <div class="exercises-container">
         `;
@@ -118,7 +187,8 @@ class Dashboard {
                     <div class="weight-selector">
                         <input type="number" 
                                value="${exercise.weight}" 
-                               readonly
+                               ${!this.editMode ? 'readonly' : ''}
+                               onchange="dashboard.updateWeight('${exercise.name}', this.value)"
                                min="0" 
                                step="1">
                         <span>KG</span>
@@ -141,6 +211,16 @@ class Dashboard {
                         </iframe>
                     </div>
                 </div>
+                ${this.editMode ? `
+                    <div class="exercise-controls">
+                        <button onclick="dashboard.editExercise('${exercise.name}')" class="edit-btn">
+                            <i class="fas fa-edit"></i> Düzenle
+                        </button>
+                        <button onclick="dashboard.deleteExercise('${exercise.name}')" class="delete-btn">
+                            <i class="fas fa-trash"></i> Sil
+                        </button>
+                    </div>
+                ` : ''}
             </div>
         `;
     }
@@ -149,6 +229,25 @@ class Dashboard {
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         const match = url.match(regExp);
         return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    async updateWeight(exerciseName, newWeight) {
+        if (!this.editMode) return;
+
+        try {
+            const snapshot = await get(ref(db, `programs/${this.currentDay}`));
+            const program = snapshot.val();
+            const exercise = program.exercises.find(e => e.name === exerciseName);
+            
+            if (exercise) {
+                exercise.weight = parseInt(newWeight) || 0;
+                await update(ref(db), {
+                    [`programs/${this.currentDay}`]: program
+                });
+            }
+        } catch (error) {
+            console.error('Error updating weight:', error);
+        }
     }
 }
 
