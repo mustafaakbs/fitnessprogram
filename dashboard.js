@@ -1,4 +1,4 @@
-class Dashboard {
+dashboard. js class Dashboard {
     constructor() {
         // Temel ayarlar
         this.db = new Database();
