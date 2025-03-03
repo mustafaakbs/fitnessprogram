@@ -1,13 +1,11 @@
 import { db } from './firebase-config.js';
-import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 class Dashboard {
     constructor() {
         this.currentUser = null;
         this.currentDay = 'pazartesi';
-        this.editMode = false;
         
-        // Kullanıcı kontrolü
         const userJson = sessionStorage.getItem('currentUser');
         if (!userJson) {
             window.location.href = 'index.html';
@@ -21,18 +19,24 @@ class Dashboard {
     initializeInterface() {
         this.createDayButtons();
         this.setupEventListeners();
-        this.loadPrograms();
+        this.loadUserPrograms();
         this.updateDateTime();
         setInterval(() => this.updateDateTime(), 1000);
     }
 
     updateDateTime() {
         const now = new Date();
-        const formattedDate = now.toISOString().slice(0, 19).replace('T', ' ');
-        document.getElementById('currentDateTime').textContent = 
-            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}`;
-        document.getElementById('currentUser').textContent = 
-            `Current User's Login: ${this.currentUser.username}`;
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        };
+        const turkishDate = now.toLocaleDateString('tr-TR', options);
+        document.getElementById('currentDateTime').textContent = `Tarih: ${turkishDate}`;
+        document.getElementById('currentUser').textContent = `Kullanıcı: ${this.currentUser.name}`;
     }
 
     createDayButtons() {
@@ -61,54 +65,70 @@ class Dashboard {
                 window.location.href = 'index.html';
             });
         }
-
-        const editModeBtn = document.getElementById('editModeBtn');
-        if (editModeBtn) {
-            editModeBtn.addEventListener('click', () => {
-                this.showPasswordModal();
-            });
-        }
-
-        const confirmPassword = document.getElementById('confirmPassword');
-        if (confirmPassword) {
-            confirmPassword.addEventListener('click', () => {
-                this.checkAdminPassword();
-            });
-        }
-
-        const cancelPassword = document.getElementById('cancelPassword');
-        if (cancelPassword) {
-            cancelPassword.addEventListener('click', () => {
-                document.getElementById('passwordModal').style.display = 'none';
-            });
-        }
     }
 
-    async loadPrograms() {
+    async loadUserPrograms() {
         try {
-            const snapshot = await get(ref(db, 'programs'));
+            const userId = this.currentUser.id;
+            const snapshot = await get(ref(db, `userPrograms/${userId}`));
             let programs = snapshot.val();
             
             if (!programs) {
-                programs = {
-                    pazartesi: { title: "Göğüs + Ön Kol", exercises: [] },
-                    sali: { title: "Karın + Cardio", exercises: [] },
-                    carsamba: { title: "Sırt + Arka Kol", exercises: [] },
-                    persembe: { title: "Karın + Cardio", exercises: [] },
-                    cuma: { title: "Bacak + Omuz", exercises: [] },
-                    cumartesi: { title: "Karın + Cardio", exercises: [] },
-                    pazar: { title: "Dinlenme", exercises: [] }
-                };
-                await update(ref(db), { programs });
+                programs = this.createDefaultPrograms();
+                // Yeni kullanıcı için varsayılan programları oluştur
+                await update(ref(db), { [`userPrograms/${userId}`]: programs });
             }
 
-            const program = programs[this.currentDay];
-            if (program) {
-                this.renderProgram(program);
-            }
+            this.renderProgram(programs[this.currentDay]);
         } catch (error) {
             console.error('Error loading programs:', error);
         }
+    }
+
+    createDefaultPrograms() {
+        const defaultPrograms = {
+            pazartesi: { 
+                title: "Göğüs + Ön Kol", 
+                exercises: [
+                    {
+                        name: "Bench Press",
+                        weight: 20,
+                        sets: [
+                            { number: 1, reps: 12 },
+                            { number: 2, reps: 10 },
+                            { number: 3, reps: 8 }
+                        ],
+                        videoUrl: "https://www.youtube.com/watch?v=rT7DgCr-3pg"
+                    }
+                ]
+            },
+            sali: { 
+                title: "Karın + Cardio",
+                exercises: []
+            },
+            carsamba: { 
+                title: "Sırt + Arka Kol",
+                exercises: []
+            },
+            persembe: { 
+                title: "Karın + Cardio",
+                exercises: []
+            },
+            cuma: { 
+                title: "Bacak + Omuz",
+                exercises: []
+            },
+            cumartesi: { 
+                title: "Karın + Cardio",
+                exercises: []
+            },
+            pazar: { 
+                title: "Dinlenme",
+                exercises: []
+            }
+        };
+
+        return defaultPrograms;
     }
 
     changeDay(day) {
@@ -116,12 +136,12 @@ class Dashboard {
         document.querySelectorAll('.day-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.day === day);
         });
-        this.loadPrograms();
+        this.loadUserPrograms();
     }
 
     renderProgram(program) {
         const container = document.getElementById('programCards');
-        if (!container) return;
+        if (!container || !program) return;
 
         let html = `
             <h2>${program.title}</h2>
@@ -162,39 +182,6 @@ class Dashboard {
         `;
     }
 
-    showPasswordModal() {
-        const modal = document.getElementById('passwordModal');
-        if (modal) {
-            modal.style.display = 'block';
-            const adminPassword = document.getElementById('adminPassword');
-            if (adminPassword) {
-                adminPassword.value = '';
-                adminPassword.focus();
-            }
-        }
-    }
-
-    async checkAdminPassword() {
-        const password = document.getElementById('adminPassword').value;
-        try {
-            const snapshot = await get(ref(db, 'users'));
-            const users = snapshot.val();
-            const adminUser = users.find(u => u.role === 'admin');
-            
-            if (password === adminUser.password) {
-                this.editMode = !this.editMode;
-                document.getElementById('passwordModal').style.display = 'none';
-                document.getElementById('editModeBtn').classList.toggle('active', this.editMode);
-                this.loadPrograms();
-            } else {
-                alert('Yanlış şifre!');
-            }
-        } catch (error) {
-            console.error('Error checking admin password:', error);
-            alert('Bir hata oluştu!');
-        }
-    }
-
     getYoutubeVideoId(url) {
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         const match = url.match(regExp);
@@ -202,7 +189,6 @@ class Dashboard {
     }
 }
 
-// Dashboard'ı başlat
 window.onload = () => {
     window.dashboard = new Dashboard();
 };
