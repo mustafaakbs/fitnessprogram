@@ -228,3 +228,147 @@ body {
         max-width: 100%;
     }
 }
+/* ... diğer CSS kodları aynı ... */
+
+.dashboard-header {
+    background: rgba(0, 0, 0, 0.9); /* Arka plan rengini daha belirgin yaptık */
+    padding: 15px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Ana içerik alanı için margin değerini artırdık */
+.dashboard-content {
+    margin-top: 160px; /* Mobil görünümde üst üste binmeyi engellemek için değeri artırdık */
+    padding: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Mobil görünüm için özel düzenlemeler */
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 10px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .user-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Header'ın yüksekliği artacağı için içerik margin'ini daha da artırıyoruz */
+    .dashboard-content {
+        margin-top: 200px;
+    }
+
+    h1 {
+        font-size: 24px; /* Mobilde başlık boyutunu küçülttük */
+        margin-bottom: 10px;
+    }
+
+    #currentDateTime,
+    #currentUser {
+        font-size: 14px; /* Mobilde metin boyutunu küçülttük */
+        margin: 5px 0;
+    }
+
+    .days-container {
+        flex-direction: column;
+        margin-top: 20px;
+    }
+    
+    .day-button {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+    }
+
+    /* Buton boyutlarını mobil için optimize ettik */
+    .action-btn {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}
+
+/* Daha küçük ekranlar için ek düzenlemeler */
+@media (max-width: 480px) {
+    .dashboard-content {
+        margin-top: 220px;
+        padding: 10px;
+    }
+
+    .program-container {
+        padding: 15px;
+    }
+
+    .exercise-card {
+        padding: 12px;
+    }
+}
+
+/* Yüksek DPI ekranlar için ek güvenlik marjini */
+@media (max-width: 768px) and (min-resolution: 192dpi) {
+    .dashboard-content {
+        margin-top: 230px;
+    }
+}
+
+/* Header içeriği için düzenlemeler */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+#currentUser {
+    font-weight: bold;
+    color: #4CAF50;
+    text-align: right;
+    line-height: 1.5;
+    white-space: pre-line; /* Yeni satırları korur */
+}
+
+#currentDateTime {
+    color: #fff;
+    white-space: nowrap; /* Tarih tek satırda kalır */
+}
+
+/* Günler container'ı için ek düzenlemeler */
+.days-container {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    z-index: 1;
+}
+
+/* Program container'ı için ek düzenlemeler */
+.program-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 20px;
+}
+
+/* Çıkış butonu için özel stil */
+#logoutBtn {
+    white-space: nowrap;
+    min-width: 100px;
+}
