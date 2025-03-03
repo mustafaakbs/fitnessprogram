@@ -18,13 +18,12 @@ class Dashboard {
         }
 
         this.currentUser = JSON.parse(userJson);
-        document.getElementById('currentUser').textContent = `Current User's Login: ${this.currentUser.username}`;
+        document.getElementById('currentUser').textContent = this.currentUser.username;
     }
 
     updateDateTime() {
         const now = new Date();
-        const formattedDate = `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${now.toISOString().slice(0, 19).replace('T', ' ')}`;
-        document.getElementById('currentDateTime').textContent = formattedDate;
+        document.getElementById('currentDateTime').textContent = now.toLocaleString('tr-TR');
     }
 
     async loadUserProgram(day) {
@@ -37,8 +36,10 @@ class Dashboard {
 
             // Program başlığını göster
             const titleElement = document.querySelector('.program-title');
-            if (titleElement) {
-                titleElement.textContent = program?.title || 'Program';
+            if (titleElement && program && program.title) {
+                titleElement.textContent = program.title;
+            } else if (titleElement) {
+                titleElement.textContent = 'Program';
             }
 
             // Program içeriğini temizle
@@ -61,25 +62,45 @@ class Dashboard {
                     exercise.sets.forEach(set => {
                         setsHtml += `
                             <div class="set-item">
-                                <span>Set ${set.number}:</span>
-                                <span>${set.reps} tekrar</span>
+                                <span class="set-number">Set ${set.number}</span>
+                                <span class="set-reps">${set.reps} tekrar</span>
                             </div>
                         `;
                     });
                 }
 
+                // Video önizleme için iframe veya resim
+                let videoPreview = '';
+                if (exercise.videoUrl) {
+                    if (exercise.videoUrl.includes('youtube.com') || exercise.videoUrl.includes('youtu.be')) {
+                        const videoId = this.getYoutubeVideoId(exercise.videoUrl);
+                        if (videoId) {
+                            videoPreview = `
+                                <div class="video-preview">
+                                    <iframe 
+                                        width="100%" 
+                                        height="200" 
+                                        src="https://www.youtube.com/embed/${videoId}" 
+                                        frameborder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowfullscreen
+                                    ></iframe>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+
                 exerciseDiv.innerHTML = `
-                    <h3 class="exercise-name">${exercise.name || 'İsimsiz Egzersiz'}</h3>
-                    <div class="sets-container">
-                        ${setsHtml}
+                    <div class="exercise-header">
+                        <h3 class="exercise-name">${exercise.name || 'İsimsiz Egzersiz'}</h3>
                     </div>
-                    ${exercise.videoUrl ? `
-                        <div class="video-container">
-                            <a href="${exercise.videoUrl}" target="_blank" class="video-link">
-                                Egzersiz Videosu <i class="fas fa-external-link-alt"></i>
-                            </a>
+                    <div class="exercise-content">
+                        <div class="sets-container">
+                            ${setsHtml}
                         </div>
-                    ` : ''}
+                        ${videoPreview}
+                    </div>
                 `;
 
                 exercisesContainer.appendChild(exerciseDiv);
@@ -92,16 +113,19 @@ class Dashboard {
         }
     }
 
+    getYoutubeVideoId(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
     initializeInterface() {
         // Günleri seçme işlemleri
         const dayButtons = document.querySelectorAll('.day-button');
         dayButtons.forEach(button => {
             button.addEventListener('click', (e) => {
-                // Aktif gün butonunu güncelle
                 dayButtons.forEach(btn => btn.classList.remove('active'));
                 e.target.classList.add('active');
-
-                // Seçilen günün programını yükle
                 const selectedDay = e.target.dataset.day;
                 this.currentDay = selectedDay;
                 this.loadUserProgram(selectedDay);
