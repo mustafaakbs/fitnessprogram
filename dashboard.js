@@ -1,90 +1,155 @@
-// Ağırlık güncelleme fonksiyonu
-async updateWeight(exerciseName, newWeight) {
-    if (!this.editMode) return;
+import { db } from './firebase-config.js';
+import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    try {
-        const snapshot = await get(ref(db, `programs/${this.currentDay}`));
-        const program = snapshot.val();
+class Dashboard {
+    constructor() {
+        this.currentUser = null;
+        this.currentDay = 'pazartesi';
+        this.editMode = false;
         
-        if (program && program.exercises) {
-            const exerciseIndex = program.exercises.findIndex(e => e.name === exerciseName);
-            if (exerciseIndex !== -1) {
-                program.exercises[exerciseIndex].weight = parseInt(newWeight) || 0;
-                
-                await update(ref(db), {
-                    [`programs/${this.currentDay}`]: program
-                });
-                
-                // Başarılı güncelleme mesajı
-                alert('Ağırlık güncellendi!');
-            }
+        // Kullanıcı kontrolü
+        const userJson = sessionStorage.getItem('currentUser');
+        if (!userJson) {
+            window.location.href = 'index.html';
+            return;
         }
-    } catch (error) {
-        console.error('Error updating weight:', error);
-        alert('Ağırlık güncellenirken bir hata oluştu!');
+
+        this.currentUser = JSON.parse(userJson);
+        this.initializeInterface();
     }
-}
 
-// Set güncelleme fonksiyonu
-async updateSet(exerciseName, setNumber, newReps) {
-    if (!this.editMode) return;
+    initializeInterface() {
+        this.createDayButtons();
+        this.setupEventListeners();
+        this.loadPrograms();
+        this.updateDateTime();
+        setInterval(() => this.updateDateTime(), 1000);
+    }
 
-    try {
-        const snapshot = await get(ref(db, `programs/${this.currentDay}`));
-        const program = snapshot.val();
+    updateDateTime() {
+        const now = new Date();
+        const formattedDate = now.toISOString().slice(0, 19).replace('T', ' ');
+        document.getElementById('currentDateTime').textContent = 
+            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}`;
+        document.getElementById('currentUser').textContent = 
+            `Current User's Login: ${this.currentUser.username}`;
+    }
+
+    createDayButtons() {
+        const days = ['pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi', 'pazar'];
+        const container = document.querySelector('.days-container');
         
-        if (program && program.exercises) {
-            const exerciseIndex = program.exercises.findIndex(e => e.name === exerciseName);
-            if (exerciseIndex !== -1) {
-                const setIndex = program.exercises[exerciseIndex].sets.findIndex(s => s.number === setNumber);
-                if (setIndex !== -1) {
-                    program.exercises[exerciseIndex].sets[setIndex].reps = parseInt(newReps) || 0;
-                    
-                    await update(ref(db), {
-                        [`programs/${this.currentDay}`]: program
-                    });
-                    
-                    // Başarılı güncelleme mesajı
-                    alert('Set güncellendi!');
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Error updating set:', error);
-        alert('Set güncellenirken bir hata oluştu!');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        days.forEach(day => {
+            const btn = document.createElement('button');
+            btn.className = `day-btn ${day === this.currentDay ? 'active' : ''}`;
+            btn.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+            btn.dataset.day = day;
+            btn.onclick = () => this.changeDay(day);
+            container.appendChild(btn);
+        });
     }
-}
 
-// Egzersiz render fonksiyonunu güncelle
-renderExercise(exercise) {
-    return `
-        <div class="exercise-card">
-            <h3>${exercise.name}</h3>
-            <div class="exercise-info">
-                <div class="weight-selector">
-                    <input type="number" 
-                           value="${exercise.weight}" 
-                           onchange="dashboard.updateWeight('${exercise.name}', this.value)"
-                           min="0" 
-                           step="1"
-                           ${!this.editMode ? 'readonly' : ''}>
-                    <span>KG</span>
+    setupEventListeners() {
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            });
+        }
+
+        const editModeBtn = document.getElementById('editModeBtn');
+        if (editModeBtn) {
+            editModeBtn.addEventListener('click', () => {
+                this.showPasswordModal();
+            });
+        }
+
+        const confirmPassword = document.getElementById('confirmPassword');
+        if (confirmPassword) {
+            confirmPassword.addEventListener('click', () => {
+                this.checkAdminPassword();
+            });
+        }
+
+        const cancelPassword = document.getElementById('cancelPassword');
+        if (cancelPassword) {
+            cancelPassword.addEventListener('click', () => {
+                document.getElementById('passwordModal').style.display = 'none';
+            });
+        }
+    }
+
+    async loadPrograms() {
+        try {
+            const snapshot = await get(ref(db, 'programs'));
+            let programs = snapshot.val();
+            
+            if (!programs) {
+                programs = {
+                    pazartesi: { title: "Göğüs + Ön Kol", exercises: [] },
+                    sali: { title: "Karın + Cardio", exercises: [] },
+                    carsamba: { title: "Sırt + Arka Kol", exercises: [] },
+                    persembe: { title: "Karın + Cardio", exercises: [] },
+                    cuma: { title: "Bacak + Omuz", exercises: [] },
+                    cumartesi: { title: "Karın + Cardio", exercises: [] },
+                    pazar: { title: "Dinlenme", exercises: [] }
+                };
+                await update(ref(db), { programs });
+            }
+
+            const program = programs[this.currentDay];
+            if (program) {
+                this.renderProgram(program);
+            }
+        } catch (error) {
+            console.error('Error loading programs:', error);
+        }
+    }
+
+    changeDay(day) {
+        this.currentDay = day;
+        document.querySelectorAll('.day-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.day === day);
+        });
+        this.loadPrograms();
+    }
+
+    renderProgram(program) {
+        const container = document.getElementById('programCards');
+        if (!container) return;
+
+        let html = `
+            <h2>${program.title}</h2>
+            <div class="exercises-container">
+        `;
+
+        if (program.exercises && program.exercises.length > 0) {
+            program.exercises.forEach(exercise => {
+                html += this.renderExercise(exercise);
+            });
+        } else {
+            html += '<p>Bu gün için egzersiz bulunmamaktadır.</p>';
+        }
+
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    renderExercise(exercise) {
+        return `
+            <div class="exercise-card">
+                <h3>${exercise.name}</h3>
+                <p>Ağırlık: ${exercise.weight} kg</p>
+                <div class="sets">
+                    ${exercise.sets.map(set => 
+                        `<p>${set.number}. Set: ${set.reps} Tekrar</p>`
+                    ).join('')}
                 </div>
-            </div>
-            <div class="sets-container">
-                ${exercise.sets.map(set => `
-                    <div class="set-box">
-                        <span>${set.number}. Set:</span>
-                        <input type="number" 
-                               value="${set.reps}" 
-                               onchange="dashboard.updateSet('${exercise.name}', ${set.number}, this.value)"
-                               min="0"
-                               ${!this.editMode ? 'readonly' : ''}>
-                        <span>Tekrar</span>
-                    </div>
-                `).join('')}
-            </div>
-            <div class="video-section">
                 <div class="video-container">
                     <iframe
                         src="https://www.youtube.com/embed/${this.getYoutubeVideoId(exercise.videoUrl)}?rel=0"
@@ -94,16 +159,50 @@ renderExercise(exercise) {
                     </iframe>
                 </div>
             </div>
-            ${this.editMode ? `
-                <div class="exercise-controls">
-                    <button onclick="dashboard.editExercise('${exercise.name}')" class="edit-btn">
-                        <i class="fas fa-edit"></i> Düzenle
-                    </button>
-                    <button onclick="dashboard.deleteExercise('${exercise.name}')" class="delete-btn">
-                        <i class="fas fa-trash"></i> Sil
-                    </button>
-                </div>
-            ` : ''}
-        </div>
-    `;
+        `;
+    }
+
+    showPasswordModal() {
+        const modal = document.getElementById('passwordModal');
+        if (modal) {
+            modal.style.display = 'block';
+            const adminPassword = document.getElementById('adminPassword');
+            if (adminPassword) {
+                adminPassword.value = '';
+                adminPassword.focus();
+            }
+        }
+    }
+
+    async checkAdminPassword() {
+        const password = document.getElementById('adminPassword').value;
+        try {
+            const snapshot = await get(ref(db, 'users'));
+            const users = snapshot.val();
+            const adminUser = users.find(u => u.role === 'admin');
+            
+            if (password === adminUser.password) {
+                this.editMode = !this.editMode;
+                document.getElementById('passwordModal').style.display = 'none';
+                document.getElementById('editModeBtn').classList.toggle('active', this.editMode);
+                this.loadPrograms();
+            } else {
+                alert('Yanlış şifre!');
+            }
+        } catch (error) {
+            console.error('Error checking admin password:', error);
+            alert('Bir hata oluştu!');
+        }
+    }
+
+    getYoutubeVideoId(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
 }
+
+// Dashboard'ı başlat
+window.onload = () => {
+    window.dashboard = new Dashboard();
+};
