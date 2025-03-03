@@ -11,9 +11,11 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const snapshot = await get(ref(db, 'users'));
         const users = snapshot.val();
 
+        // Kullanıcı kontrolü
         const user = users.find(u => u.username === username && u.password === password);
 
         if (user) {
+            // Kullanıcı bilgilerini sessionStorage'a kaydet
             sessionStorage.setItem('currentUser', JSON.stringify(user));
             window.location.href = 'dashboard.html';
         } else {
