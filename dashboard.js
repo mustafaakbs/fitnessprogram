@@ -6,6 +6,7 @@ class Dashboard {
         this.currentUser = null;
         this.currentDay = 'pazartesi';
         
+        // Kullanıcı kontrolü
         const userJson = sessionStorage.getItem('currentUser');
         if (!userJson) {
             window.location.href = 'index.html';
@@ -27,16 +28,24 @@ class Dashboard {
     updateDateTime() {
         const now = new Date();
         const options = { 
+            weekday: 'long', 
             year: 'numeric', 
             month: 'long', 
             day: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            second: '2-digit'
+            second: '2-digit',
+            hour12: false
         };
+        
         const turkishDate = now.toLocaleDateString('tr-TR', options);
-        document.getElementById('currentDateTime').textContent = `Tarih: ${turkishDate}`;
-        document.getElementById('currentUser').textContent = `Kullanıcı: ${this.currentUser.name}`;
+        document.getElementById('currentDateTime').textContent = turkishDate;
+        
+        // Kullanıcı adını göster
+        const userName = document.getElementById('currentUser');
+        if (userName) {
+            userName.textContent = this.currentUser.name || this.currentUser.username;
+        }
     }
 
     createDayButtons() {
@@ -45,15 +54,16 @@ class Dashboard {
         
         if (!container) return;
         
-        container.innerHTML = '';
-        
-        days.forEach(day => {
-            const btn = document.createElement('button');
-            btn.className = `day-btn ${day === this.currentDay ? 'active' : ''}`;
-            btn.textContent = day.charAt(0).toUpperCase() + day.slice(1);
-            btn.dataset.day = day;
-            btn.onclick = () => this.changeDay(day);
-            container.appendChild(btn);
+        container.innerHTML = days.map(day => `
+            <button class="day-btn ${day === this.currentDay ? 'active' : ''}" 
+                    data-day="${day}">
+                ${day.charAt(0).toUpperCase() + day.slice(1)}
+            </button>
+        `).join('');
+
+        // Gün butonlarına event listener ekle
+        container.querySelectorAll('.day-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.changeDay(btn.dataset.day));
         });
     }
 
@@ -74,61 +84,17 @@ class Dashboard {
             let programs = snapshot.val();
             
             if (!programs) {
-                programs = this.createDefaultPrograms();
-                // Yeni kullanıcı için varsayılan programları oluştur
-                await update(ref(db), { [`userPrograms/${userId}`]: programs });
+                console.log('Bu kullanıcı için program bulunamadı');
+                return;
             }
 
-            this.renderProgram(programs[this.currentDay]);
+            const currentProgram = programs[this.currentDay];
+            if (currentProgram) {
+                this.renderProgram(currentProgram);
+            }
         } catch (error) {
             console.error('Error loading programs:', error);
         }
-    }
-
-    createDefaultPrograms() {
-        const defaultPrograms = {
-            pazartesi: { 
-                title: "Göğüs + Ön Kol", 
-                exercises: [
-                    {
-                        name: "Bench Press",
-                        weight: 20,
-                        sets: [
-                            { number: 1, reps: 12 },
-                            { number: 2, reps: 10 },
-                            { number: 3, reps: 8 }
-                        ],
-                        videoUrl: "https://www.youtube.com/watch?v=rT7DgCr-3pg"
-                    }
-                ]
-            },
-            sali: { 
-                title: "Karın + Cardio",
-                exercises: []
-            },
-            carsamba: { 
-                title: "Sırt + Arka Kol",
-                exercises: []
-            },
-            persembe: { 
-                title: "Karın + Cardio",
-                exercises: []
-            },
-            cuma: { 
-                title: "Bacak + Omuz",
-                exercises: []
-            },
-            cumartesi: { 
-                title: "Karın + Cardio",
-                exercises: []
-            },
-            pazar: { 
-                title: "Dinlenme",
-                exercises: []
-            }
-        };
-
-        return defaultPrograms;
     }
 
     changeDay(day) {
@@ -144,7 +110,7 @@ class Dashboard {
         if (!container || !program) return;
 
         let html = `
-            <h2>${program.title}</h2>
+            <h2 class="program-title">${program.title}</h2>
             <div class="exercises-container">
         `;
 
@@ -153,7 +119,7 @@ class Dashboard {
                 html += this.renderExercise(exercise);
             });
         } else {
-            html += '<p>Bu gün için egzersiz bulunmamaktadır.</p>';
+            html += '<p class="no-exercise">Bu gün için egzersiz bulunmamaktadır.</p>';
         }
 
         html += '</div>';
@@ -164,7 +130,6 @@ class Dashboard {
         return `
             <div class="exercise-card">
                 <h3>${exercise.name}</h3>
-                <p>Ağırlık: ${exercise.weight} kg</p>
                 <div class="sets">
                     ${exercise.sets.map(set => 
                         `<p>${set.number}. Set: ${set.reps} Tekrar</p>`
@@ -183,12 +148,38 @@ class Dashboard {
     }
 
     getYoutubeVideoId(url) {
+        if (!url) return '';
+        
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
+        
+        return (match && match[2].length === 11) ? match[2] : '';
+    }
+
+    // Hata mesajlarını göstermek için yardımcı fonksiyon
+    showError(message) {
+        const container = document.getElementById('programCards');
+        if (container) {
+            container.innerHTML = `
+                <div class="error-message">
+                    <p>${message}</p>
+                </div>
+            `;
+        }
     }
 }
 
+// Dashboard'ı başlat
 window.onload = () => {
     window.dashboard = new Dashboard();
 };
+
+// Sayfadan çıkış yapılırken session'ı temizle
+window.addEventListener('beforeunload', () => {
+    // Eğer sayfa yenileniyorsa session'ı korumak için kontrol eklenebilir
+    if (!window.location.href.includes('index.html')) {
+        sessionStorage.removeItem('currentUser');
+    }
+});
+
+export default Dashboard;
