@@ -12,19 +12,19 @@
         <div class="header-content">
             <h1>ADMİN PANELİ</h1>
             <div class="admin-info">
+                <span id="currentDateTime"></span>
                 <span class="admin-name" id="currentAdmin"></span>
-                <span class="date-time" id="currentDateTime"></span>
-                <button id="logoutBtn">Çıkış Yap</button>
+                <button id="logoutBtn" class="logout-btn">Çıkış Yap</button>
             </div>
         </div>
     </header>
 
     <main class="admin-content">
         <div class="admin-main">
-            <div id="users-section" class="admin-section active">
-                <h2>Kullanıcı Yönetimi</h2>
-                <div class="action-bar">
-                    <button id="addUserBtn" class="action-btn">Yeni Kullanıcı Ekle</button>
+            <div id="users-section" class="admin-section">
+                <div class="section-header">
+                    <h2>Kullanıcı Yönetimi</h2>
+                    <button id="addUserBtn" class="action-btn add-btn">Yeni Kullanıcı Ekle</button>
                 </div>
                 <div class="table-container">
                     <table id="usersTable">
@@ -35,13 +35,10 @@
                                 <th>Kullanıcı Adı</th>
                                 <th>Şifre</th>
                                 <th>Rol</th>
-                                <th>Program</th>
                                 <th>İşlemler</th>
                             </tr>
                         </thead>
-                        <tbody id="usersTableBody">
-                            <!-- Kullanıcılar buraya dinamik olarak eklenecek -->
-                        </tbody>
+                        <tbody id="usersTableBody"></tbody>
                     </table>
                 </div>
             </div>
