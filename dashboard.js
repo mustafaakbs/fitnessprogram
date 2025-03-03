@@ -34,23 +34,6 @@ class Dashboard {
         // Tarih ve kullanıcı bilgisini güncelle
         this.updateDateTime();
         setInterval(() => this.updateDateTime(), 1000);
-
-        // Düzenleme modu butonu
-        const editModeBtn = document.getElementById('editModeBtn');
-        if (editModeBtn) {
-            editModeBtn.addEventListener('click', () => {
-                this.showPasswordModal();
-            });
-        }
-
-        // Şifre modalı için event listeners
-        document.getElementById('confirmPassword')?.addEventListener('click', () => {
-            this.checkAdminPassword();
-        });
-
-        document.getElementById('cancelPassword')?.addEventListener('click', () => {
-            document.getElementById('passwordModal').style.display = 'none';
-        });
     }
 
     updateDateTime() {
@@ -63,7 +46,7 @@ class Dashboard {
     }
 
     createDayButtons() {
-        const days = ['pazartesi', 'carsamba', 'cuma'];
+        const days = ['pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi', 'pazar'];
         const container = document.querySelector('.days-container');
         
         if (!container) return;
@@ -89,6 +72,28 @@ class Dashboard {
                 window.location.href = 'index.html';
             });
         }
+
+        // Düzenleme modu butonu
+        const editModeBtn = document.getElementById('editModeBtn');
+        if (editModeBtn) {
+            editModeBtn.addEventListener('click', () => {
+                this.showPasswordModal();
+            });
+        }
+
+        // Şifre modalı için event listeners
+        document.getElementById('confirmPassword')?.addEventListener('click', () => {
+            this.checkAdminPassword();
+        });
+
+        document.getElementById('cancelPassword')?.addEventListener('click', () => {
+            document.getElementById('passwordModal').style.display = 'none';
+        });
+
+        // Form submit olayını dinle
+        document.getElementById('exerciseForm')?.addEventListener('submit', (e) => {
+            this.saveExercise(e);
+        });
     }
 
     showPasswordModal() {
@@ -124,111 +129,179 @@ class Dashboard {
         }
     }
 
-    async loadPrograms() {
+    async saveExercise(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const exerciseName = form.querySelector('#exerciseName').value;
+        const weight = parseInt(form.querySelector('#exerciseWeight').value);
+        const videoUrl = form.querySelector('#exerciseVideo').value;
+        
+        // Setleri topla
+        const setsList = document.getElementById('setsList');
+        const sets = Array.from(setsList.children).map((setRow, index) => ({
+            number: index + 1,
+            reps: parseInt(setRow.querySelector('.set-reps').value)
+        }));
+
+        const exercise = { name: exerciseName, sets, weight, videoUrl };
+
         try {
-            const snapshot = await get(ref(db, 'programs'));
-            const programs = snapshot.val();
+            await this.updateExercise(exercise);
+            document.getElementById('exerciseModal').style.display = 'none';
+            this.loadPrograms();
+        } catch (error) {
+            console.error('Error saving exercise:', error);
+            alert('Egzersiz kaydedilirken bir hata oluştu!');
+        }
+    }
+
+    async updateExercise(exercise) {
+        try {
+            const snapshot = await get(ref(db, `programs/${this.currentDay}`));
+            const program = snapshot.val() || { title: '', exercises: [] };
             
-            if (!programs) {
-                console.error('No programs found');
-                return;
+            const existingIndex = program.exercises.findIndex(e => e.name === exercise.name);
+            
+            if (existingIndex !== -1) {
+                program.exercises[existingIndex] = exercise;
+            } else {
+                program.exercises.push(exercise);
             }
 
-            // Günlük programı göster
-            this.renderProgram(programs[this.currentDay]);
-
-        } catch (error) {
-            console.error('Error loading programs:', error);
-        }
-    }
-
-    changeDay(day) {
-        this.currentDay = day;
-        // Aktif gün butonunu güncelle
-        document.querySelectorAll('.day-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.day === day);
-        });
-        this.loadPrograms();
-    }
-
-    renderProgram(program) {
-        if (!program) return;
-
-        const container = document.getElementById('programCards');
-        if (!container) return;
-
-        let html = `
-            <div class="program-title">
-                <h2>${program.title}</h2>
-                ${this.editMode ? `
-                    <button onclick="dashboard.addNewExercise()" class="add-btn">
-                        <i class="fas fa-plus"></i> Yeni Egzersiz
-                    </button>
-                ` : ''}
-            </div>
-            <div class="exercises-container">
-        `;
-
-        if (program.exercises && Array.isArray(program.exercises)) {
-            program.exercises.forEach(exercise => {
-                html += this.renderExercise(exercise);
+            await update(ref(db), {
+                [`programs/${this.currentDay}`]: program
             });
+
+            return true;
+        } catch (error) {
+            console.error('Error updating exercise:', error);
+            return false;
+        }
+    }
+
+    async deleteExercise(exerciseName) {
+        if (!confirm('Bu egzersizi silmek istediğinizden emin misiniz?')) return;
+
+        try {
+            const snapshot = await get(ref(db, `programs/${this.currentDay}`));
+            const program = snapshot.val();
+            
+            if (program && program.exercises) {
+                program.exercises = program.exercises.filter(e => e.name !== exerciseName);
+                
+                await update(ref(db), {
+                    [`programs/${this.currentDay}`]: program
+                });
+                
+                this.loadPrograms();
+            }
+        } catch (error) {
+            console.error('Error deleting exercise:', error);
+            alert('Egzersiz silinirken bir hata oluştu!');
+        }
+    }
+
+    addNewExercise() {
+        const modal = document.getElementById('exerciseModal');
+        if (!modal) return;
+
+        // Form alanlarını temizle
+        document.getElementById('exerciseName').value = '';
+        document.getElementById('exerciseWeight').value = '';
+        document.getElementById('exerciseVideo').value = '';
+
+        // Başlangıç setlerini oluştur
+        const setsList = document.getElementById('setsList');
+        if (setsList) {
+            setsList.innerHTML = `
+                <div class="set-row" data-set="1">
+                    <input type="number" value="1" class="set-number" readonly>
+                    <input type="number" placeholder="Tekrar" class="set-reps" required>
+                    <button type="button" class="delete-set-btn" onclick="dashboard.removeSet(1)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            `;
         }
 
-        html += '</div>';
-        container.innerHTML = html;
+        modal.style.display = 'block';
     }
 
-    renderExercise(exercise) {
-        return `
-            <div class="exercise-card">
-                <h3>${exercise.name}</h3>
-                <div class="exercise-info">
-                    <div class="weight-selector">
-                        <input type="number" 
-                               value="${exercise.weight}" 
-                               ${!this.editMode ? 'readonly' : ''}
-                               onchange="dashboard.updateWeight('${exercise.name}', this.value)"
-                               min="0" 
-                               step="1">
-                        <span>KG</span>
-                    </div>
-                </div>
-                <div class="sets-container">
-                    ${exercise.sets.map(set => `
-                        <div class="set-box">
-                            <span>${set.number}. Set: ${set.reps} Tekrar</span>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="video-section">
-                    <div class="video-container">
-                        <iframe
-                            src="https://www.youtube.com/embed/${this.getYoutubeVideoId(exercise.videoUrl)}?rel=0"
-                            frameborder="0"
-                            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                </div>
-                ${this.editMode ? `
-                    <div class="exercise-controls">
-                        <button onclick="dashboard.editExercise('${exercise.name}')" class="edit-btn">
-                            <i class="fas fa-edit"></i> Düzenle
-                        </button>
-                        <button onclick="dashboard.deleteExercise('${exercise.name}')" class="delete-btn">
-                            <i class="fas fa-trash"></i> Sil
-                        </button>
-                    </div>
-                ` : ''}
-            </div>
+    editExercise(exerciseName) {
+        if (!this.editMode) return;
+
+        const modal = document.getElementById('exerciseModal');
+        if (!modal) return;
+
+        get(ref(db, `programs/${this.currentDay}`))
+            .then(snapshot => {
+                const program = snapshot.val();
+                const exercise = program.exercises.find(e => e.name === exerciseName);
+                
+                if (exercise) {
+                    document.getElementById('exerciseName').value = exercise.name;
+                    document.getElementById('exerciseWeight').value = exercise.weight;
+                    document.getElementById('exerciseVideo').value = exercise.videoUrl;
+
+                    const setsList = document.getElementById('setsList');
+                    if (setsList) {
+                        setsList.innerHTML = exercise.sets.map((set, index) => `
+                            <div class="set-row" data-set="${index + 1}">
+                                <input type="number" value="${index + 1}" class="set-number" readonly>
+                                <input type="number" value="${set.reps}" placeholder="Tekrar" class="set-reps" required>
+                                <button type="button" class="delete-set-btn" onclick="dashboard.removeSet(${index + 1})">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        `).join('');
+                    }
+
+                    modal.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading exercise for edit:', error);
+                alert('Egzersiz yüklenirken bir hata oluştu!');
+            });
+    }
+
+    addSet() {
+        const setsList = document.getElementById('setsList');
+        if (!setsList) return;
+
+        const setCount = setsList.children.length + 1;
+        
+        const newSetDiv = document.createElement('div');
+        newSetDiv.className = 'set-row';
+        newSetDiv.dataset.set = setCount;
+        newSetDiv.innerHTML = `
+            <input type="number" value="${setCount}" class="set-number" readonly>
+            <input type="number" placeholder="Tekrar" class="set-reps" required>
+            <button type="button" class="delete-set-btn" onclick="dashboard.removeSet(${setCount})">
+                <i class="fas fa-minus"></i>
+            </button>
         `;
+        
+        setsList.appendChild(newSetDiv);
     }
 
-    getYoutubeVideoId(url) {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
+    removeSet(setNumber) {
+        const setsList = document.getElementById('setsList');
+        if (!setsList || setsList.children.length <= 1) return;
+
+        setsList.querySelector(`[data-set="${setNumber}"]`)?.remove();
+        
+        // Set numaralarını güncelle
+        Array.from(setsList.children).forEach((set, index) => {
+            const newSetNumber = index + 1;
+            set.dataset.set = newSetNumber;
+            set.querySelector('.set-number').value = newSetNumber;
+            set.querySelector('.delete-set-btn').setAttribute(
+                'onclick',
+                `dashboard.removeSet(${newSetNumber})`
+            );
+        });
     }
 
     async updateWeight(exerciseName, newWeight) {
@@ -244,10 +317,18 @@ class Dashboard {
                 await update(ref(db), {
                     [`programs/${this.currentDay}`]: program
                 });
+                this.loadPrograms();
             }
         } catch (error) {
             console.error('Error updating weight:', error);
+            alert('Ağırlık güncellenirken bir hata oluştu!');
         }
+    }
+
+    getYoutubeVideoId(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
     }
 }
 
