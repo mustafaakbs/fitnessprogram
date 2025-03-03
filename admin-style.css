@@ -34,42 +34,49 @@ body {
     gap: 20px;
 }
 
+#currentDateTime {
+    color: #aaa;
+    font-size: 0.9em;
+}
+
 .admin-name {
-    font-size: 1.2em;
     color: #00bcd4;
     font-weight: bold;
 }
 
-.date-time {
-    color: #aaa;
-}
-
-#logoutBtn {
-    background: linear-gradient(45deg, #ff4081, #ff6b6b);
+.logout-btn {
+    background: #f44336;
     color: white;
-    padding: 10px 20px;
     border: none;
-    border-radius: 8px;
+    padding: 8px 16px;
+    border-radius: 4px;
     cursor: pointer;
 }
 
 .admin-content {
     margin-top: 100px;
     padding: 20px;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .table-container {
-    margin-top: 20px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    overflow-x: auto;
-    padding: 20px;
+    overflow: hidden;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    color: #fff;
 }
 
 th, td {
@@ -80,11 +87,7 @@ th, td {
 
 th {
     background: rgba(0, 0, 0, 0.2);
-    font-weight: bold;
-}
-
-tr:hover {
-    background: rgba(255, 255, 255, 0.05);
+    font-weight: 500;
 }
 
 .table-input {
@@ -102,38 +105,98 @@ tr:hover {
 }
 
 .action-btn {
-    background: linear-gradient(45deg, #007bff, #00bcd4);
-    color: white;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
-    margin: 5px;
+    transition: background 0.3s;
+}
+
+.add-btn {
+    background: #4CAF50;
+    color: white;
 }
 
 .save-btn {
-    background: #4CAF50;
+    background: #2196F3;
+    color: white;
 }
 
 .delete-btn {
     background: #f44336;
+    color: white;
 }
 
-.edit-btn {
-    background: #2196F3;
+.program-row {
+    background: rgba(0, 0, 0, 0.2);
 }
 
-.action-bar {
-    margin-bottom: 20px;
+.program-container {
+    padding: 20px;
+}
+
+.program-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.day-select {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.program-exercises {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.exercise-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.exercise-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.exercise-sets {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.set-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.video-url-input {
+    width: 100%;
+    margin-top: 10px;
 }
 
 @media (max-width: 768px) {
+    .admin-content {
+        padding: 10px;
+    }
+
     .header-content {
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
     }
 
     .table-container {
-        overflow-x: scroll;
+        overflow-x: auto;
     }
 }
