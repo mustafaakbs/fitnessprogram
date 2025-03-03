@@ -4,196 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Program Dashboard</title>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2964/2964514.png" type="image/png">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <header>
-        <div class="header-left">
-            <img src="https://cdn-icons-png.flaticon.com/512/2964/2964514.png" alt="Logo" class="logo">
-            <h1>Fitness Programı</h1>
-        </div>
-        <div class="header-right">
-            <span id="currentUser" class="user-info">
-                <i class="fas fa-user"></i>
-                <span id="userLoginDisplay">mustafaakbs</span>
+        <h1>FITNESS PROGRAMI</h1>
+        <div class="user-info">
+            <span id="currentDateTime">
+                Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-03-03 07:50:06
             </span>
-            <span id="currentDateTime" class="date-time">
-                <i class="far fa-clock"></i>
-                <span id="dateTimeDisplay">2025-03-03 07:38:31</span>
+            <span id="currentUser">
+                Current User's Login: mustafaakbs
             </span>
-            <button id="logoutBtn" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i>
-                Çıkış
-            </button>
+            <button id="logoutBtn">Çıkış</button>
         </div>
     </header>
 
-    <main>
-        <div class="dashboard-container">
-            <div class="sidebar">
-                <div class="user-profile">
-                    <div class="profile-image">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
-                    <div class="profile-info">
-                        <h3 id="userName">Mustafa Akbaş</h3>
-                        <span id="userRole" class="role-badge admin">Admin</span>
-                    </div>
-                </div>
-                <nav class="program-nav">
-                    <h4>Program Günleri</h4>
-                    <ul>
-                        <li><a href="#pazartesi" class="active"><i class="fas fa-dumbbell"></i> Pazartesi</a></li>
-                        <li><a href="#carsamba"><i class="fas fa-dumbbell"></i> Çarşamba</a></li>
-                        <li><a href="#cuma"><i class="fas fa-dumbbell"></i> Cuma</a></li>
-                    </ul>
-                </nav>
-            </div>
+    <div class="container">
+        <!-- Günlerin butonları -->
+        <div class="days-buttons">
+            <button class="day-btn active" data-day="pazartesi">Pazartesi</button>
+            <button class="day-btn" data-day="carsamba">Çarşamba</button>
+            <button class="day-btn" data-day="cuma">Cuma</button>
+        </div>
 
-            <div class="main-content">
-                <div class="program-header">
-                    <h2>Antrenman Programı</h2>
-                    <div class="program-actions">
-                        <button id="addExerciseBtn" class="action-btn">
-                            <i class="fas fa-plus"></i> Yeni Egzersiz
-                        </button>
-                        <button id="printProgramBtn" class="action-btn">
-                            <i class="fas fa-print"></i> Yazdır
-                        </button>
-                    </div>
-                </div>
-
-                <div id="programContainer" class="program-grid">
-                    <!-- Programlar buraya dinamik olarak eklenecek -->
-                </div>
-
-                <!-- Yeni egzersiz ekleme formu -->
-                <div id="addExerciseModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <h3>Yeni Egzersiz Ekle</h3>
-                        <form id="newExerciseForm">
-                            <div class="form-group">
-                                <label for="exerciseDay">Gün:</label>
-                                <select id="exerciseDay" required>
-                                    <option value="pazartesi">Pazartesi</option>
-                                    <option value="carsamba">Çarşamba</option>
-                                    <option value="cuma">Cuma</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="exerciseName">Egzersiz Adı:</label>
-                                <input type="text" id="exerciseName" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Setler:</label>
-                                <div id="setsContainer">
-                                    <div class="set-row">
-                                        <input type="number" class="set-input" placeholder="Tekrar" min="1" required>
-                                        <button type="button" class="remove-set"><i class="fas fa-minus"></i></button>
-                                    </div>
-                                </div>
-                                <button type="button" id="addSetBtn"><i class="fas fa-plus"></i> Set Ekle</button>
-                            </div>
-                            <div class="form-group">
-                                <label for="exerciseWeight">Ağırlık (kg):</label>
-                                <input type="number" id="exerciseWeight" min="0" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="exerciseVideo">Video URL:</label>
-                                <input type="url" id="exerciseVideo" required>
-                            </div>
-                            <button type="submit" class="submit-btn">Egzersiz Ekle</button>
-                        </form>
-                    </div>
+        <!-- Program içeriği -->
+        <div id="programContainer">
+            <div class="program-day active" id="pazartesi">
+                <h2>Göğüs + Ön Kol</h2>
+                <div class="exercises">
+                    <!-- Egzersizler buraya dinamik olarak eklenecek -->
                 </div>
             </div>
-
-            <div class="changes-panel">
-                <div class="changes-history" id="changesHistory">
-                    <h3><i class="fas fa-history"></i> Son Değişiklikler</h3>
-                    <div class="changes-list" id="changesList">
-                        <!-- Değişiklik geçmişi buraya dinamik olarak eklenecek -->
-                    </div>
+            <div class="program-day" id="carsamba">
+                <h2>Sırt + Arka Kol</h2>
+                <div class="exercises">
+                    <!-- Egzersizler buraya dinamik olarak eklenecek -->
+                </div>
+            </div>
+            <div class="program-day" id="cuma">
+                <h2>Bacak</h2>
+                <div class="exercises">
+                    <!-- Egzersizler buraya dinamik olarak eklenecek -->
                 </div>
             </div>
         </div>
-    </main>
 
-    <footer>
-        <div class="footer-content">
-            <p>&copy; 2024 Fitness Programı. Tüm hakları saklıdır.</p>
-            <div class="social-links">
-                <a href="#" target="_blank"><i class="fab fa-github"></i></a>
-                <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
-                <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Program şablonu (gizli) -->
-    <template id="exerciseTemplate">
-        <div class="exercise-item">
-            <div class="exercise-header">
-                <h3 class="exercise-name"></h3>
-                <div class="exercise-actions">
-                    <button class="edit-exercise"><i class="fas fa-edit"></i></button>
-                    <button class="delete-exercise"><i class="fas fa-trash"></i></button>
+        <!-- Egzersiz formu şablonu -->
+        <template id="exerciseFormTemplate">
+            <form class="exercise-form">
+                <div class="form-group">
+                    <label>Egzersiz Adı:</label>
+                    <input type="text" class="exercise-name" required>
                 </div>
-            </div>
-            <div class="exercise-details">
-                <div class="sets-container">
-                    <h4>Setler</h4>
-                    <div class="sets-list"></div>
+                <div class="form-group">
+                    <label>Setler:</label>
+                    <div class="sets-container">
+                        <input type="number" class="set-input" required>
+                        <input type="number" class="set-input" required>
+                        <input type="number" class="set-input" required>
+                    </div>
                 </div>
-                <div class="weight-container">
-                    <h4>Ağırlık</h4>
-                    <span class="weight-value"></span>
+                <div class="form-group">
+                    <label>Ağırlık (kg):</label>
+                    <input type="number" class="weight-input" required>
                 </div>
-                <div class="video-container">
-                    <a class="video-link" target="_blank">
-                        <i class="fab fa-youtube"></i> Video
-                    </a>
+                <div class="form-group">
+                    <label>Video URL:</label>
+                    <input type="url" class="video-url" required>
+                    <div class="video-preview"></div>
                 </div>
-            </div>
-        </div>
-    </template>
-
-    <!-- Loading Spinner -->
-    <div id="loadingSpinner" class="loading-spinner">
-        <div class="spinner"></div>
-        <p>Yükleniyor...</p>
+                <div class="form-actions">
+                    <button type="submit" class="save-btn">Kaydet</button>
+                </div>
+            </form>
+        </template>
     </div>
-
-    <!-- Notification System -->
-    <div id="notificationContainer" class="notification-container"></div>
 
     <!-- Firebase SDK -->
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="database.js"></script>
     <script type="module" src="dashboard.js"></script>
-
-    <!-- Utility Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/tr.js"></script>
-    <script>
-        // Tarih ve saat güncelleyici
-        function updateDateTime() {
-            const now = moment();
-            document.getElementById('dateTimeDisplay').textContent = now.format('YYYY-MM-DD HH:mm:ss');
-        }
-        
-        // Her saniye güncelle
-        setInterval(updateDateTime, 1000);
-        updateDateTime(); // İlk yükleme
-
-        // Kullanıcı bilgisini göster
-        document.getElementById('userLoginDisplay').textContent = 
-            sessionStorage.getItem('currentUser') ? 
-            JSON.parse(sessionStorage.getItem('currentUser')).username : 
-            'Misafir';
-    </script>
 </body>
 </html>
