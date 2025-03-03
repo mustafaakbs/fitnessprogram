@@ -3,49 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Fitness Program</title>
+    <title>Admin Panel</title>
     <link rel="stylesheet" href="admin-style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="admin-header">
         <div class="header-content">
-            <h1>ADMİN PANELİ</h1>
+            <h1>Admin Panel</h1>
             <div class="admin-info">
                 <span id="currentDateTime"></span>
-                <span class="admin-name" id="currentAdmin"></span>
-                <button id="logoutBtn" class="logout-btn">Çıkış Yap</button>
+                <span id="currentAdmin"></span>
+                <button id="logoutBtn" class="action-btn">Çıkış Yap</button>
             </div>
         </div>
     </header>
 
     <main class="admin-content">
-        <div class="admin-main">
-            <div id="users-section" class="admin-section">
-                <div class="section-header">
-                    <h2>Kullanıcı Yönetimi</h2>
-                    <button id="addUserBtn" class="action-btn add-btn">Yeni Kullanıcı Ekle</button>
-                </div>
-                <div class="table-container">
-                    <table id="usersTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Ad Soyad</th>
-                                <th>Kullanıcı Adı</th>
-                                <th>Şifre</th>
-                                <th>Rol</th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="section-header">
+            <h2>Kullanıcı Yönetimi</h2>
+            <button id="addUserBtn" class="action-btn">Yeni Kullanıcı</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ad Soyad</th>
+                        <th>Kullanıcı Adı</th>
+                        <th>Şifre</th>
+                        <th>Rol</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- Kullanıcılar buraya yüklenecek -->
+                </tbody>
+            </table>
         </div>
     </main>
 
-    <script type="module" src="firebase-config.js"></script>
     <script type="module" src="admin.js"></script>
 </body>
 </html>
