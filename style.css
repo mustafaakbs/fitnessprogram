@@ -1,106 +1,209 @@
-/* Koyu tema için genel stiller */
-body {
-    font-family: Arial, sans-serif;
+/* Genel Stiller ve Reset */
+* {
     margin: 0;
     padding: 0;
-    background-color: #1a1a1a;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
     color: #fff;
+    min-height: 100vh;
 }
 
-header {
-    background-color: #000;
+/* Login Sayfası Stilleri */
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    font-size: 2.5em;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.form-group label {
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    color: #aaa;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.form-group input:focus + label,
+.form-group input:valid + label {
+    top: -20px;
+    left: 0;
+    color: #fff;
+    font-size: 14px;
+}
+
+.login-btn {
+    background: linear-gradient(45deg, #007bff, #00bcd4);
     color: white;
-    padding: 1rem;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
 }
 
-.container {
+.login-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Dashboard Stilleri */
+.dashboard-header {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-content {
     max-width: 1200px;
     margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #00bcd4;
+}
+
+.date-time {
+    color: #aaa;
+    font-size: 0.9em;
+}
+
+#logoutBtn {
+    background: linear-gradient(45deg, #ff4081, #ff6b6b);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#logoutBtn:hover {
+    transform: translateY(-2px);
+}
+
+.dashboard-content {
+    max-width: 1200px;
+    margin: 100px auto 30px;
     padding: 20px;
 }
 
-/* Günler butonları */
+/* Günler Butonları */
 .days-container {
     display: flex;
-    gap: 10px;
-    margin: 20px 0;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
     flex-wrap: wrap;
 }
 
 .day-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #333;
+    background: rgba(255, 255, 255, 0.1);
     color: #fff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
 }
 
 .day-btn:hover {
-    background-color: #444;
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .day-btn.active {
-    background-color: #007bff;
-    color: white;
+    background: linear-gradient(45deg, #007bff, #00bcd4);
+    transform: translateY(-2px);
 }
 
-/* Edit mode button */
-.edit-mode-btn {
-    padding: 10px 20px;
-    margin: 10px 0;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.edit-mode-btn.active {
-    background-color: #dc3545;
-}
-
-/* Exercise cards */
+/* Program Kartları */
 .exercises-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    gap: 30px;
+    margin-top: 30px;
 }
 
 .exercise-card {
-    background-color: #333;
-    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
     padding: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .exercise-card h3 {
-    color: #fff;
-    margin-top: 0;
+    color: #00bcd4;
+    margin-bottom: 15px;
 }
 
-/* Input stilleri */
-input[type="number"],
-input[type="text"],
-input[type="password"] {
-    background-color: #444;
-    border: 1px solid #555;
-    color: #fff;
-    padding: 8px;
-    border-radius: 4px;
-}
-
-/* Video container */
+/* Video Container */
 .video-container {
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
     position: relative;
     padding-bottom: 56.25%;
     height: 0;
-    overflow: hidden;
-    margin-top: 15px;
-    background-color: #000;
-    border-radius: 8px;
 }
 
 .video-container iframe {
@@ -109,63 +212,26 @@ input[type="password"] {
     left: 0;
     width: 100%;
     height: 100%;
-}
-
-/* Modal */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.8);
-}
-
-.modal-content {
-    background-color: #333;
-    padding: 20px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
-    margin: 50px auto;
-    color: #fff;
-}
-
-/* Login container */
-.login-container {
-    background-color: #333;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 400px;
-    margin: 50px auto;
-}
-
-/* Buttons */
-button {
-    background-color: #007bff;
-    color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
 }
 
-button:hover {
-    background-color: #0056b3;
-}
+/* Responsive Tasarım */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+    }
 
-/* User info */
-.user-info {
-    color: #fff;
-    font-size: 14px;
-}
+    .user-info {
+        flex-direction: column;
+        text-align: center;
+    }
 
-#logoutBtn {
-    background-color: #dc3545;
-}
+    .login-container {
+        margin: 50px 20px;
+    }
 
-#logoutBtn:hover {
-    background-color: #c82333;
+    .exercises-container {
+        grid-template-columns: 1fr;
+    }
 }
