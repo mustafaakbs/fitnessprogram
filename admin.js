@@ -6,6 +6,7 @@ class AdminPanel {
         this.currentAdmin = null;
         this.checkAdminAccess();
         this.initializeInterface();
+        this.loadUsers(); // Constructor'da loadUsers'ı çağır
     }
 
     checkAdminAccess() {
@@ -22,40 +23,46 @@ class AdminPanel {
         }
 
         this.currentAdmin = user;
-        document.getElementById('currentAdmin').textContent = user.username;
+        document.getElementById('currentAdmin').textContent = `Admin: ${user.name}`;
     }
 
     updateDateTime() {
         const now = new Date();
-        const formattedDate = now.toISOString().slice(0, 19).replace('T', ' ');
-        document.getElementById('currentDateTime').textContent = 
-            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}`;
-    }
-
-    initializeInterface() {
-        document.getElementById('addUserBtn').addEventListener('click', () => this.addNewUser());
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            sessionStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
-        });
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        };
         
-        this.updateDateTime();
-        setInterval(() => this.updateDateTime(), 1000);
-        this.loadUsers();
+        const turkishDate = now.toLocaleDateString('tr-TR', options);
+        document.getElementById('currentDateTime').textContent = turkishDate;
     }
 
     async loadUsers() {
         try {
-            const snapshot = await get(ref(db, 'users'));
-            const users = snapshot.val() || {};
-            const tbody = document.getElementById('usersTableBody');
-            
-            if (!tbody) return;
-            tbody.innerHTML = '';
+            // Firebase'den kullanıcıları al
+            const usersRef = ref(db, 'users');
+            const snapshot = await get(usersRef);
+            const users = snapshot.val();
 
-            for (const userId in users) {
-                const user = users[userId];
+            if (!users) {
+                console.log('Kullanıcı bulunamadı');
+                return;
+            }
+
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = ''; // Tabloyu temizle
+
+            // Her kullanıcı için bir satır oluştur
+            Object.entries(users).forEach(([userId, user]) => {
                 const tr = document.createElement('tr');
+                tr.dataset.id = userId;
+                
                 tr.innerHTML = `
                     <td>${userId}</td>
                     <td><input type="text" class="table-input" name="name" value="${user.name || ''}" /></td>
@@ -74,6 +81,7 @@ class AdminPanel {
                     </td>
                 `;
 
+                // Program detayları için gizli satır
                 const programRow = document.createElement('tr');
                 programRow.className = 'program-row';
                 programRow.style.display = 'none';
@@ -100,9 +108,11 @@ class AdminPanel {
 
                 tbody.appendChild(tr);
                 tbody.appendChild(programRow);
-            }
+            });
+
+            console.log('Kullanıcılar yüklendi:', users);
         } catch (error) {
-            console.error('Error loading users:', error);
+            console.error('Kullanıcılar yüklenirken hata oluştu:', error);
         }
     }
 
@@ -120,9 +130,10 @@ class AdminPanel {
 
         try {
             await set(ref(db, `users/${userId}`), userData);
-            alert('Kullanıcı kaydedildi');
+            alert('Kullanıcı başarıyla kaydedildi');
+            this.loadUsers(); // Tabloyu yenile
         } catch (error) {
-            console.error('Error saving user:', error);
+            console.error('Kullanıcı kaydedilirken hata:', error);
             alert('Kullanıcı kaydedilirken hata oluştu');
         }
     }
@@ -133,45 +144,16 @@ class AdminPanel {
         try {
             await remove(ref(db, `users/${userId}`));
             await remove(ref(db, `userPrograms/${userId}`));
-            this.loadUsers();
-            alert('Kullanıcı silindi');
+            this.loadUsers(); // Tabloyu yenile
+            alert('Kullanıcı başarıyla silindi');
         } catch (error) {
-            console.error('Error deleting user:', error);
+            console.error('Kullanıcı silinirken hata:', error);
             alert('Kullanıcı silinirken hata oluştu');
         }
     }
 
-    addNewUser() {
-        const tbody = document.getElementById('usersTableBody');
-        const newId = Date.now().toString();
-        const tr = document.createElement('tr');
-        tr.dataset.id = newId;
-        
-        tr.innerHTML = `
-            <td>${newId}</td>
-            <td><input type="text" class="table-input" name="name" /></td>
-            <td><input type="text" class="table-input" name="username" /></td>
-            <td><input type="text" class="table-input" name="password" /></td>
-            <td>
-                <select class="table-input" name="role">
-                    <option value="user">Kullanıcı</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </td>
-            <td>
-                <button class="action-btn save-btn" onclick="adminPanel.saveUser('${newId}')">Kaydet</button>
-                <button class="action-btn delete-btn" onclick="adminPanel.deleteUser('${newId}')">Sil</button>
-            </td>
-        `;
-        
-        tbody.insertBefore(tr, tbody.firstChild);
-    }
-
     async toggleProgram(userId) {
-        const tr = document.querySelector(`tr[data-id="${userId}"]`);
-        if (!tr) return;
-
-        const programRow = tr.nextElementSibling;
+        const programRow = document.querySelector(`tr[data-id="${userId}"]`).nextElementSibling;
         if (programRow.style.display === 'none') {
             programRow.style.display = 'table-row';
             await this.loadDayProgram(userId, 'pazartesi');
@@ -186,10 +168,43 @@ class AdminPanel {
             const program = snapshot.val() || { exercises: [] };
             const container = document.getElementById(`program-${userId}`);
             
-            container.innerHTML = program.exercises.map((exercise, index) => `
-                <div class="exercise-card" data-index="${index}">
-                    <div class="exercise-header">
-                        <input type="text" class="table-input" name="name" value="${exercise.name || ''}" placeholder="Egzersiz Adı" />
-                        <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">Sil</button>
-                    </div>
-                    
+            let html = '';
+            if (program.exercises) {
+                program.exercises.forEach((exercise, index) => {
+                    html += `
+                        <div class="exercise-card">
+                            <input type="text" class="table-input" value="${exercise.name || ''}" placeholder="Egzersiz Adı">
+                            <div class="sets-container">
+                                ${exercise.sets.map((set, setIndex) => `
+                                    <div class="set-item">
+                                        <span>Set ${setIndex + 1}:</span>
+                                        <input type="number" class="table-input" value="${set.reps}" min="1">
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <input type="text" class="table-input" value="${exercise.videoUrl || ''}" placeholder="Video URL">
+                            <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">Sil</button>
+                        </div>
+                    `;
+                });
+            }
+            container.innerHTML = html;
+        } catch (error) {
+            console.error('Program yüklenirken hata:', error);
+        }
+    }
+
+    initializeInterface() {
+        document.getElementById('addUserBtn').addEventListener('click', () => this.addNewUser());
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
+        
+        this.updateDateTime();
+        setInterval(() => this.updateDateTime(), 1000);
+    }
+}
+
+// Global erişim için
+window.adminPanel = new AdminPanel();
