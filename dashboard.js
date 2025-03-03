@@ -18,7 +18,7 @@ class Dashboard {
         }
 
         this.currentUser = JSON.parse(userJson);
-        document.getElementById('currentUser').innerHTML = `Hoş Geldin<br>name: "${this.currentUser.name}"`;
+        document.getElementById('currentUser').innerHTML = `Hoş Geldin<br>${this.currentUser.name}`;
     }
 
     updateDateTime() {
