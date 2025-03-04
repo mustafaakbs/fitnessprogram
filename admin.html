@@ -19,25 +19,23 @@
     </header>
 
     <main class="admin-content">
-        <div class="section-header">
-            <h2>Kullanıcı Yönetimi</h2>
-            <button id="addUserBtn" class="action-btn">Yeni Kullanıcı</button>
-        </div>
-
-        <div class="table-container">
-            <table>
+        <div class="users-container">
+            <div class="table-header">
+                <h2 class="table-title">Kullanıcı Yönetimi</h2>
+                <button id="addUserBtn" class="action-btn">Yeni Kullanıcı</button>
+            </div>
+            <table class="users-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Ad Soyad</th>
                         <th>Kullanıcı Adı</th>
                         <th>Şifre</th>
+                        <th>Ad Soyad</th>
                         <th>Rol</th>
                         <th>İşlemler</th>
                     </tr>
                 </thead>
-                <tbody id="usersTableBody">
-                    <!-- Kullanıcılar buraya yüklenecek -->
+                <tbody>
+                    <!-- JavaScript ile doldurulacak -->
                 </tbody>
             </table>
         </div>
