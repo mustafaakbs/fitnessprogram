@@ -38,12 +38,6 @@ body {
 #currentUser {
     font-weight: bold;
     color: #4CAF50;
-    text-align: right;
-    line-height: 1.5;
-}
-
-#currentDateTime {
-    color: #fff;
 }
 
 .dashboard-content {
@@ -54,6 +48,7 @@ body {
     margin-right: auto;
 }
 
+/* Günler menüsü */
 .days-container {
     display: flex;
     justify-content: space-between;
@@ -86,6 +81,7 @@ body {
     box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
 }
 
+/* Program container */
 .program-container {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 15px;
@@ -100,6 +96,7 @@ body {
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
+/* Egzersiz kartları */
 .exercise-card {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 12px;
@@ -123,6 +120,7 @@ body {
     color: #4CAF50;
 }
 
+/* Setler */
 .sets-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -144,6 +142,7 @@ body {
     color: #4CAF50;
 }
 
+/* Video önizleme */
 .video-preview-container {
     margin-top: 20px;
     width: 100%;
@@ -155,7 +154,7 @@ body {
 .video-preview {
     position: relative;
     width: 100%;
-    padding-bottom: 56.25%;
+    padding-bottom: 56.25%; /* 16:9 oranı */
     height: 0;
     overflow: hidden;
     border-radius: 10px;
@@ -171,6 +170,7 @@ body {
     border: none;
 }
 
+/* Hata ve boş durum mesajları */
 .no-program, .error-message {
     text-align: center;
     padding: 40px;
@@ -182,6 +182,7 @@ body {
     color: #ff6b6b;
 }
 
+/* Butonlar */
 .action-btn {
     padding: 8px 16px;
     background: #4CAF50;
@@ -197,17 +198,8 @@ body {
     transform: translateY(-2px);
 }
 
+/* Responsive tasarım */
 @media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-
-    .user-info {
-        flex-direction: column;
-    }
-
     .days-container {
         flex-direction: column;
     }
@@ -226,5 +218,15 @@ body {
 
     .video-preview-container {
         max-width: 100%;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .user-info {
+        flex-direction: column;
     }
 }
