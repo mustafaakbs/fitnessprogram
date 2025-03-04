@@ -3,24 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitness Programı</title>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2964/2964514.png" type="image/png">
+    <title>Dashboard</title>
     <link rel="stylesheet" href="dashboard-style.css">
 </head>
 <body>
-    <header class="dashboard-header">
-        <div class="header-content">
-            <h1>Fitness Programı</h1>
-            <div class="user-info">
-                <span id="currentDateTime"></span>
-                <span id="currentUser"></span>
-                <button id="logoutBtn" class="action-btn">Çıkış Yap</button>
-            </div>
+    <div class="dashboard-container">
+        <div class="user-info">
+            <pre id="currentDateTime"></pre>
+            <pre id="currentUser"></pre>
+            <button id="logoutBtn" class="action-btn">Çıkış Yap</button>
         </div>
-    </header>
 
-    <main class="dashboard-content">
-        <div class="days-container">
+        <div class="day-selector">
             <button class="day-button active" data-day="pazartesi">Pazartesi</button>
             <button class="day-button" data-day="sali">Salı</button>
             <button class="day-button" data-day="carsamba">Çarşamba</button>
@@ -34,7 +28,7 @@
             <h2 class="program-title"></h2>
             <div id="exercisesContainer"></div>
         </div>
-    </main>
+    </div>
 
     <script type="module" src="dashboard.js"></script>
 </body>
