@@ -24,40 +24,48 @@ class AdminPanel {
         }
 
         this.currentAdmin = user;
-        document.getElementById('currentAdmin').textContent = user.username;
+        document.getElementById('currentAdmin').innerText = 
+            `Current User's Login: ${user.username}\n`;
     }
 
     updateDateTime() {
         const now = new Date();
-        document.getElementById('currentDateTime').textContent = now.toLocaleString('tr-TR');
+        const formattedDate = now.toISOString().replace('T', ' ').split('.')[0];
+        document.getElementById('currentDateTime').innerText = 
+            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}\n`;
     }
 
     async loadUsers() {
         try {
-            const snapshot = await get(ref(db, 'users'));
+            const usersRef = ref(db, 'users');
+            const snapshot = await get(usersRef);
             const users = snapshot.val();
-            const tbody = document.getElementById('usersTableBody');
-            
-            if (!tbody) return;
+
+            const tbody = document.querySelector('.users-table tbody');
             tbody.innerHTML = '';
 
-            Object.entries(users).forEach(([userId, user]) => {
+            for (const userId in users) {
+                const user = users[userId];
                 const tr = document.createElement('tr');
-                tr.dataset.id = userId;
                 
                 tr.innerHTML = `
-                    <td>${userId}</td>
-                    <td><input type="text" class="table-input" name="name" value="${user.name || ''}" /></td>
-                    <td><input type="text" class="table-input" name="username" value="${user.username || ''}" /></td>
-                    <td><input type="text" class="table-input" name="password" value="${user.password || ''}" /></td>
                     <td>
-                        <select class="table-input" name="role">
-                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>Kullanıcı</option>
+                        <input type="text" class="table-input" value="${user.username}" data-field="username">
+                    </td>
+                    <td>
+                        <input type="password" class="table-input" value="${user.password}" data-field="password">
+                    </td>
+                    <td>
+                        <input type="text" class="table-input" value="${user.name || ''}" data-field="name">
+                    </td>
+                    <td>
+                        <select class="table-input" data-field="role">
+                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
                             <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
                         </select>
                     </td>
                     <td>
-                        <button class="action-btn save-btn" onclick="adminPanel.saveUser('${userId}')">Kaydet</button>
+                        <button class="action-btn save-btn" onclick="adminPanel.saveUser('${userId}', this)">Kaydet</button>
                         <button class="action-btn delete-btn" onclick="adminPanel.deleteUser('${userId}')">Sil</button>
                         <button class="action-btn program-btn" onclick="adminPanel.toggleProgram('${userId}')">Program</button>
                     </td>
@@ -65,12 +73,12 @@ class AdminPanel {
 
                 const programRow = document.createElement('tr');
                 programRow.className = 'program-row';
-                programRow.style.display = 'none';
+                programRow.id = `program-${userId}`;
                 programRow.innerHTML = `
-                    <td colspan="6">
+                    <td colspan="5">
                         <div class="program-container">
                             <div class="program-header">
-                                <select class="day-select" onchange="adminPanel.loadDayProgram('${userId}', this.value)">
+                                <select class="day-select" onchange="adminPanel.dayChanged('${userId}', this.value)">
                                     <option value="pazartesi">Pazartesi</option>
                                     <option value="sali">Salı</option>
                                     <option value="carsamba">Çarşamba</option>
@@ -79,107 +87,47 @@ class AdminPanel {
                                     <option value="cumartesi">Cumartesi</option>
                                     <option value="pazar">Pazar</option>
                                 </select>
+                                <select class="program-title-select">
+                                    <option value="Cardio">Cardio</option>
+                                    <option value="Üst Vücut">Üst Vücut</option>
+                                    <option value="Alt Vücut">Alt Vücut</option>
+                                    <option value="Full Body">Full Body</option>
+                                </select>
                             </div>
-                            <div id="program-${userId}" class="program-content"></div>
+                            <div class="exercises-container">
+                                <!-- Exercises will be loaded here -->
+                            </div>
+                            <div class="program-actions">
+                                <button class="action-btn" onclick="adminPanel.addExercise('${userId}')">Yeni Egzersiz</button>
+                                <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">Programı Kaydet</button>
+                            </div>
                         </div>
                     </td>
                 `;
 
                 tbody.appendChild(tr);
                 tbody.appendChild(programRow);
-            });
+            }
         } catch (error) {
             console.error('Error loading users:', error);
         }
     }
 
-    async loadDayProgram(userId, day) {
-        this.currentDay = day;
+    async saveUser(userId, button) {
         try {
-            const snapshot = await get(ref(db, `userPrograms/${userId}/${day}`));
-            const program = snapshot.val() || { title: '', exercises: [] };
-            const container = document.getElementById(`program-${userId}`);
-            
-            let html = `
-                <div class="program-title-container">
-                    <select class="program-title-select" onchange="adminPanel.updateProgramTitle('${userId}', this.value)">
-                        <option value="">Program Seçin</option>
-                        <option value="Karın + Cardio" ${program.title === 'Karın + Cardio' ? 'selected' : ''}>Karın + Cardio</option>
-                        <option value="Göğüs + Triceps" ${program.title === 'Göğüs + Triceps' ? 'selected' : ''}>Göğüs + Triceps</option>
-                        <option value="Sırt + Biceps" ${program.title === 'Sırt + Biceps' ? 'selected' : ''}>Sırt + Biceps</option>
-                        <option value="Bacak" ${program.title === 'Bacak' ? 'selected' : ''}>Bacak</option>
-                        <option value="Omuz" ${program.title === 'Omuz' ? 'selected' : ''}>Omuz</option>
-                    </select>
-                </div>
-                <div class="exercises-container">
-            `;
+            const tr = button.closest('tr');
+            const inputs = tr.querySelectorAll('.table-input');
+            const userData = {};
 
-            if (program.exercises && program.exercises.length > 0) {
-                program.exercises.forEach((exercise, index) => {
-                    html += `
-                        <div class="exercise-card" data-index="${index}">
-                            <input type="text" class="exercise-name" value="${exercise.name || ''}" placeholder="Egzersiz Adı">
-                            <div class="sets-container">
-                                ${exercise.sets ? exercise.sets.map((set, setIndex) => `
-                                    <div class="set-item">
-                                        <span>Set ${setIndex + 1}:</span>
-                                        <input type="number" class="set-input" value="${set.reps}" min="1">
-                                        <span>tekrar</span>
-                                    </div>
-                                `).join('') : ''}
-                            </div>
-                            <input type="text" class="video-url" value="${exercise.videoUrl || ''}" placeholder="Video URL">
-                            <div class="exercise-actions">
-                                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${index})">Set Ekle</button>
-                                <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">Egzersizi Sil</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
+            inputs.forEach(input => {
+                userData[input.dataset.field] = input.value;
+            });
 
-            html += `
-                </div>
-                <div class="program-actions">
-                    <button class="action-btn add-btn" onclick="adminPanel.addExercise('${userId}')">Yeni Egzersiz</button>
-                    <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">Programı Kaydet</button>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-        } catch (error) {
-            console.error('Error loading program:', error);
-        }
-    }
-
-    async updateProgramTitle(userId, title) {
-        try {
-            const programRef = ref(db, `userPrograms/${userId}/${this.currentDay}`);
-            const snapshot = await get(programRef);
-            const currentProgram = snapshot.val() || { exercises: [] };
-            
-            currentProgram.title = title;
-            await set(programRef, currentProgram);
-        } catch (error) {
-            console.error('Error updating program title:', error);
-        }
-    }
-
-    async saveUser(userId) {
-        const row = document.querySelector(`tr[data-id="${userId}"]`);
-        const userData = {
-            name: row.querySelector('[name="name"]').value,
-            username: row.querySelector('[name="username"]').value,
-            password: row.querySelector('[name="password"]').value,
-            role: row.querySelector('[name="role"]').value
-        };
-
-        try {
             await set(ref(db, `users/${userId}`), userData);
-            alert('Kullanıcı başarıyla kaydedildi');
+            alert('Kullanıcı başarıyla güncellendi');
         } catch (error) {
             console.error('Error saving user:', error);
-            alert('Kullanıcı kaydedilirken hata oluştu');
+            alert('Kullanıcı güncellenirken bir hata oluştu');
         }
     }
 
@@ -189,63 +137,216 @@ class AdminPanel {
         try {
             await remove(ref(db, `users/${userId}`));
             await remove(ref(db, `userPrograms/${userId}`));
-            this.loadUsers();
+            await this.loadUsers();
             alert('Kullanıcı başarıyla silindi');
         } catch (error) {
             console.error('Error deleting user:', error);
-            alert('Kullanıcı silinirken hata oluştu');
+            alert('Kullanıcı silinirken bir hata oluştu');
         }
     }
 
-    addNewUser() {
-        const tbody = document.getElementById('usersTableBody');
-        const newId = Date.now().toString();
-        const tr = document.createElement('tr');
-        tr.dataset.id = newId;
-        
-        tr.innerHTML = `
-            <td>${newId}</td>
-            <td><input type="text" class="table-input" name="name" /></td>
-            <td><input type="text" class="table-input" name="username" /></td>
-            <td><input type="text" class="table-input" name="password" /></td>
-            <td>
-                <select class="table-input" name="role">
-                    <option value="user">Kullanıcı</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </td>
-            <td>
-                <button class="action-btn save-btn" onclick="adminPanel.saveUser('${newId}')">Kaydet</button>
-                <button class="action-btn delete-btn" onclick="adminPanel.deleteUser('${newId}')">Sil</button>
-            </td>
-        `;
-        
-        tbody.insertBefore(tr, tbody.firstChild);
-    }
-
     async toggleProgram(userId) {
-        const tr = document.querySelector(`tr[data-id="${userId}"]`);
-        const programRow = tr.nextElementSibling;
+        const programRow = document.getElementById(`program-${userId}`);
+        const isVisible = programRow.style.display === 'table-row';
         
-        if (programRow.style.display === 'none') {
+        if (!isVisible) {
+            // Tüm program satırlarını gizle
+            document.querySelectorAll('.program-row').forEach(row => {
+                row.style.display = 'none';
+            });
+            
+            // Seçilen program satırını göster
             programRow.style.display = 'table-row';
-            await this.loadDayProgram(userId, this.currentDay);
+            await this.loadUserProgram(userId);
         } else {
             programRow.style.display = 'none';
         }
     }
 
+    async loadUserProgram(userId) {
+        try {
+            const programRef = ref(db, `userPrograms/${userId}/${this.currentDay}`);
+            const snapshot = await get(programRef);
+            const program = snapshot.val();
+
+            const container = document.getElementById(`program-${userId}`);
+            const titleSelect = container.querySelector('.program-title-select');
+            const exercisesContainer = container.querySelector('.exercises-container');
+            
+            exercisesContainer.innerHTML = '';
+
+            if (program && program.title) {
+                titleSelect.value = program.title;
+            }
+
+            if (program && program.exercises) {
+                program.exercises.forEach((exercise, index) => {
+                    const exerciseCard = document.createElement('div');
+                    exerciseCard.className = 'exercise-card';
+                    exerciseCard.dataset.index = index;
+
+                    let setsHtml = '';
+                    if (exercise.sets) {
+                        exercise.sets.forEach((set, setIndex) => {
+                            setsHtml += `
+                                <div class="set-item">
+                                    <span>Set ${set.number}:</span>
+                                    <input type="number" class="set-input" value="${set.reps}" min="1">
+                                    <span>tekrar</span>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    exerciseCard.innerHTML = `
+                        <input type="text" class="exercise-name" value="${exercise.name || ''}" placeholder="Egzersiz Adı">
+                        <div class="sets-container">
+                            ${setsHtml}
+                        </div>
+                        <input type="text" class="video-url" value="${exercise.videoUrl || ''}" placeholder="Video URL">
+                        <div class="exercise-actions">
+                            <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${index})">Set Ekle</button>
+                            <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">Egzersizi Sil</button>
+                        </div>
+                    `;
+
+                    exercisesContainer.appendChild(exerciseCard);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading program:', error);
+        }
+    }
+
+    dayChanged(userId, day) {
+        this.currentDay = day;
+        this.loadUserProgram(userId);
+    }
+
+    async addSet(userId, exerciseIndex) {
+        const container = document.getElementById(`program-${userId}`);
+        const exerciseCards = container.querySelectorAll('.exercise-card');
+        const exerciseCard = exerciseCards[exerciseIndex];
+        
+        if (exerciseCard) {
+            const setsContainer = exerciseCard.querySelector('.sets-container');
+            const currentSets = setsContainer.querySelectorAll('.set-item').length;
+            
+            const newSetDiv = document.createElement('div');
+            newSetDiv.className = 'set-item';
+            newSetDiv.innerHTML = `
+                <span>Set ${currentSets + 1}:</span>
+                <input type="number" class="set-input" value="12" min="1">
+                <span>tekrar</span>
+            `;
+            
+            setsContainer.appendChild(newSetDiv);
+        }
+    }
+
+    async deleteExercise(userId, exerciseIndex) {
+        if (!confirm('Bu egzersizi silmek istediğinize emin misiniz?')) return;
+
+        const container = document.getElementById(`program-${userId}`);
+        const exerciseCards = container.querySelectorAll('.exercise-card');
+        const exerciseCard = exerciseCards[exerciseIndex];
+        
+        if (exerciseCard) {
+            exerciseCard.remove();
+        }
+    }
+
+    async addExercise(userId) {
+        const container = document.getElementById(`program-${userId}`);
+        const exercisesContainer = container.querySelector('.exercises-container');
+        
+        const newExerciseCard = document.createElement('div');
+        newExerciseCard.className = 'exercise-card';
+        newExerciseCard.dataset.index = exercisesContainer.children.length;
+        
+        newExerciseCard.innerHTML = `
+            <input type="text" class="exercise-name" value="" placeholder="Egzersiz Adı">
+            <div class="sets-container">
+                <div class="set-item">
+                    <span>Set 1:</span>
+                    <input type="number" class="set-input" value="12" min="1">
+                    <span>tekrar</span>
+                </div>
+            </div>
+            <input type="text" class="video-url" value="" placeholder="Video URL">
+            <div class="exercise-actions">
+                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${newExerciseCard.dataset.index})">Set Ekle</button>
+                <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${newExerciseCard.dataset.index})">Egzersizi Sil</button>
+            </div>
+        `;
+        
+        exercisesContainer.appendChild(newExerciseCard);
+    }
+
+    async saveProgram(userId) {
+        try {
+            const container = document.getElementById(`program-${userId}`);
+            const titleSelect = container.querySelector('.program-title-select');
+            const exerciseCards = container.querySelectorAll('.exercise-card');
+            
+            const exercises = Array.from(exerciseCards).map(card => {
+                const sets = Array.from(card.querySelectorAll('.set-item')).map((setItem, index) => ({
+                    number: index + 1,
+                    reps: parseInt(setItem.querySelector('.set-input').value) || 12
+                }));
+                
+                return {
+                    name: card.querySelector('.exercise-name').value,
+                    sets: sets,
+                    videoUrl: card.querySelector('.video-url').value
+                };
+            });
+            
+            const programData = {
+                title: titleSelect.value,
+                exercises: exercises
+            };
+            
+            await set(ref(db, `userPrograms/${userId}/${this.currentDay}`), programData);
+            alert('Program başarıyla kaydedildi');
+        } catch (error) {
+            console.error('Error saving program:', error);
+            alert('Program kaydedilirken bir hata oluştu');
+        }
+    }
+
     initializeInterface() {
-        document.getElementById('addUserBtn').addEventListener('click', () => this.addNewUser());
+        document.getElementById('addUserBtn').addEventListener('click', () => {
+            const tbody = document.querySelector('.users-table tbody');
+            const tr = document.createElement('tr');
+            const userId = 'new-' + Date.now();
+            
+            tr.innerHTML = `
+                <td><input type="text" class="table-input" value="" data-field="username"></td>
+                <td><input type="password" class="table-input" value="" data-field="password"></td>
+                <td><input type="text" class="table-input" value="" data-field="name"></td>
+                <td>
+                    <select class="table-input" data-field="role">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="action-btn save-btn" onclick="adminPanel.saveUser('${userId}', this)">Kaydet</button>
+                </td>
+            `;
+            
+            tbody.insertBefore(tr, tbody.firstChild);
+        });
+
         document.getElementById('logoutBtn').addEventListener('click', () => {
             sessionStorage.removeItem('currentUser');
             window.location.href = 'index.html';
         });
-        
+
         this.updateDateTime();
         setInterval(() => this.updateDateTime(), 1000);
     }
 }
 
-// Global erişim için
 window.adminPanel = new AdminPanel();
