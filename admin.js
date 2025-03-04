@@ -24,14 +24,14 @@ class AdminPanel {
         }
 
         this.currentAdmin = user;
-        document.getElementById('currentAdmin').innerText = 
-            `Current User's Login: ${user.username}\n`;
+        document.getElementById('currentAdmin').innerText = `Current User's Login: ${user.username}\n`;
     }
 
     updateDateTime() {
         const now = new Date();
+        const formattedDate = now.toISOString().replace('T', ' ').split('.')[0];
         document.getElementById('currentDateTime').innerText = 
-            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${now.toISOString().replace('T', ' ').split('.')[0]}\n`;
+            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}\n`;
     }
 
     async loadUsers() {
@@ -86,12 +86,7 @@ class AdminPanel {
                                     <option value="cumartesi">Cumartesi</option>
                                     <option value="pazar">Pazar</option>
                                 </select>
-                                <select class="program-title-select">
-                                    <option value="Cardio">Cardio</option>
-                                    <option value="Üst Vücut">Üst Vücut</option>
-                                    <option value="Alt Vücut">Alt Vücut</option>
-                                    <option value="Full Body">Full Body</option>
-                                </select>
+                                <input type="text" class="program-title-input" placeholder="Program Adı" value="Cardio">
                             </div>
                             <div class="exercises-container"></div>
                             <div class="program-actions">
@@ -165,13 +160,13 @@ class AdminPanel {
             const program = snapshot.val();
 
             const container = document.getElementById(`program-${userId}`);
-            const titleSelect = container.querySelector('.program-title-select');
+            const titleInput = container.querySelector('.program-title-input');
             const exercisesContainer = container.querySelector('.exercises-container');
             
             exercisesContainer.innerHTML = '';
 
             if (program && program.title) {
-                titleSelect.value = program.title;
+                titleInput.value = program.title;
             }
 
             if (program && program.exercises) {
@@ -191,12 +186,13 @@ class AdminPanel {
 
         let setsHtml = '';
         if (exercise.sets) {
-            exercise.sets.forEach(set => {
+            exercise.sets.forEach((set, setIndex) => {
                 setsHtml += `
                     <div class="set-item">
                         <span>Set ${set.number}:</span>
                         <input type="number" class="set-input" value="${set.reps}" min="1">
                         <span>tekrar</span>
+                        <button class="action-btn delete-btn" onclick="adminPanel.deleteSet('${userId}', ${index}, ${setIndex})">Set Sil</button>
                     </div>
                 `;
             });
@@ -237,9 +233,34 @@ class AdminPanel {
                 <span>Set ${currentSets + 1}:</span>
                 <input type="number" class="set-input" value="12" min="1">
                 <span>tekrar</span>
+                <button class="action-btn delete-btn" onclick="adminPanel.deleteSet('${userId}', ${exerciseIndex}, ${currentSets})">Set Sil</button>
             `;
             
             setsContainer.appendChild(newSetDiv);
+        }
+    }
+
+    deleteSet(userId, exerciseIndex, setIndex) {
+        const container = document.getElementById(`program-${userId}`);
+        const exerciseCards = container.querySelectorAll('.exercise-card');
+        const exerciseCard = exerciseCards[exerciseIndex];
+        
+        if (exerciseCard) {
+            const setsContainer = exerciseCard.querySelector('.sets-container');
+            const setItems = setsContainer.querySelectorAll('.set-item');
+            
+            if (setItems.length > 1) {
+                setItems[setIndex].remove();
+                
+                // Kalan setlerin numaralarını güncelle
+                const remainingSets = setsContainer.querySelectorAll('.set-item');
+                remainingSets.forEach((set, idx) => {
+                    const setNumber = set.querySelector('span:first-child');
+                    setNumber.textContent = `Set ${idx + 1}:`;
+                });
+            } else {
+                alert('En az bir set bulunmalıdır!');
+            }
         }
     }
 
@@ -271,7 +292,7 @@ class AdminPanel {
     async saveProgram(userId) {
         try {
             const container = document.getElementById(`program-${userId}`);
-            const titleSelect = container.querySelector('.program-title-select');
+            const titleInput = container.querySelector('.program-title-input');
             const exerciseCards = container.querySelectorAll('.exercise-card');
             
             const exercises = Array.from(exerciseCards).map(card => {
@@ -288,7 +309,7 @@ class AdminPanel {
             });
             
             const programData = {
-                title: titleSelect.value,
+                title: titleInput.value,
                 exercises: exercises
             };
             
@@ -300,7 +321,7 @@ class AdminPanel {
         }
     }
 
-    initializeInterface() {
+            initializeInterface() {
         document.getElementById('addUserBtn').addEventListener('click', () => {
             const tbody = document.querySelector('.users-table tbody');
             const tr = document.createElement('tr');
@@ -329,9 +350,11 @@ class AdminPanel {
             window.location.href = 'index.html';
         });
 
+        // Tarih ve saat güncellemesi
         this.updateDateTime();
         setInterval(() => this.updateDateTime(), 1000);
     }
 }
 
+// Global olarak adminPanel nesnesini oluştur
 window.adminPanel = new AdminPanel();
