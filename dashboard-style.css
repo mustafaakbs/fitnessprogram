@@ -372,3 +372,20 @@ body {
     white-space: nowrap;
     min-width: 100px;
 }
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.footer p {
+    margin: 0;
+    opacity: 0.8;
+}
