@@ -4,12 +4,13 @@ import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-dat
 class Dashboard {
     constructor() {
         this.currentUser = null;
-        this.currentDay = null;
-        this.init();
+        this.currentDay = 'pazartesi';
+        this.checkUserAccess();
+        this.initializeInterface();
+        this.loadUserProgram(this.currentDay);
     }
 
-    init() {
-        // Session'dan kullanıcı bilgisini al
+    checkUserAccess() {
         const userJson = sessionStorage.getItem('currentUser');
         if (!userJson) {
             window.location.href = 'index.html';
@@ -17,138 +18,131 @@ class Dashboard {
         }
 
         this.currentUser = JSON.parse(userJson);
-        
-        // Kullanıcı rolünü kontrol et
-        if (this.currentUser.role === 'admin') {
-            window.location.href = 'admin.html';
-            return;
-        }
-
-        // Bugünün gününü al
-        const days = ['pazar', 'pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi'];
-        this.currentDay = days[new Date().getDay()];
-
-        // Event listener'ları ekle
-        this.addEventListeners();
-        
-        // Programı yükle
-        this.loadUserProgram();
-        
-        // Kullanıcı bilgilerini göster
-        this.displayUserInfo();
+        document.getElementById('currentUser').innerHTML = `Hoş Geldin<br>${this.currentUser.name}`;
     }
 
-    displayUserInfo() {
-        const currentDateTime = new Date().toISOString().replace('T', ' ').split('.')[0];
-        document.getElementById('currentDateTime').textContent = 
-            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${currentDateTime}\n`;
-        document.getElementById('currentUser').textContent = 
-            `Current User's Login: ${this.currentUser.username}\n`;
+    updateDateTime() {
+        const now = new Date();
+        document.getElementById('currentDateTime').textContent = now.toLocaleString('tr-TR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
     }
 
-    addEventListeners() {
-        // Gün seçici için event listener
-        const daySelect = document.getElementById('daySelect');
-        if (daySelect) {
-            daySelect.value = this.currentDay;
-            daySelect.addEventListener('change', (e) => {
-                this.currentDay = e.target.value;
-                this.loadUserProgram();
-            });
-        }
-
-        // Çıkış butonu için event listener
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                sessionStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
-            });
-        }
-    }
-
-    async loadUserProgram() {
+    async loadUserProgram(day) {
         try {
-            // users array'inden kullanıcının index'ini bul
-            const usersRef = ref(db, 'users');
-            const usersSnapshot = await get(usersRef);
-            const users = usersSnapshot.val();
-            
-            let userIndex = null;
-            for (let i = 0; i < users.length; i++) {
-                if (users[i] && users[i].username === this.currentUser.username) {
-                    userIndex = i;
-                    break;
-                }
+            if (!this.currentUser) return;
+
+            const programRef = ref(db, `userPrograms/${this.currentUser.id}/${day}`);
+            const snapshot = await get(programRef);
+            const program = snapshot.val();
+
+            const titleElement = document.querySelector('.program-title');
+            if (titleElement && program && program.title) {
+                titleElement.textContent = program.title;
+            } else if (titleElement) {
+                titleElement.textContent = 'Program';
             }
 
-            if (userIndex === null) {
-                console.error('Kullanıcı bulunamadı');
+            const exercisesContainer = document.getElementById('exercisesContainer');
+            if (!exercisesContainer) return;
+            exercisesContainer.innerHTML = '';
+
+            if (!program || !program.exercises || program.exercises.length === 0) {
+                exercisesContainer.innerHTML = '<p class="no-program">Bu gün için program bulunamadı.</p>';
                 return;
             }
 
-            // Kullanıcının programını yükle
-            const programRef = ref(db, `userPrograms/${userIndex}/${this.currentDay}`);
-            const programSnapshot = await get(programRef);
-            const program = programSnapshot.val();
+            program.exercises.forEach((exercise, index) => {
+                const exerciseDiv = document.createElement('div');
+                exerciseDiv.className = 'exercise-card';
+                
+                let setsHtml = '';
+                if (exercise.sets) {
+                    exercise.sets.forEach(set => {
+                        setsHtml += `
+                            <div class="set-item">
+                                <span class="set-number">Set ${set.number}</span>
+                                <span class="set-reps">${set.reps} tekrar</span>
+                            </div>
+                        `;
+                    });
+                }
 
-            this.displayProgram(program);
+                let videoPreview = '';
+                if (exercise.videoUrl) {
+                    if (exercise.videoUrl.includes('youtube.com') || exercise.videoUrl.includes('youtu.be')) {
+                        const videoId = this.getYoutubeVideoId(exercise.videoUrl);
+                        if (videoId) {
+                            videoPreview = `
+                                <div class="video-preview-container">
+                                    <div class="video-preview">
+                                        <iframe 
+                                            src="https://www.youtube.com/embed/${videoId}" 
+                                            frameborder="0" 
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                            allowfullscreen
+                                        ></iframe>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+
+                exerciseDiv.innerHTML = `
+                    <div class="exercise-header">
+                        <h3 class="exercise-name">${exercise.name || 'İsimsiz Egzersiz'}</h3>
+                    </div>
+                    <div class="exercise-content">
+                        <div class="sets-container">
+                            ${setsHtml}
+                        </div>
+                        ${videoPreview}
+                    </div>
+                `;
+
+                exercisesContainer.appendChild(exerciseDiv);
+            });
+
         } catch (error) {
-            console.error('Program yüklenirken hata:', error);
+            console.error('Error loading program:', error);
+            document.getElementById('exercisesContainer').innerHTML = 
+                '<p class="error-message">Program yüklenirken bir hata oluştu.</p>';
         }
     }
 
-    displayProgram(program) {
-        const programContainer = document.getElementById('programContainer');
-        if (!programContainer) return;
+    getYoutubeVideoId(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
 
-        if (!program) {
-            programContainer.innerHTML = '<p class="no-program">Bu gün için program bulunmamaktadır.</p>';
-            return;
-        }
-
-        let html = `
-            <div class="program-header">
-                <h2>${program.title || 'Program'}</h2>
-            </div>
-        `;
-
-        if (program.exercises && program.exercises.length > 0) {
-            html += '<div class="exercises-container">';
-            program.exercises.forEach(exercise => {
-                html += `
-                    <div class="exercise-card">
-                        <h3 class="exercise-name">${exercise.name}</h3>
-                        <div class="sets-container">
-                            ${exercise.sets.map(set => `
-                                <div class="set-item">
-                                    <span>Set ${set.number}:</span>
-                                    <span>${set.reps} tekrar</span>
-                                    ${exercise.weight ? `<span>${exercise.weight} kg</span>` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                        ${exercise.videoUrl ? `
-                            <div class="video-container">
-                                <a href="${exercise.videoUrl}" target="_blank" class="video-link">
-                                    Egzersiz Videosu
-                                </a>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
+    initializeInterface() {
+        const dayButtons = document.querySelectorAll('.day-button');
+        dayButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                dayButtons.forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                const selectedDay = e.target.dataset.day;
+                this.currentDay = selectedDay;
+                this.loadUserProgram(selectedDay);
             });
-            html += '</div>';
-        }
+        });
 
-        programContainer.innerHTML = html;
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
+
+        this.updateDateTime();
+        setInterval(() => this.updateDateTime(), 1000);
     }
 }
 
-// Dashboard nesnesini oluştur
-const dashboard = new Dashboard();
-
-// Sayfa yüklendiğinde otomatik güncelleme için
-setInterval(() => {
-    dashboard.displayUserInfo();
-}, 1000);
+window.dashboard = new Dashboard();
