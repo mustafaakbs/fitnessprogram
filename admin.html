@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <link rel="stylesheet" href="admin-style.css">
+    <!-- Monospace font için Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="admin-header">
         <div class="header-content">
             <h1>Admin Panel</h1>
             <div class="admin-info">
-                <span id="currentDateTime"></span>
-                <span id="currentAdmin"></span>
+                <!-- pre etiketi ile formatlı gösterim -->
+                <pre id="currentDateTime" class="info-text"></pre>
+                <pre id="currentAdmin" class="info-text"></pre>
                 <button id="logoutBtn" class="action-btn">Çıkış Yap</button>
             </div>
         </div>
