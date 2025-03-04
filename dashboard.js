@@ -18,27 +18,48 @@ class Dashboard {
         }
 
         this.currentUser = JSON.parse(userJson);
-        document.getElementById('currentUser').innerHTML = `Hoş Geldin<br>${this.currentUser.name}`;
+        if (this.currentUser.role === 'admin') {
+            window.location.href = 'admin.html';
+            return;
+        }
+
+        this.displayUserInfo();
     }
 
-    updateDateTime() {
+    displayUserInfo() {
         const now = new Date();
-        document.getElementById('currentDateTime').textContent = now.toLocaleString('tr-TR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        });
+        const dateStr = now.toISOString().replace('T', ' ').split('.')[0];
+        
+        document.getElementById('currentDateTime').innerText = 
+            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${dateStr}\n`;
+        
+        document.getElementById('currentUser').innerText = 
+            `Current User's Login: ${this.currentUser.username}\n`;
     }
 
     async loadUserProgram(day) {
         try {
             if (!this.currentUser) return;
 
-            const programRef = ref(db, `userPrograms/${this.currentUser.id}/${day}`);
+            // Önce users dizisinde kullanıcının indeksini bulalım
+            const usersRef = ref(db, 'users');
+            const usersSnapshot = await get(usersRef);
+            const users = usersSnapshot.val();
+
+            let userIndex = null;
+            for (let i = 0; i < users.length; i++) {
+                if (users[i] && users[i].username === this.currentUser.username) {
+                    userIndex = i;
+                    break;
+                }
+            }
+
+            if (userIndex === null) {
+                console.error('Kullanıcı indeksi bulunamadı');
+                return;
+            }
+
+            const programRef = ref(db, `userPrograms/${userIndex}/${day}`);
             const snapshot = await get(programRef);
             const program = snapshot.val();
 
@@ -69,6 +90,7 @@ class Dashboard {
                             <div class="set-item">
                                 <span class="set-number">Set ${set.number}</span>
                                 <span class="set-reps">${set.reps} tekrar</span>
+                                ${exercise.weight ? `<span class="set-weight">${exercise.weight} kg</span>` : ''}
                             </div>
                         `;
                     });
@@ -140,9 +162,10 @@ class Dashboard {
             window.location.href = 'index.html';
         });
 
-        this.updateDateTime();
-        setInterval(() => this.updateDateTime(), 1000);
+        // Her saniye kullanıcı bilgilerini güncelle
+        setInterval(() => this.displayUserInfo(), 1000);
     }
 }
 
+// Dashboard nesnesini oluştur
 window.dashboard = new Dashboard();
