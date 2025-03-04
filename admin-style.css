@@ -42,10 +42,14 @@ body {
 #currentAdmin {
     font-family: 'Courier New', monospace;
     white-space: pre;
-    color: #fff;
-    font-size: 14px;
-    line-height: 1.5;
     text-align: right;
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
 }
 
 /* Main Content */
@@ -100,9 +104,7 @@ body {
 }
 
 /* Input and Select Styles */
-.table-input,
-.day-select,
-.program-title-select {
+.table-input {
     width: 100%;
     padding: 8px 12px;
     background: rgba(40, 40, 40, 0.95);
@@ -112,38 +114,43 @@ body {
     font-size: 14px;
 }
 
-.day-select,
-.program-title-select {
+.day-select {
     width: 200px;
+    padding: 8px 12px;
+    background: rgba(40, 40, 40, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: #fff;
     margin-bottom: 15px;
     cursor: pointer;
 }
 
-.table-input option,
-.day-select option,
-.program-title-select option {
+.program-title-input {
+    width: 200px;
+    padding: 8px 12px;
     background: rgba(40, 40, 40, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
     color: #fff;
-    padding: 8px;
+    font-size: 14px;
+    margin-bottom: 15px;
 }
 
 .table-input:focus,
 .day-select:focus,
-.program-title-select:focus {
+.program-title-input:focus {
     outline: none;
     border-color: #4CAF50;
 }
 
-/* Program Styles */
+/* Program Row Styles */
 .program-row {
-    background: rgba(30, 30, 30, 0.95);
     display: none;
+    background: rgba(30, 30, 30, 0.95);
 }
 
 .program-container {
     padding: 20px;
-    background: rgba(30, 30, 30, 0.95);
-    border-radius: 8px;
 }
 
 .program-header {
@@ -250,6 +257,26 @@ body {
     justify-content: flex-end;
 }
 
+/* Set Item Delete Button */
+.set-item .delete-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* Info Text Styles */
+.info-text {
+    font-family: 'Courier New', monospace;
+    white-space: pre;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: right;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .header-content {
@@ -263,7 +290,8 @@ body {
     }
 
     #currentDateTime,
-    #currentAdmin {
+    #currentAdmin,
+    .info-text {
         text-align: center;
     }
 
@@ -286,7 +314,7 @@ body {
     }
 
     .day-select,
-    .program-title-select {
+    .program-title-input {
         width: 100%;
     }
 
@@ -298,5 +326,14 @@ body {
     .action-btn {
         width: 100%;
         margin: 5px 0;
+    }
+
+    .set-item {
+        flex-wrap: wrap;
+    }
+
+    .set-item .delete-btn {
+        width: 100%;
+        margin-top: 5px;
     }
 }
