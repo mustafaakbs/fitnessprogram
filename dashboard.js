@@ -27,15 +27,9 @@ class Dashboard {
     }
 
     displayUserInfo() {
-        const now = new Date();
-        const dateStr = now.toISOString().replace('T', ' ').split('.')[0];
-        
-        document.getElementById('currentDateTime').innerText = 
-            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${dateStr}\n`;
-        
-        document.getElementById('currentUser').innerText = 
-            `Current User's Login: ${this.currentUser.username}\n`;
-    }
+    // Sadece "Hoş Geldin" ve kullanıcı adını göster
+    document.getElementById('currentUser').innerHTML = `Hoş Geldin<br>${this.currentUser.name}`;
+}
 
     async loadUserProgram(day) {
         try {
