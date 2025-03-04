@@ -30,9 +30,8 @@ class AdminPanel {
 
     updateDateTime() {
         const now = new Date();
-        const formattedDate = now.toISOString().replace('T', ' ').split('.')[0];
         document.getElementById('currentDateTime').innerText = 
-            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}\n`;
+            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${now.toISOString().replace('T', ' ').split('.')[0]}\n`;
     }
 
     async loadUsers() {
@@ -94,9 +93,7 @@ class AdminPanel {
                                     <option value="Full Body">Full Body</option>
                                 </select>
                             </div>
-                            <div class="exercises-container">
-                                <!-- Exercises will be loaded here -->
-                            </div>
+                            <div class="exercises-container"></div>
                             <div class="program-actions">
                                 <button class="action-btn" onclick="adminPanel.addExercise('${userId}')">Yeni Egzersiz</button>
                                 <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">Programı Kaydet</button>
@@ -150,12 +147,10 @@ class AdminPanel {
         const isVisible = programRow.style.display === 'table-row';
         
         if (!isVisible) {
-            // Tüm program satırlarını gizle
             document.querySelectorAll('.program-row').forEach(row => {
                 row.style.display = 'none';
             });
             
-            // Seçilen program satırını göster
             programRow.style.display = 'table-row';
             await this.loadUserProgram(userId);
         } else {
@@ -181,36 +176,7 @@ class AdminPanel {
 
             if (program && program.exercises) {
                 program.exercises.forEach((exercise, index) => {
-                    const exerciseCard = document.createElement('div');
-                    exerciseCard.className = 'exercise-card';
-                    exerciseCard.dataset.index = index;
-
-                    let setsHtml = '';
-                    if (exercise.sets) {
-                        exercise.sets.forEach((set, setIndex) => {
-                            setsHtml += `
-                                <div class="set-item">
-                                    <span>Set ${set.number}:</span>
-                                    <input type="number" class="set-input" value="${set.reps}" min="1">
-                                    <span>tekrar</span>
-                                </div>
-                            `;
-                        });
-                    }
-
-                    exerciseCard.innerHTML = `
-                        <input type="text" class="exercise-name" value="${exercise.name || ''}" placeholder="Egzersiz Adı">
-                        <div class="sets-container">
-                            ${setsHtml}
-                        </div>
-                        <input type="text" class="video-url" value="${exercise.videoUrl || ''}" placeholder="Video URL">
-                        <div class="exercise-actions">
-                            <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${index})">Set Ekle</button>
-                            <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">Egzersizi Sil</button>
-                        </div>
-                    `;
-
-                    exercisesContainer.appendChild(exerciseCard);
+                    this.createExerciseCard(exercisesContainer, exercise, index, userId);
                 });
             }
         } catch (error) {
@@ -218,12 +184,45 @@ class AdminPanel {
         }
     }
 
+    createExerciseCard(container, exercise, index, userId) {
+        const exerciseCard = document.createElement('div');
+        exerciseCard.className = 'exercise-card';
+        exerciseCard.dataset.index = index;
+
+        let setsHtml = '';
+        if (exercise.sets) {
+            exercise.sets.forEach(set => {
+                setsHtml += `
+                    <div class="set-item">
+                        <span>Set ${set.number}:</span>
+                        <input type="number" class="set-input" value="${set.reps}" min="1">
+                        <span>tekrar</span>
+                    </div>
+                `;
+            });
+        }
+
+        exerciseCard.innerHTML = `
+            <input type="text" class="exercise-name" value="${exercise.name || ''}" placeholder="Egzersiz Adı">
+            <div class="sets-container">
+                ${setsHtml}
+            </div>
+            <input type="text" class="video-url" value="${exercise.videoUrl || ''}" placeholder="Video URL">
+            <div class="exercise-actions">
+                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${index})">Set Ekle</button>
+                <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">Egzersizi Sil</button>
+            </div>
+        `;
+
+        container.appendChild(exerciseCard);
+    }
+
     dayChanged(userId, day) {
         this.currentDay = day;
         this.loadUserProgram(userId);
     }
 
-    async addSet(userId, exerciseIndex) {
+    addSet(userId, exerciseIndex) {
         const container = document.getElementById(`program-${userId}`);
         const exerciseCards = container.querySelectorAll('.exercise-card');
         const exerciseCard = exerciseCards[exerciseIndex];
@@ -244,7 +243,7 @@ class AdminPanel {
         }
     }
 
-    async deleteExercise(userId, exerciseIndex) {
+    deleteExercise(userId, exerciseIndex) {
         if (!confirm('Bu egzersizi silmek istediğinize emin misiniz?')) return;
 
         const container = document.getElementById(`program-${userId}`);
@@ -256,31 +255,17 @@ class AdminPanel {
         }
     }
 
-    async addExercise(userId) {
+    addExercise(userId) {
         const container = document.getElementById(`program-${userId}`);
         const exercisesContainer = container.querySelector('.exercises-container');
         
-        const newExerciseCard = document.createElement('div');
-        newExerciseCard.className = 'exercise-card';
-        newExerciseCard.dataset.index = exercisesContainer.children.length;
-        
-        newExerciseCard.innerHTML = `
-            <input type="text" class="exercise-name" value="" placeholder="Egzersiz Adı">
-            <div class="sets-container">
-                <div class="set-item">
-                    <span>Set 1:</span>
-                    <input type="number" class="set-input" value="12" min="1">
-                    <span>tekrar</span>
-                </div>
-            </div>
-            <input type="text" class="video-url" value="" placeholder="Video URL">
-            <div class="exercise-actions">
-                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${newExerciseCard.dataset.index})">Set Ekle</button>
-                <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${newExerciseCard.dataset.index})">Egzersizi Sil</button>
-            </div>
-        `;
-        
-        exercisesContainer.appendChild(newExerciseCard);
+        const exercise = {
+            name: '',
+            sets: [{number: 1, reps: 12}],
+            videoUrl: ''
+        };
+
+        this.createExerciseCard(exercisesContainer, exercise, exercisesContainer.children.length, userId);
     }
 
     async saveProgram(userId) {
