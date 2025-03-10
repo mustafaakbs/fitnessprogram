@@ -1,8 +1,5 @@
-// Firebase yapılandırması
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
 import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
-import { getAuth } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyADqRGwGotZiCA4C5rmAf7HwvADpZQRAu0",
@@ -18,7 +15,19 @@ const firebaseConfig = {
 // Firebase'i başlat
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const auth = getAuth(app);
-const analytics = getAnalytics(app);
 
-export { db, auth, analytics };
+// auth.currentUser için global değişken
+let currentUser = null;
+
+// Session'dan kullanıcıyı al
+const storedUser = sessionStorage.getItem('currentUser');
+if (storedUser) {
+    currentUser = JSON.parse(storedUser);
+}
+
+// Auth nesnesi
+const auth = {
+    currentUser: currentUser?.username || null
+};
+
+export { db, auth };
