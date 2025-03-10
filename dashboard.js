@@ -7,7 +7,7 @@ const db = getDatabase();
 document.getElementById('logoutBtn').addEventListener('click', () => {
     signOut(auth).then(() => {
         sessionStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
     }).catch((error) => {
         console.error('Çıkış hatası:', error);
     });
@@ -16,7 +16,7 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', () => {
     const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
     if (!currentUser) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -32,13 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
             dayButtons.forEach(btn => btn.classList.remove('active'));
             e.target.classList.add('active');
             const selectedDay = e.target.dataset.day;
-            this.currentDay = selectedDay;
-            this.loadUserProgram(selectedDay);
+            loadUserProgram(selectedDay);
         });
     });
 
     // Varsayılan olarak Pazartesi gününün programını yükleyelim
-    this.loadUserProgram('pazartesi');
+    loadUserProgram('pazartesi');
 });
 
 async function loadUserProgram(day) {
