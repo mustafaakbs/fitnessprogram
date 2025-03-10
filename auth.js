@@ -1,41 +1,49 @@
-import { db } from './firebase-config.js';
-import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
+const auth = getAuth();
+const db = getDatabase();
+
+document.getElementById('loginBtn').addEventListener('click', (e) => {
     e.preventDefault();
     
-    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    try {
-        const usersRef = ref(db, 'users');
-        const snapshot = await get(usersRef);
-        const users = snapshot.val();
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            // Giriş başarılı
+            const user = userCredential.user;
+            const userRef = ref(db, 'users/' + user.uid);
 
-        if (!users) {
-            throw new Error('Kullanıcı bulunamadı!');
-        }
+            get(userRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    console.log('Giriş başarılı:', userData);
 
-        // Kullanıcı kontrolü
-        const user = Object.values(users).find(u => 
-            u.username === username && u.password === password
-        );
+                    // Kullanıcı bilgilerini sessionStorage'a kaydet
+                    sessionStorage.setItem('currentUser', JSON.stringify({
+                        uid: user.uid,
+                        email: user.email,
+                        name: userData.name,
+                        role: userData.role
+                    }));
 
-        if (user) {
-            // Kullanıcı bilgilerini sessionStorage'a kaydet
-            sessionStorage.setItem('currentUser', JSON.stringify(user));
-            
-            // Admin kontrolü ve yönlendirme
-            if (user.role === 'admin') {
-                window.location.href = 'admin.html';
-            } else {
-                window.location.href = 'dashboard.html';
-            }
-        } else {
-            alert('Kullanıcı adı veya şifre hatalı!');
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        alert('Giriş yapılırken bir hata oluştu: ' + error.message);
-    }
+                    // Giriş başarılı olduğunda yönlendirme
+                    window.location.href = 'dashboard.html';
+                } else {
+                    console.error('Kullanıcı verileri bulunamadı.');
+                }
+            }).catch((error) => {
+                console.error('Veritabanı hatası:', error);
+            });
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error('Giriş hatası:', errorCode, errorMessage);
+
+            // Hata mesajını kullanıcıya göster
+            document.getElementById('error-message').innerText = 'Giriş başarısız: ' + errorMessage;
+        });
 });
