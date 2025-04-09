@@ -84,7 +84,35 @@
         function convertJsonToExcel() {
             try {
                 const jsonData = JSON.parse(document.getElementById('jsonInput').value);
-                const ws = XLSX.utils.json_to_sheet(flattenJSON(jsonData));
+                const flatData = [];
+
+                // JSON yapısını düz bir diziye çevir
+                for (const userId in jsonData) {
+                    const userPrograms = jsonData[userId];
+                    for (const day in userPrograms) {
+                        const program = userPrograms[day];
+                        if (program && program.exercises) {
+                            program.exercises.forEach(exercise => {
+                                if (exercise.sets) {
+                                    exercise.sets.forEach(set => {
+                                        flatData.push({
+                                            userId: userId,
+                                            day: day,
+                                            programName: program.title || '',
+                                            exerciseName: exercise.name || '',
+                                            setNumber: set.number || '',
+                                            reps: set.reps || '',
+                                            videoUrl: exercise.videoUrl || ''
+                                        });
+                                    });
+                                }
+                            });
+                        }
+                    }
+                }
+
+                // Excel oluştur
+                const ws = XLSX.utils.json_to_sheet(flatData);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Programlar");
                 XLSX.writeFile(wb, "program.xlsx");
@@ -108,40 +136,49 @@
                     const workbook = XLSX.read(data, {type: 'array'});
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-                    document.getElementById('jsonOutput').value = JSON.stringify(jsonData, null, 2);
+
+                    // Excel verilerini Firebase formatına dönüştür
+                    const formattedData = {};
+                    jsonData.forEach(row => {
+                        if (!formattedData[row.userId]) {
+                            formattedData[row.userId] = {};
+                        }
+                        if (!formattedData[row.userId][row.day]) {
+                            formattedData[row.userId][row.day] = {
+                                title: row.programName,
+                                exercises: []
+                            };
+                        }
+
+                        // Egzersiz kontrolü
+                        let exercise = formattedData[row.userId][row.day].exercises.find(
+                            e => e.name === row.exerciseName
+                        );
+
+                        if (!exercise) {
+                            exercise = {
+                                name: row.exerciseName,
+                                sets: [],
+                                videoUrl: row.videoUrl
+                            };
+                            formattedData[row.userId][row.day].exercises.push(exercise);
+                        }
+
+                        // Set kontrolü
+                        if (!exercise.sets.find(s => s.number === row.setNumber)) {
+                            exercise.sets.push({
+                                number: parseInt(row.setNumber),
+                                reps: parseInt(row.reps)
+                            });
+                        }
+                    });
+
+                    document.getElementById('jsonOutput').value = JSON.stringify(formattedData, null, 2);
                 } catch (error) {
                     alert('Hata: ' + error.message);
                 }
             };
             reader.readAsArrayBuffer(file);
-        }
-
-        // JSON düzleştirme yardımcı fonksiyonu
-        function flattenJSON(json) {
-            const result = [];
-            for (const userId in json) {
-                for (const day in json[userId]) {
-                    const program = json[userId][day];
-                    if (program.exercises) {
-                        program.exercises.forEach(exercise => {
-                            if (exercise.sets) {
-                                exercise.sets.forEach(set => {
-                                    result.push({
-                                        userId: userId,
-                                        day: day,
-                                        programName: program.title,
-                                        exerciseName: exercise.name,
-                                        setNumber: set.number,
-                                        reps: set.reps,
-                                        videoUrl: exercise.videoUrl || ''
-                                    });
-                                });
-                            }
-                        });
-                    }
-                }
-            }
-            return result;
         }
     </script>
 </body>
