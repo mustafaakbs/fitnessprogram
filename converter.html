@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Program Dönüştürücü - Fitness Program</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2964/2964514.png" type="image/png">
+    <link rel="stylesheet" href="converter-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="converter-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="https://cdn-icons-png.flaticon.com/512/2964/2964514.png" alt="Logo" class="logo">
+                <h1>Program Dönüştürücü</h1>
+            </div>
+            <div class="user-info">
+                <pre id="currentDateTime" class="info-text"></pre>
+                <pre id="currentAdmin" class="info-text"></pre>
+                <div class="header-buttons">
+                    <button onclick="location.href='admin.html'" class="nav-btn">Admin Paneli</button>
+                    <button id="logoutBtn" class="nav-btn logout">Çıkış Yap</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="converter-content">
+        <div class="converter-container">
+            <div class="converter-tabs">
+                <button class="tab-btn active" data-tab="json-to-excel">JSON'dan Excel'e</button>
+                <button class="tab-btn" data-tab="excel-to-json">Excel'den JSON'a</button>
+            </div>
+
+            <!-- JSON to Excel Tab -->
+            <div class="tab-content active" id="json-to-excel">
+                <div class="conversion-area">
+                    <div class="input-section">
+                        <h3>JSON Verisi</h3>
+                        <div class="code-wrapper">
+                            <textarea id="jsonInput" class="code-input" placeholder="JSON verisini buraya yapıştırın veya Firebase'den yükleyin..."></textarea>
+                            <div class="editor-buttons">
+                                <button id="formatJson" class="editor-btn" title="JSON'u Formatla">
+                                    <span class="btn-icon">⚙️</span> Formatla
+                                </button>
+                                <button id="clearJson" class="editor-btn" title="Temizle">
+                                    <span class="btn-icon">🗑️</span> Temizle
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="validateJson" class="action-btn validate-btn">
+                            <span class="btn-icon">✓</span> JSON Doğrula
+                        </button>
+                        <button id="loadFromFirebase" class="action-btn firebase-btn">
+                            <span class="btn-icon">📥</span> Firebase'den Yükle
+                        </button>
+                        <button id="convertToExcel" class="action-btn convert-btn">
+                            <span class="btn-icon">📊</span> Excel'e Dönüştür
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Excel to JSON Tab -->
+            <div class="tab-content" id="excel-to-json">
+                <div class="conversion-area">
+                    <div class="input-section">
+                        <h3>Excel Dosyası</h3>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="excelInput" accept=".xlsx, .xls, .csv" class="file-upload" />
+                            <label for="excelInput" class="file-upload-label">
+                                <span class="upload-icon">📑</span>
+                                Excel Dosyası Seçin
+                            </label>
+                        </div>
+                        <div id="excelPreview" class="excel-preview"></div>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="downloadTemplate" class="action-btn template-btn">
+                            <span class="btn-icon">📝</span> Şablon İndir
+                        </button>
+                        <button id="convertToJson" class="action-btn convert-btn">
+                            <span class="btn-icon">🔄</span> JSON'a Dönüştür
+                        </button>
+                        <button id="saveToFirebase" class="action-btn firebase-btn">
+                            <span class="btn-icon">📤</span> Firebase'e Kaydet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sonuç Modalı -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modalTitle">Dönüştürme Sonucu</h2>
+            <div id="modalBody" class="modal-body"></div>
+            <div class="modal-footer">
+                <button id="copyResult" class="action-btn">Kopyala</button>
+                <button id="downloadResult" class="action-btn">İndir</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Tasarım ve Kodlama: Mustafa Akbaş</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script type="module" src="converter.js"></script>
+</body>
+</html>
