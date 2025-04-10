@@ -1,6 +1,3 @@
-import { db } from './firebase-config.js';
-import { ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
 class AdminPanel {
     constructor() {
         this.currentAdmin = null;
@@ -10,351 +7,187 @@ class AdminPanel {
         this.loadUsers();
     }
 
-    checkAdminAccess() {
-        const userJson = sessionStorage.getItem('currentUser');
-        if (!userJson) {
-            window.location.href = 'index.html';
-            return;
-        }
-
-        const user = JSON.parse(userJson);
-        if (user.role !== 'admin') {
-            window.location.href = 'dashboard.html';
-            return;
-        }
-
-        this.currentAdmin = user;
-        document.getElementById('currentAdmin').innerText = `Current User's Login: ${user.username}\n`;
+    // Türkçe ay isimleri için yardımcı dizi
+    getTurkishMonth(monthIndex) {
+        const months = [
+            'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+            'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+        ];
+        return months[monthIndex];
     }
 
+    // Türkçe gün isimleri için yardımcı dizi
+    getTurkishDay(dayIndex) {
+        const days = [
+            'Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 
+            'Perşembe', 'Cuma', 'Cumartesi'
+        ];
+        return days[dayIndex];
+    }
+
+    // Tarih ve saat güncelleme fonksiyonu - Türkçe format
     updateDateTime() {
         const now = new Date();
-        const formattedDate = now.toISOString().replace('T', ' ').split('.')[0];
-        document.getElementById('currentDateTime').innerText = 
-            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}\n`;
-    }
-
-    async loadUsers() {
-        try {
-            const usersRef = ref(db, 'users');
-            const snapshot = await get(usersRef);
-            const users = snapshot.val();
-
-            const tbody = document.querySelector('.users-table tbody');
-            tbody.innerHTML = '';
-
-            for (const userId in users) {
-                const user = users[userId];
-                const tr = document.createElement('tr');
-                
-                tr.innerHTML = `
-                    <td>
-                        <input type="text" class="table-input" value="${user.username}" data-field="username">
-                    </td>
-                    <td>
-                        <input type="password" class="table-input" value="${user.password}" data-field="password">
-                    </td>
-                    <td>
-                        <input type="text" class="table-input" value="${user.name || ''}" data-field="name">
-                    </td>
-                    <td>
-                        <select class="table-input" data-field="role">
-                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
-                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-                        </select>
-                    </td>
-                    <td>
-                        <button class="action-btn save-btn" onclick="adminPanel.saveUser('${userId}', this)">Kaydet</button>
-                        <button class="action-btn delete-btn" onclick="adminPanel.deleteUser('${userId}')">Sil</button>
-                        <button class="action-btn program-btn" onclick="adminPanel.toggleProgram('${userId}')">Program</button>
-                    </td>
-                `;
-
-                const programRow = document.createElement('tr');
-                programRow.className = 'program-row';
-                programRow.id = `program-${userId}`;
-                programRow.innerHTML = `
-                    <td colspan="5">
-                        <div class="program-container">
-                            <div class="program-header">
-                                <select class="day-select" onchange="adminPanel.dayChanged('${userId}', this.value)">
-                                    <option value="pazartesi">Pazartesi</option>
-                                    <option value="sali">Salı</option>
-                                    <option value="carsamba">Çarşamba</option>
-                                    <option value="persembe">Perşembe</option>
-                                    <option value="cuma">Cuma</option>
-                                    <option value="cumartesi">Cumartesi</option>
-                                    <option value="pazar">Pazar</option>
-                                </select>
-                                <input type="text" class="program-title-input" placeholder="Program Adı" value="Cardio">
-                            </div>
-                            <div class="exercises-container"></div>
-                            <div class="program-actions">
-                                <button class="action-btn" onclick="adminPanel.addExercise('${userId}')">Yeni Egzersiz</button>
-                                <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">Programı Kaydet</button>
-                            </div>
-                        </div>
-                    </td>
-                `;
-
-                tbody.appendChild(tr);
-                tbody.appendChild(programRow);
-            }
-        } catch (error) {
-            console.error('Error loading users:', error);
-        }
-    }
-
-    async saveUser(userId, button) {
-        try {
-            const tr = button.closest('tr');
-            const inputs = tr.querySelectorAll('.table-input');
-            const userData = {};
-
-            inputs.forEach(input => {
-                userData[input.dataset.field] = input.value;
-            });
-
-            await set(ref(db, `users/${userId}`), userData);
-            alert('Kullanıcı başarıyla güncellendi');
-        } catch (error) {
-            console.error('Error saving user:', error);
-            alert('Kullanıcı güncellenirken bir hata oluştu');
-        }
-    }
-
-    async deleteUser(userId) {
-        if (!confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) return;
-
-        try {
-            await remove(ref(db, `users/${userId}`));
-            await remove(ref(db, `userPrograms/${userId}`));
-            await this.loadUsers();
-            alert('Kullanıcı başarıyla silindi');
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            alert('Kullanıcı silinirken bir hata oluştu');
-        }
-    }
-
-    async toggleProgram(userId) {
-        const programRow = document.getElementById(`program-${userId}`);
-        const isVisible = programRow.style.display === 'table-row';
+        const day = now.getDate();
+        const month = this.getTurkishMonth(now.getMonth());
+        const year = now.getFullYear();
+        const dayName = this.getTurkishDay(now.getDay());
         
-        if (!isVisible) {
-            document.querySelectorAll('.program-row').forEach(row => {
-                row.style.display = 'none';
-            });
-            
-            programRow.style.display = 'table-row';
-            await this.loadUserProgram(userId);
-        } else {
-            programRow.style.display = 'none';
-        }
+        // Saat bilgisini 2 haneli formatta alma
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        const formattedDate = `Tarih: ${day} ${month} ${year} ${dayName}\nSaat: ${hours}:${minutes}:${seconds}`;
+        document.getElementById('currentDateTime').innerText = formattedDate;
+
+        // Aktif kullanıcı bilgisini güncelle
+        const currentUserInfo = `Aktif Kullanıcı: ${this.currentAdmin ? this.currentAdmin.username : ''}\n`;
+        document.getElementById('currentAdmin').innerText = currentUserInfo;
     }
 
-    async loadUserProgram(userId) {
+    async exportToExcel(userId) {
         try {
-            const programRef = ref(db, `userPrograms/${userId}/${this.currentDay}`);
-            const snapshot = await get(programRef);
-            const program = snapshot.val();
-
-            const container = document.getElementById(`program-${userId}`);
-            const titleInput = container.querySelector('.program-title-input');
-            const exercisesContainer = container.querySelector('.exercises-container');
+            const programs = {};
+            const days = ['pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi', 'pazar'];
             
-            exercisesContainer.innerHTML = '';
+            // Kullanıcı adını al
+            const userRef = ref(db, `users/${userId}`);
+            const userSnapshot = await get(userRef);
+            const userName = userSnapshot.val()?.name || userId;
 
-            if (program && program.title) {
-                titleInput.value = program.title;
+            for (const day of days) {
+                const programRef = ref(db, `userPrograms/${userId}/${day}`);
+                const snapshot = await get(programRef);
+                programs[day] = snapshot.val() || { title: '', exercises: [] };
             }
 
-            if (program && program.exercises) {
-                program.exercises.forEach((exercise, index) => {
-                    this.createExerciseCard(exercisesContainer, exercise, index, userId);
+            const wb = XLSX.utils.book_new();
+            
+            // Her gün için worksheet oluştur
+            for (const day of days) {
+                const program = programs[day];
+                const exercises = program.exercises || [];
+                
+                const wsData = [
+                    ['Program Sahibi:', userName],
+                    ['Program Günü:', this.getTurkishDay(days.indexOf(day))],
+                    ['Program Adı:', program.title || ''],
+                    [''],
+                    ['Egzersiz Adı', 'Video Bağlantısı', 'Set Detayları']
+                ];
+
+                exercises.forEach(exercise => {
+                    const setInfo = exercise.sets
+                        .map(set => `Set ${set.number}: ${set.reps} tekrar`)
+                        .join(', ');
+                    
+                    wsData.push([
+                        exercise.name || '',
+                        exercise.videoUrl || '',
+                        setInfo
+                    ]);
                 });
+
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                
+                // Sütun genişliklerini ayarla
+                ws['!cols'] = [
+                    {width: 30}, // Egzersiz adı
+                    {width: 40}, // Video URL
+                    {width: 50}  // Set bilgileri
+                ];
+
+                XLSX.utils.book_append_sheet(wb, ws, this.getTurkishDay(days.indexOf(day)));
             }
+
+            // Dosya adını tarih ile birlikte oluştur
+            const now = new Date();
+            const dateStr = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`;
+            XLSX.writeFile(wb, `${userName}_antrenman_programi_${dateStr}.xlsx`);
+            
+            alert('Program başarıyla Excel dosyasına aktarıldı');
+
         } catch (error) {
-            console.error('Error loading program:', error);
+            console.error('Excel dışa aktarma hatası:', error);
+            alert('Excel dosyası oluşturulurken bir hata oluştu');
         }
     }
 
-    createExerciseCard(container, exercise, index, userId) {
-        const exerciseCard = document.createElement('div');
-        exerciseCard.className = 'exercise-card';
-        exerciseCard.dataset.index = index;
-
-        let setsHtml = '';
-        if (exercise.sets) {
-            exercise.sets.forEach((set, setIndex) => {
-                setsHtml += `
-                    <div class="set-item">
-                        <span>Set ${set.number}:</span>
-                        <input type="number" class="set-input" value="${set.reps}" min="1">
-                        <span>tekrar</span>
-                        <button class="action-btn delete-btn" onclick="adminPanel.deleteSet('${userId}', ${index}, ${setIndex})">Set Sil</button>
-                    </div>
-                `;
-            });
-        }
-
-        exerciseCard.innerHTML = `
-            <input type="text" class="exercise-name" value="${exercise.name || ''}" placeholder="Egzersiz Adı">
-            <div class="sets-container">
-                ${setsHtml}
-            </div>
-            <input type="text" class="video-url" value="${exercise.videoUrl || ''}" placeholder="Video URL">
-            <div class="exercise-actions">
-                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${index})">Set Ekle</button>
-                <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">Egzersizi Sil</button>
-            </div>
-        `;
-
-        container.appendChild(exerciseCard);
-    }
-
-    dayChanged(userId, day) {
-        this.currentDay = day;
-        this.loadUserProgram(userId);
-    }
-
-    addSet(userId, exerciseIndex) {
-        const container = document.getElementById(`program-${userId}`);
-        const exerciseCards = container.querySelectorAll('.exercise-card');
-        const exerciseCard = exerciseCards[exerciseIndex];
-        
-        if (exerciseCard) {
-            const setsContainer = exerciseCard.querySelector('.sets-container');
-            const currentSets = setsContainer.querySelectorAll('.set-item').length;
-            
-            const newSetDiv = document.createElement('div');
-            newSetDiv.className = 'set-item';
-            newSetDiv.innerHTML = `
-                <span>Set ${currentSets + 1}:</span>
-                <input type="number" class="set-input" value="12" min="1">
-                <span>tekrar</span>
-                <button class="action-btn delete-btn" onclick="adminPanel.deleteSet('${userId}', ${exerciseIndex}, ${currentSets})">Set Sil</button>
-            `;
-            
-            setsContainer.appendChild(newSetDiv);
-        }
-    }
-
-    deleteSet(userId, exerciseIndex, setIndex) {
-        const container = document.getElementById(`program-${userId}`);
-        const exerciseCards = container.querySelectorAll('.exercise-card');
-        const exerciseCard = exerciseCards[exerciseIndex];
-        
-        if (exerciseCard) {
-            const setsContainer = exerciseCard.querySelector('.sets-container');
-            const setItems = setsContainer.querySelectorAll('.set-item');
-            
-            if (setItems.length > 1) {
-                setItems[setIndex].remove();
-                
-                // Kalan setlerin numaralarını güncelle
-                const remainingSets = setsContainer.querySelectorAll('.set-item');
-                remainingSets.forEach((set, idx) => {
-                    const setNumber = set.querySelector('span:first-child');
-                    setNumber.textContent = `Set ${idx + 1}:`;
-                });
-            } else {
-                alert('En az bir set bulunmalıdır!');
-            }
-        }
-    }
-
-    deleteExercise(userId, exerciseIndex) {
-        if (!confirm('Bu egzersizi silmek istediğinize emin misiniz?')) return;
-
-        const container = document.getElementById(`program-${userId}`);
-        const exerciseCards = container.querySelectorAll('.exercise-card');
-        const exerciseCard = exerciseCards[exerciseIndex];
-        
-        if (exerciseCard) {
-            exerciseCard.remove();
-        }
-    }
-
-    addExercise(userId) {
-        const container = document.getElementById(`program-${userId}`);
-        const exercisesContainer = container.querySelector('.exercises-container');
-        
-        const exercise = {
-            name: '',
-            sets: [{number: 1, reps: 12}],
-            videoUrl: ''
-        };
-
-        this.createExerciseCard(exercisesContainer, exercise, exercisesContainer.children.length, userId);
-    }
-
-    async saveProgram(userId) {
+    async importFromExcel(userId, input) {
         try {
-            const container = document.getElementById(`program-${userId}`);
-            const titleInput = container.querySelector('.program-title-input');
-            const exerciseCards = container.querySelectorAll('.exercise-card');
-            
-            const exercises = Array.from(exerciseCards).map(card => {
-                const sets = Array.from(card.querySelectorAll('.set-item')).map((setItem, index) => ({
-                    number: index + 1,
-                    reps: parseInt(setItem.querySelector('.set-input').value) || 12
-                }));
-                
-                return {
-                    name: card.querySelector('.exercise-name').value,
-                    sets: sets,
-                    videoUrl: card.querySelector('.video-url').value
-                };
-            });
-            
-            const programData = {
-                title: titleInput.value,
-                exercises: exercises
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+
+                    const dayMapping = {
+                        'Pazartesi': 'pazartesi',
+                        'Salı': 'sali',
+                        'Çarşamba': 'carsamba',
+                        'Perşembe': 'persembe',
+                        'Cuma': 'cuma',
+                        'Cumartesi': 'cumartesi',
+                        'Pazar': 'pazar'
+                    };
+
+                    for (const sheetName of workbook.SheetNames) {
+                        const day = dayMapping[sheetName];
+                        if (!day) continue;
+
+                        const worksheet = workbook.Sheets[sheetName];
+                        const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                        const programTitle = sheetData[2][1] || ''; // Program adı 3. satırda
+                        const exercises = [];
+
+                        // 5. satırdan (index 4) itibaren egzersiz verileri başlıyor
+                        for (let i = 5; i < sheetData.length; i++) {
+                            const row = sheetData[i];
+                            if (!row[0]) continue;
+
+                            const setInfoStr = row[2] || '';
+                            const sets = setInfoStr.split(',').map((setStr, index) => {
+                                const reps = parseInt(setStr.match(/\d+(?=\s*tekrar)/)) || 12;
+                                return { number: index + 1, reps };
+                            });
+
+                            exercises.push({
+                                name: row[0],
+                                videoUrl: row[1] || '',
+                                sets: sets.length > 0 ? sets : [{ number: 1, reps: 12 }]
+                            });
+                        }
+
+                        const programData = {
+                            title: programTitle,
+                            exercises
+                        };
+
+                        await set(ref(db, `userPrograms/${userId}/${day}`), programData);
+                    }
+
+                    await this.loadUserProgram(userId);
+                    alert('Program başarıyla Excel dosyasından yüklendi');
+
+                } catch (error) {
+                    console.error('Excel içe aktarma işlem hatası:', error);
+                    alert('Excel dosyası işlenirken bir hata oluştu');
+                }
             };
-            
-            await set(ref(db, `userPrograms/${userId}/${this.currentDay}`), programData);
-            alert('Program başarıyla kaydedildi');
+
+            reader.readAsArrayBuffer(file);
+
         } catch (error) {
-            console.error('Error saving program:', error);
-            alert('Program kaydedilirken bir hata oluştu');
+            console.error('Excel içe aktarma hatası:', error);
+            alert('Excel dosyası yüklenirken bir hata oluştu');
         }
-    }
-
-            initializeInterface() {
-        document.getElementById('addUserBtn').addEventListener('click', () => {
-            const tbody = document.querySelector('.users-table tbody');
-            const tr = document.createElement('tr');
-            const userId = 'new-' + Date.now();
-            
-            tr.innerHTML = `
-                <td><input type="text" class="table-input" value="" data-field="username"></td>
-                <td><input type="password" class="table-input" value="" data-field="password"></td>
-                <td><input type="text" class="table-input" value="" data-field="name"></td>
-                <td>
-                    <select class="table-input" data-field="role">
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </td>
-                <td>
-                    <button class="action-btn save-btn" onclick="adminPanel.saveUser('${userId}', this)">Kaydet</button>
-                </td>
-            `;
-            
-            tbody.insertBefore(tr, tbody.firstChild);
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            sessionStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
-        });
-
-        // Tarih ve saat güncellemesi
-        this.updateDateTime();
-        setInterval(() => this.updateDateTime(), 1000);
     }
 }
 
-// Global olarak adminPanel nesnesini oluştur
+// Global AdminPanel nesnesini oluştur
 window.adminPanel = new AdminPanel();
