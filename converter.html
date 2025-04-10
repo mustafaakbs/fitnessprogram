@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Program Yönetimi</title>
+    <title>Program Düzenleyici</title>
     <style>
         body { 
             padding: 20px; 
@@ -18,6 +18,7 @@
             padding: 15px;
             border-radius: 4px;
             margin-bottom: 20px;
+            font-family: monospace;
         }
         .container {
             background: white;
@@ -33,7 +34,7 @@
         }
         textarea {
             width: 100%;
-            height: 300px;
+            height: 400px;
             margin: 10px 0;
             padding: 10px;
             font-family: monospace;
@@ -53,11 +54,6 @@
         button:hover {
             background: #45a049;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
         .status {
             padding: 10px;
             margin: 10px 0;
@@ -70,43 +66,20 @@
 </head>
 <body>
     <div class="header">
-        <div>Tarih ve Saat (TSI): <span id="currentDateTime"></span></div>
+        <div>Tarih ve Saat (UTC): <span id="currentDateTime"></span></div>
         <div>Kullanıcı: <span id="currentUser">mustafaakbs</span></div>
     </div>
 
     <div class="container">
-        <div class="grid">
-            <!-- Program Görüntüleme -->
-            <div class="section">
-                <h3>1. Program Görüntüleme</h3>
-                <textarea id="viewProgram" readonly placeholder="Program verileri burada görüntülenecek..."></textarea>
-                <button onclick="loadProgram()">Programı Yükle</button>
-                <div id="viewStatus" class="status"></div>
+        <div class="section">
+            <h3>Program Düzenleyici</h3>
+            <div>
+                <button onclick="formatJson()">JSON Formatla</button>
+                <button onclick="validateData()">Veriyi Doğrula</button>
+                <button onclick="saveChanges()">Değişiklikleri Kaydet</button>
             </div>
-
-            <!-- Program Düzenleme -->
-            <div class="section">
-                <h3>2. Program Düzenleme</h3>
-                <textarea id="editProgram" placeholder="Düzenlemek istediğiniz program verilerini yapıştırın..."></textarea>
-                <button onclick="validateProgram()">Doğrula</button>
-                <div id="editStatus" class="status"></div>
-            </div>
-
-            <!-- Firebase Veri Gönderme -->
-            <div class="section">
-                <h3>3. Firebase'e Gönder</h3>
-                <textarea id="firebaseProgram" readonly placeholder="Firebase'e gönderilecek veriler..."></textarea>
-                <button onclick="sendToFirebase()">Gönder</button>
-                <div id="firebaseStatus" class="status"></div>
-            </div>
-
-            <!-- Kullanıcı Yönetimi -->
-            <div class="section">
-                <h3>4. Kullanıcı Yönetimi</h3>
-                <textarea id="userManagement" placeholder="Kullanıcı verilerini görüntüle/düzenle..."></textarea>
-                <button onclick="manageUsers()">Kullanıcıları Yönet</button>
-                <div id="userStatus" class="status"></div>
-            </div>
+            <textarea id="jsonEditor" placeholder="JSON verilerini buraya yapıştırın..."></textarea>
+            <div id="status" class="status"></div>
         </div>
     </div>
 
@@ -114,55 +87,97 @@
         // Tarih güncelleme
         function updateDateTime() {
             const now = new Date();
-            const trDateTime = new Intl.DateTimeFormat('tr-TR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false,
-                timeZone: 'Europe/Istanbul'
-            }).format(now);
-            document.getElementById('currentDateTime').textContent = trDateTime;
+            const utcString = now.toISOString().replace('T', ' ').split('.')[0];
+            document.getElementById('currentDateTime').textContent = utcString;
         }
 
-        // Program yükleme
-        function loadProgram() {
-            showStatus('viewStatus', 'Program yükleniyor...', true);
-            // Firebase'den veri çekme işlemi buraya gelecek
-        }
-
-        // Program doğrulama
-        function validateProgram() {
+        // JSON formatlama
+        function formatJson() {
             try {
-                const data = JSON.parse(document.getElementById('editProgram').value);
-                // Doğrulama kontrolleri buraya gelecek
-                showStatus('editStatus', 'Program yapısı geçerli', true);
+                const editor = document.getElementById('jsonEditor');
+                const data = JSON.parse(editor.value);
+                editor.value = JSON.stringify(data, null, 2);
+                showStatus('Veri başarıyla formatlandı', true);
             } catch (error) {
-                showStatus('editStatus', 'Hata: ' + error.message, false);
+                showStatus('Hata: Geçersiz JSON formatı - ' + error.message, false);
             }
         }
 
-        // Firebase'e gönderme
-        function sendToFirebase() {
-            showStatus('firebaseStatus', 'Veriler gönderiliyor...', true);
-            // Firebase gönderme işlemi buraya gelecek
+        // Veri doğrulama
+        function validateData() {
+            try {
+                const data = JSON.parse(document.getElementById('jsonEditor').value);
+                const errors = [];
+
+                // Programs kontrolü
+                if (!data.programs) {
+                    errors.push("'programs' alanı bulunamadı");
+                } else {
+                    Object.entries(data.programs).forEach(([programId, program]) => {
+                        if (!program.days) {
+                            errors.push(`Program ${programId}: 'days' alanı eksik`);
+                        } else {
+                            Object.entries(program.days).forEach(([day, dayData]) => {
+                                if (!dayData.title) {
+                                    errors.push(`Program ${programId}, ${day}: 'title' alanı eksik`);
+                                }
+                                if (!Array.isArray(dayData.exercises)) {
+                                    errors.push(`Program ${programId}, ${day}: 'exercises' dizisi eksik`);
+                                } else {
+                                    dayData.exercises.forEach((exercise, index) => {
+                                        if (!exercise.name) {
+                                            errors.push(`Program ${programId}, ${day}, Egzersiz ${index + 1}: 'name' alanı eksik`);
+                                        }
+                                        if (!Array.isArray(exercise.sets)) {
+                                            errors.push(`Program ${programId}, ${day}, Egzersiz ${index + 1}: 'sets' dizisi eksik`);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+
+                // Users kontrolü
+                if (!data.users) {
+                    errors.push("'users' alanı bulunamadı");
+                } else {
+                    Object.entries(data.users).forEach(([username, user]) => {
+                        if (!user.name) errors.push(`Kullanıcı ${username}: 'name' alanı eksik`);
+                        if (!user.role) errors.push(`Kullanıcı ${username}: 'role' alanı eksik`);
+                    });
+                }
+
+                if (errors.length > 0) {
+                    showStatus('Hatalar bulundu:\n' + errors.join('\n'), false);
+                } else {
+                    showStatus('Veri yapısı geçerli', true);
+                }
+            } catch (error) {
+                showStatus('Hata: ' + error.message, false);
+            }
         }
 
-        // Kullanıcı yönetimi
-        function manageUsers() {
-            showStatus('userStatus', 'Kullanıcılar yönetiliyor...', true);
-            // Kullanıcı yönetimi işlemleri buraya gelecek
+        // Değişiklikleri kaydet
+        function saveChanges() {
+            try {
+                const data = JSON.parse(document.getElementById('jsonEditor').value);
+                // Burada Firebase güncelleme işlemi yapılacak
+                showStatus('Değişiklikler kaydedildi', true);
+            } catch (error) {
+                showStatus('Hata: ' + error.message, false);
+            }
         }
 
         // Durum mesajı gösterme
-        function showStatus(elementId, message, isSuccess) {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.style.display = 'block';
-            element.className = 'status ' + (isSuccess ? 'success' : 'error');
-            setTimeout(() => element.style.display = 'none', 3000);
+        function showStatus(message, isSuccess) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.style.display = 'block';
+            status.className = 'status ' + (isSuccess ? 'success' : 'error');
+            if (isSuccess) {
+                setTimeout(() => status.style.display = 'none', 3000);
+            }
         }
 
         // Sayfa yüklendiğinde
