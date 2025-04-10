@@ -7,51 +7,108 @@ class AdminPanel {
         this.loadUsers();
     }
 
-    // Türkçe ay isimleri için yardımcı dizi
-    getTurkishMonth(monthIndex) {
-        const months = [
-            'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-            'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
-        ];
-        return months[monthIndex];
+    checkAdminAccess() {
+        const userJson = sessionStorage.getItem('currentUser');
+        if (!userJson) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const user = JSON.parse(userJson);
+        if (user.role !== 'admin') {
+            window.location.href = 'dashboard.html';
+            return;
+        }
+
+        this.currentAdmin = user;
+        document.getElementById('currentAdmin').innerText = `Aktif Kullanıcı: ${user.username}`;
     }
 
-    // Türkçe gün isimleri için yardımcı dizi
-    getTurkishDay(dayIndex) {
-        const days = [
-            'Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 
-            'Perşembe', 'Cuma', 'Cumartesi'
-        ];
-        return days[dayIndex];
+    initializeInterface() {
+        document.getElementById('addUserBtn').addEventListener('click', () => {
+            const tbody = document.querySelector('.users-table tbody');
+            const tr = document.createElement('tr');
+            const userId = 'new-' + Date.now();
+            
+            tr.innerHTML = `
+                <td><input type="text" class="table-input" value="" data-field="username"></td>
+                <td><input type="password" class="table-input" value="" data-field="password"></td>
+                <td><input type="text" class="table-input" value="" data-field="name"></td>
+                <td>
+                    <select class="table-input" data-field="role">
+                        <option value="user">Kullanıcı</option>
+                        <option value="admin">Yönetici</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="action-btn save-btn" onclick="adminPanel.saveUser('${userId}', this)">Kaydet</button>
+                </td>
+            `;
+            
+            tbody.insertBefore(tr, tbody.firstChild);
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
     }
 
-    // Tarih ve saat güncelleme fonksiyonu - Türkçe format
-    updateDateTime() {
-        const now = new Date();
-        const day = now.getDate();
-        const month = this.getTurkishMonth(now.getMonth());
-        const year = now.getFullYear();
-        const dayName = this.getTurkishDay(now.getDay());
-        
-        // Saat bilgisini 2 haneli formatta alma
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
+    createExerciseCard(container, exercise, index, userId) {
+        const exerciseCard = document.createElement('div');
+        exerciseCard.className = 'exercise-card';
+        exerciseCard.dataset.index = index;
 
-        const formattedDate = `Tarih: ${day} ${month} ${year} ${dayName}\nSaat: ${hours}:${minutes}:${seconds}`;
-        document.getElementById('currentDateTime').innerText = formattedDate;
+        let setsHtml = '';
+        if (exercise.sets) {
+            exercise.sets.forEach((set, setIndex) => {
+                setsHtml += `
+                    <div class="set-item">
+                        <span>Set ${set.number}:</span>
+                        <input type="number" class="set-input" value="${set.reps}" min="1">
+                        <span>tekrar</span>
+                        <button class="action-btn delete-btn" onclick="adminPanel.deleteSet('${userId}', ${index}, ${setIndex})">Set Sil</button>
+                    </div>
+                `;
+            });
+        }
 
-        // Aktif kullanıcı bilgisini güncelle
-        const currentUserInfo = `Aktif Kullanıcı: ${this.currentAdmin ? this.currentAdmin.username : ''}\n`;
-        document.getElementById('currentAdmin').innerText = currentUserInfo;
+        exerciseCard.innerHTML = `
+            <input type="text" class="exercise-name" value="${exercise.name || ''}" placeholder="Egzersiz Adı">
+            <div class="sets-container">
+                ${setsHtml}
+            </div>
+            <input type="text" class="video-url" value="${exercise.videoUrl || ''}" placeholder="Video URL">
+            <div class="exercise-actions">
+                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${index})">Set Ekle</button>
+                <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">Egzersizi Sil</button>
+            </div>
+        `;
+
+        const programActionsDiv = container.querySelector('.program-actions') || document.createElement('div');
+        if (!container.querySelector('.program-actions')) {
+            programActionsDiv.className = 'program-actions';
+            programActionsDiv.innerHTML = `
+                <button class="action-btn" onclick="adminPanel.addExercise('${userId}')">Yeni Egzersiz</button>
+                <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">Programı Kaydet</button>
+                <button class="action-btn excel-btn" onclick="adminPanel.exportToExcel('${userId}')">Excel'e Aktar</button>
+                <input type="file" id="excel-upload-${userId}" style="display: none" accept=".xlsx" onchange="adminPanel.importFromExcel('${userId}', this)">
+                <button class="action-btn excel-btn" onclick="document.getElementById('excel-upload-${userId}').click()">Excel'den Yükle</button>
+            `;
+            container.appendChild(programActionsDiv);
+        }
+
+        container.insertBefore(exerciseCard, programActionsDiv);
     }
 
+    // ... (diğer mevcut metodlar aynen kalacak)
+
+    // Excel ile ilgili metodlar buraya eklenecek
     async exportToExcel(userId) {
         try {
             const programs = {};
             const days = ['pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi', 'pazar'];
             
-            // Kullanıcı adını al
             const userRef = ref(db, `users/${userId}`);
             const userSnapshot = await get(userRef);
             const userName = userSnapshot.val()?.name || userId;
@@ -64,14 +121,13 @@ class AdminPanel {
 
             const wb = XLSX.utils.book_new();
             
-            // Her gün için worksheet oluştur
             for (const day of days) {
                 const program = programs[day];
                 const exercises = program.exercises || [];
                 
                 const wsData = [
                     ['Program Sahibi:', userName],
-                    ['Program Günü:', this.getTurkishDay(days.indexOf(day))],
+                    ['Program Günü:', day.charAt(0).toUpperCase() + day.slice(1)],
                     ['Program Adı:', program.title || ''],
                     [''],
                     ['Egzersiz Adı', 'Video Bağlantısı', 'Set Detayları']
@@ -90,22 +146,11 @@ class AdminPanel {
                 });
 
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
-                
-                // Sütun genişliklerini ayarla
-                ws['!cols'] = [
-                    {width: 30}, // Egzersiz adı
-                    {width: 40}, // Video URL
-                    {width: 50}  // Set bilgileri
-                ];
-
-                XLSX.utils.book_append_sheet(wb, ws, this.getTurkishDay(days.indexOf(day)));
+                ws['!cols'] = [{width: 30}, {width: 40}, {width: 50}];
+                XLSX.utils.book_append_sheet(wb, ws, day);
             }
 
-            // Dosya adını tarih ile birlikte oluştur
-            const now = new Date();
-            const dateStr = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`;
-            XLSX.writeFile(wb, `${userName}_antrenman_programi_${dateStr}.xlsx`);
-            
+            XLSX.writeFile(wb, `${userName}_antrenman_programi.xlsx`);
             alert('Program başarıyla Excel dosyasına aktarıldı');
 
         } catch (error) {
@@ -125,27 +170,13 @@ class AdminPanel {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
 
-                    const dayMapping = {
-                        'Pazartesi': 'pazartesi',
-                        'Salı': 'sali',
-                        'Çarşamba': 'carsamba',
-                        'Perşembe': 'persembe',
-                        'Cuma': 'cuma',
-                        'Cumartesi': 'cumartesi',
-                        'Pazar': 'pazar'
-                    };
-
                     for (const sheetName of workbook.SheetNames) {
-                        const day = dayMapping[sheetName];
-                        if (!day) continue;
-
                         const worksheet = workbook.Sheets[sheetName];
                         const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-                        const programTitle = sheetData[2][1] || ''; // Program adı 3. satırda
+                        const programTitle = sheetData[2][1] || '';
                         const exercises = [];
 
-                        // 5. satırdan (index 4) itibaren egzersiz verileri başlıyor
                         for (let i = 5; i < sheetData.length; i++) {
                             const row = sheetData[i];
                             if (!row[0]) continue;
@@ -168,7 +199,7 @@ class AdminPanel {
                             exercises
                         };
 
-                        await set(ref(db, `userPrograms/${userId}/${day}`), programData);
+                        await set(ref(db, `userPrograms/${userId}/${sheetName.toLowerCase()}`), programData);
                     }
 
                     await this.loadUserProgram(userId);
