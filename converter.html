@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Program Dönüştürücü</title>
+    <title>Program Yönetimi</title>
     <style>
         body { 
             padding: 20px; 
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             max-width: 1200px; 
             margin: 0 auto; 
             background: #f5f5f5;
@@ -18,16 +18,12 @@
             padding: 15px;
             border-radius: 4px;
             margin-bottom: 20px;
-            font-family: monospace;
-            font-size: 14px;
-            line-height: 1.6;
         }
         .container {
             background: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
         }
         .section {
             margin-bottom: 20px;
@@ -35,384 +31,138 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-        h2, h3 {
-            color: #333;
-            margin-top: 0;
-        }
-        textarea { 
-            width: 100%; 
-            height: 300px; 
-            margin: 10px 0; 
+        textarea {
+            width: 100%;
+            height: 300px;
+            margin: 10px 0;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
             font-family: monospace;
             font-size: 14px;
-            resize: vertical;
-        }
-        .file-input {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px dashed #ddd;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            background: #f9f9f9;
         }
-        .file-input input[type="file"] {
-            display: block;
-            margin: 10px 0;
-        }
-        button { 
-            padding: 10px 20px; 
-            background: #4CAF50; 
-            color: white; 
-            border: none; 
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
             border-radius: 4px;
-            cursor: pointer; 
+            cursor: pointer;
             margin: 5px;
-            font-size: 14px;
-            transition: background-color 0.3s;
         }
         button:hover {
             background: #45a049;
         }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
         .status {
-            margin-top: 10px;
             padding: 10px;
+            margin: 10px 0;
             border-radius: 4px;
             display: none;
         }
-        .success {
-            background: #dff0d8;
-            color: #3c763d;
-            border: 1px solid #d6e9c6;
-        }
-        .error {
-            background: #f2dede;
-            color: #a94442;
-            border: 1px solid #ebccd1;
-        }
+        .success { background: #dff0d8; color: #3c763d; }
+        .error { background: #f2dede; color: #a94442; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div id="currentDateTime">Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-04-10 07:52:20</div>
-        <div id="currentUser">Current User's Login: mustafaakbs</div>
+        <div>Tarih ve Saat (TSI): <span id="currentDateTime"></span></div>
+        <div>Kullanıcı: <span id="currentUser">mustafaakbs</span></div>
     </div>
 
     <div class="container">
-        <h2>Program Dönüştürücü</h2>
-        
-        <div class="section">
-            <h3>JSON'dan Excel'e</h3>
-            <textarea id="jsonInput" placeholder="Firebase'den aldığınız JSON verilerini buraya yapıştırın..."></textarea>
-            <button onclick="convertJsonToExcel()">Excel'e Dönüştür</button>
-            <div id="jsonStatus" class="status"></div>
-        </div>
-
-        <div class="section">
-            <h3>Excel'den JSON'a</h3>
-            <div class="file-input">
-                <div>Excel dosyanızı seçin (.xlsx)</div>
-                <input type="file" id="excelFile" accept=".xlsx" />
+        <div class="grid">
+            <!-- Program Görüntüleme -->
+            <div class="section">
+                <h3>1. Program Görüntüleme</h3>
+                <textarea id="viewProgram" readonly placeholder="Program verileri burada görüntülenecek..."></textarea>
+                <button onclick="loadProgram()">Programı Yükle</button>
+                <div id="viewStatus" class="status"></div>
             </div>
-            <button onclick="convertExcelToJson()">Firebase JSON'a Dönüştür</button>
-            <textarea id="jsonOutput" readonly placeholder="Dönüştürülen Firebase uyumlu JSON burada görünecek..."></textarea>
-            <div id="excelStatus" class="status"></div>
+
+            <!-- Program Düzenleme -->
+            <div class="section">
+                <h3>2. Program Düzenleme</h3>
+                <textarea id="editProgram" placeholder="Düzenlemek istediğiniz program verilerini yapıştırın..."></textarea>
+                <button onclick="validateProgram()">Doğrula</button>
+                <div id="editStatus" class="status"></div>
+            </div>
+
+            <!-- Firebase Veri Gönderme -->
+            <div class="section">
+                <h3>3. Firebase'e Gönder</h3>
+                <textarea id="firebaseProgram" readonly placeholder="Firebase'e gönderilecek veriler..."></textarea>
+                <button onclick="sendToFirebase()">Gönder</button>
+                <div id="firebaseStatus" class="status"></div>
+            </div>
+
+            <!-- Kullanıcı Yönetimi -->
+            <div class="section">
+                <h3>4. Kullanıcı Yönetimi</h3>
+                <textarea id="userManagement" placeholder="Kullanıcı verilerini görüntüle/düzenle..."></textarea>
+                <button onclick="manageUsers()">Kullanıcıları Yönet</button>
+                <div id="userStatus" class="status"></div>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
-        // Firebase path temizleme
-        function cleanFirebasePath(str) {
-            if (!str) return 'empty';
-            return str
-                .replace(/[.$#\[\]\/]/g, '_')
-                .replace(/\s+/g, '_')
-                .replace(/[^a-zA-Z0-9_-]/g, '')
-                .replace(/^[^a-zA-Z]+/, 'key_')
-                .trim() || 'empty';
-        }
-
-        // JSON'dan Excel'e dönüştürme
-        function convertJsonToExcel() {
-            try {
-                const data = JSON.parse(document.getElementById('jsonInput').value);
-                const wb = XLSX.utils.book_new();
-
-                // Metadata sayfası
-                const metadataSheet = XLSX.utils.aoa_to_sheet([
-                    ['METADATA'],
-                    [],
-                    ['Son Güncelleme:', new Date().toLocaleString('tr-TR')],
-                    ['Güncelleyen:', 'mustafaakbs'],
-                    []
-                ]);
-                XLSX.utils.book_append_sheet(wb, metadataSheet, "Metadata");
-
-                // Kullanıcılar sayfası
-                const usersData = [['Kullanıcı Adı', 'İsim', 'Şifre', 'Rol']];
-                
-                // activeUsers ya da users'dan veriyi al
-                const usersList = data.activeUsers || data.users || {};
-                
-                Object.entries(usersList).forEach(([username, user]) => {
-                    if (user && typeof user === 'object') {
-                        usersData.push([
-                            username,
-                            user.name || user.displayName || '',
-                            user.password || '',
-                            user.role || 'user'
-                        ]);
-                    }
-                });
-                
-                const usersSheet = XLSX.utils.aoa_to_sheet(usersData);
-                XLSX.utils.book_append_sheet(wb, usersSheet, "Kullanıcılar");
-
-                // Program sayfaları
-                const programs = data.userPrograms || data.programs || [];
-                
-                if (Array.isArray(programs)) {
-                    // Array format (eski format)
-                    programs.forEach((program, index) => {
-                        if (program) {
-                            Object.entries(program).forEach(([day, dayData]) => {
-                                if (dayData && dayData.title) {
-                                    const sheetName = `Program_${index + 1}_${day}`;
-                                    const daySheet = createDaySheet(dayData);
-                                    XLSX.utils.book_append_sheet(wb, daySheet, sheetName);
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    // Object format (yeni format)
-                    Object.entries(programs).forEach(([programId, program]) => {
-                        if (program && program.days) {
-                            Object.entries(program.days).forEach(([day, dayData]) => {
-                                if (dayData && dayData.title) {
-                                    const sheetName = `Program_${programId}_${day}`;
-                                    const daySheet = createDaySheet(dayData);
-                                    XLSX.utils.book_append_sheet(wb, daySheet, sheetName);
-                                }
-                            });
-                        }
-                    });
-                }
-
-                XLSX.writeFile(wb, 'fitness_program.xlsx');
-                showStatus('jsonStatus', 'Excel dosyası başarıyla oluşturuldu!', true);
-            } catch (error) {
-                showStatus('jsonStatus', 'Hata: ' + error.message, false);
-                console.error('Detaylı hata:', error);
-            }
-        }
-
-        // Excel'den JSON'a dönüştürme
-        function convertExcelToJson() {
-            const file = document.getElementById('excelFile').files[0];
-            if (!file) {
-                showStatus('excelStatus', 'Lütfen bir Excel dosyası seçin', false);
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    
-                    const result = {
-                        metadata: {
-                            lastUpdate: new Date().toISOString(),
-                            updatedBy: "mustafaakbs"
-                        },
-                        users: {},
-                        programs: {}
-                    };
-
-                    // Kullanıcılar sayfasını işle
-                    if (workbook.Sheets['Kullanıcılar']) {
-                        const users = XLSX.utils.sheet_to_json(workbook.Sheets['Kullanıcılar']);
-                        users.forEach((user, index) => {
-                            if (user['Kullanıcı Adı'] && user['İsim']) {
-                                const username = cleanFirebasePath(user['Kullanıcı Adı']);
-                                result.users[username] = {
-                                    name: user['İsim'],
-                                    password: user['Şifre'] || `user${index + 1}123`,
-                                    role: user['Rol'] || 'user',
-                                    username: username,
-                                    lastLogin: new Date().toISOString()
-                                };
-                            }
-                        });
-                    }
-
-                    // Program sayfalarını işle
-                    workbook.SheetNames.forEach(sheetName => {
-                        if (sheetName.startsWith('Program_')) {
-                            const [_, programId, dayPart] = sheetName.split('_');
-                            const programKey = `program_${programId}`;
-                            
-                            if (!result.programs[programKey]) {
-                                const userKeys = Object.keys(result.users);
-                                const ownerUsername = userKeys[parseInt(programId) - 1] || userKeys[0] || 'admin';
-                                
-                                result.programs[programKey] = {
-                                    owner: ownerUsername,
-                                    createdAt: new Date().toISOString(),
-                                    days: {}
-                                };
-                            }
-
-                            if (dayPart && dayPart !== 'Bilgi') {
-                                const sheet = workbook.Sheets[sheetName];
-                                const dayData = parseDaySheet(sheet);
-                                const dayKey = cleanFirebasePath(dayPart.toLowerCase());
-                                
-                                result.programs[programKey].days[dayKey] = {
-                                    title: dayData.title || 'Dinlenme',
-                                    exercises: dayData.exercises?.map((exercise, index) => ({
-                                        id: `exercise_${index + 1}`,
-                                        name: cleanFirebasePath(exercise.name),
-                                        videoUrl: exercise.videoUrl || '',
-                                        sets: exercise.sets?.map(set => ({
-                                            number: set.number || 0,
-                                            reps: set.reps || 0
-                                        })) || []
-                                    })) || []
-                                };
-                            }
-                        }
-                    });
-
-                    // Boş günleri ekle
-                    const days = ['pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi', 'pazar'];
-                    Object.keys(result.programs).forEach(programKey => {
-                        days.forEach(day => {
-                            if (!result.programs[programKey].days[day]) {
-                                result.programs[programKey].days[day] = {
-                                    title: 'DİNLENME',
-                                    exercises: []
-                                };
-                            }
-                        });
-                    });
-
-                    document.getElementById('jsonOutput').value = JSON.stringify(result, null, 2);
-                    showStatus('excelStatus', 'Firebase uyumlu JSON oluşturuldu!', true);
-                } catch (error) {
-                    showStatus('excelStatus', 'Hata: ' + error.message, false);
-                    console.error('Detaylı hata:', error);
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        // Gün sayfası oluştur
-        function createDaySheet(dayData) {
-            if (!dayData) return XLSX.utils.aoa_to_sheet([['Veri bulunamadı']]);
-
-            const sheetData = [
-                ['GÜNLÜK PROGRAM'],
-                [],
-                ['Program Adı:', dayData.title || 'DİNLENME'],
-                []
-            ];
-
-            if (dayData.exercises && Array.isArray(dayData.exercises)) {
-                dayData.exercises.forEach((exercise, index) => {
-                    if (exercise) {
-                        sheetData.push(
-                            [`Egzersiz ${index + 1}: ${exercise.name || ''}`],
-                            ['Set No', 'Tekrar Sayısı']
-                        );
-
-                        if (exercise.sets && Array.isArray(exercise.sets)) {
-                            exercise.sets.forEach(set => {
-                                if (set) {
-                                    sheetData.push([set.number || 0, set.reps || 0]);
-                                }
-                            });
-                        }
-
-                        sheetData.push(
-                            ['Video Link:', exercise.videoUrl || ''],
-                            []
-                        );
-                    }
-                });
-            }
-
-            const ws = XLSX.utils.aoa_to_sheet(sheetData);
-            ws['!cols'] = [{wch: 15}, {wch: 30}, {wch: 50}];
-            return ws;
-        }
-
-        // Gün verilerini parse et
-        function parseDaySheet(sheet) {
-            const data = XLSX.utils.sheet_to_json(sheet, {header: 1, raw: false});
-            const dayData = {
-                title: '',
-                exercises: []
-            };
-
-            let currentExercise = null;
-
-            for(let i = 0; i < data.length; i++) {
-                const row = data[i];
-                if (!row || row.length === 0) continue;
-
-                const firstCell = String(row[0] || '');
-
-                if (firstCell === 'Program Adı:') {
-                    dayData.title = cleanFirebasePath(row[1] || '');
-                }
-                else if (firstCell.startsWith('Egzersiz')) {
-                    currentExercise = {
-                        name: cleanFirebasePath(firstCell.split(': ')[1] || ''),
-                        sets: [],
-                        videoUrl: ''
-                    };
-                    dayData.exercises.push(currentExercise);
-                } 
-                else if (firstCell === 'Set No' && currentExercise) {
-                    continue;
-                } 
-                else if (currentExercise && !isNaN(Number(firstCell))) {
-                    currentExercise.sets.push({
-                        number: parseInt(firstCell) || 0,
-                        reps: parseInt(row[1] || '0') || 0
-                    });
-                } 
-                else if (firstCell === 'Video Link:' && currentExercise) {
-                    currentExercise.videoUrl = row[1] || '';
-                }
-            }
-
-            return dayData;
-        }
-
-        // Durum mesajı göster
-        function showStatus(elementId, message, isSuccess) {
-            const statusElement = document.getElementById(elementId);
-            statusElement.textContent = message;
-            statusElement.style.display = 'block';
-            statusElement.className = 'status ' + (isSuccess ? 'success' : 'error');
-            setTimeout(() => {
-                statusElement.style.display = 'none';
-            }, 3000);
-        }
-
         // Tarih güncelleme
         function updateDateTime() {
             const now = new Date();
-            const formattedDate = now.toISOString().replace('T', ' ').split('.')[0];
-            document.getElementById('currentDateTime').textContent = 
-                `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}`;
-            document.getElementById('currentUser').textContent = 
-                `Current User's Login: mustafaakbs`;
+            const trDateTime = new Intl.DateTimeFormat('tr-TR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+                timeZone: 'Europe/Istanbul'
+            }).format(now);
+            document.getElementById('currentDateTime').textContent = trDateTime;
+        }
+
+        // Program yükleme
+        function loadProgram() {
+            showStatus('viewStatus', 'Program yükleniyor...', true);
+            // Firebase'den veri çekme işlemi buraya gelecek
+        }
+
+        // Program doğrulama
+        function validateProgram() {
+            try {
+                const data = JSON.parse(document.getElementById('editProgram').value);
+                // Doğrulama kontrolleri buraya gelecek
+                showStatus('editStatus', 'Program yapısı geçerli', true);
+            } catch (error) {
+                showStatus('editStatus', 'Hata: ' + error.message, false);
+            }
+        }
+
+        // Firebase'e gönderme
+        function sendToFirebase() {
+            showStatus('firebaseStatus', 'Veriler gönderiliyor...', true);
+            // Firebase gönderme işlemi buraya gelecek
+        }
+
+        // Kullanıcı yönetimi
+        function manageUsers() {
+            showStatus('userStatus', 'Kullanıcılar yönetiliyor...', true);
+            // Kullanıcı yönetimi işlemleri buraya gelecek
+        }
+
+        // Durum mesajı gösterme
+        function showStatus(elementId, message, isSuccess) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+            element.className = 'status ' + (isSuccess ? 'success' : 'error');
+            setTimeout(() => element.style.display = 'none', 3000);
         }
 
         // Sayfa yüklendiğinde
