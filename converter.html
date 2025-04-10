@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Program Dönüştürücü</title>
     <style>
         body { 
@@ -10,12 +12,27 @@
             margin: 0 auto; 
             background: #f5f5f5;
         }
+        .header {
+            background: #333;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 14px;
+        }
         .container {
             background: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         textarea { 
             width: 100%; 
@@ -24,6 +41,15 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .file-input {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px dashed #ddd;
+            border-radius: 4px;
+            background: #f9f9f9;
         }
         button { 
             padding: 10px 20px; 
@@ -33,31 +59,86 @@
             border-radius: 4px;
             cursor: pointer; 
             margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        h2, h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .error {
+            background: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        <div id="currentDateTime">Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-04-10 07:13:17</div>
+        <div id="currentUser">Current User's Login: mustafaakbs</div>
+    </div>
+
     <div class="container">
         <h2>Program Dönüştürücü</h2>
-        <div>
+        
+        <div class="section">
             <h3>JSON'dan Excel'e</h3>
             <textarea id="jsonInput" placeholder="JSON verilerini buraya yapıştırın..."></textarea>
             <button onclick="convertJsonToExcel()">Excel'e Dönüştür</button>
+            <div id="jsonStatus" class="status"></div>
         </div>
-        <div>
+
+        <div class="section">
             <h3>Excel'den JSON'a</h3>
-            <input type="file" id="excelFile" accept=".xlsx" />
+            <div class="file-input">
+                <input type="file" id="excelFile" accept=".xlsx" />
+            </div>
             <button onclick="convertExcelToJson()">JSON'a Dönüştür</button>
             <textarea id="jsonOutput" readonly placeholder="Dönüştürülen JSON burada görünecek..."></textarea>
+            <div id="excelStatus" class="status"></div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
+        // Tarih ve kullanıcı bilgilerini güncelle
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentDateTime').innerText = 
+                `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${now.toISOString().replace('T', ' ').split('.')[0]}`;
+            document.getElementById('currentUser').innerText = 
+                `Current User's Login: mustafaakbs`;
+        }
+
+        // JSON'dan Excel'e dönüştürme
         function convertJsonToExcel() {
             try {
                 const data = JSON.parse(document.getElementById('jsonInput').value);
                 const wb = XLSX.utils.book_new();
+
+                // Metadata sayfası
+                const metadataSheet = XLSX.utils.aoa_to_sheet([
+                    ['METADATA'],
+                    [],
+                    ['Oluşturulma Tarihi:', new Date().toLocaleString('tr-TR')],
+                    ['Oluşturan Kullanıcı:', 'mustafaakbs'],
+                    []
+                ]);
+                XLSX.utils.book_append_sheet(wb, metadataSheet, "Metadata");
 
                 // Kullanıcılar sayfası
                 const usersSheet = createUsersSheet(data.activeUsers);
@@ -80,11 +161,81 @@
                 });
 
                 XLSX.writeFile(wb, 'fitness_program.xlsx');
+                showStatus('jsonStatus', 'Excel dosyası başarıyla oluşturuldu!', true);
             } catch (error) {
-                alert('Hata: ' + error.message);
+                showStatus('jsonStatus', 'Hata: ' + error.message, false);
             }
         }
 
+        // Excel'den JSON'a dönüştürme
+        function convertExcelToJson() {
+            const file = document.getElementById('excelFile').files[0];
+            if (!file) {
+                showStatus('excelStatus', 'Lütfen bir Excel dosyası seçin', false);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    
+                    // JSON yapısını oluştur
+                    const result = {
+                        metadata: {
+                            createdAt: new Date().toISOString(),
+                            createdBy: "mustafaakbs"
+                        },
+                        activeUsers: {},
+                        userPrograms: []
+                    };
+
+                    // Kullanıcılar sayfasını işle
+                    if (workbook.Sheets['Kullanıcılar']) {
+                        const users = XLSX.utils.sheet_to_json(workbook.Sheets['Kullanıcılar']);
+                        users.forEach(user => {
+                            result.activeUsers[user['Kullanıcı Adı']] = {
+                                name: user['İsim'],
+                                role: user['Rol'],
+                                lastLogin: new Date(user['Son Giriş']).toISOString(),
+                                username: user['Kullanıcı Adı']
+                            };
+                        });
+                    }
+
+                    // Program sayfalarını işle
+                    const userSheets = {};
+                    workbook.SheetNames.forEach(sheetName => {
+                        if (sheetName.startsWith('Kullanıcı')) {
+                            const [userPart, dayPart] = sheetName.split('_');
+                            const userIndex = parseInt(userPart.replace('Kullanıcı', '')) - 1;
+                            
+                            if (!userSheets[userIndex]) {
+                                userSheets[userIndex] = {};
+                                result.userPrograms[userIndex] = {};
+                            }
+
+                            if (dayPart && dayPart !== 'Bilgi') {
+                                const sheet = workbook.Sheets[sheetName];
+                                const dayData = parseDaySheet(sheet);
+                                const dayName = dayPart.toLowerCase();
+                                result.userPrograms[userIndex][dayName] = dayData;
+                            }
+                        }
+                    });
+
+                    document.getElementById('jsonOutput').value = JSON.stringify(result, null, 2);
+                    showStatus('excelStatus', 'JSON başarıyla oluşturuldu!', true);
+                } catch (error) {
+                    showStatus('excelStatus', 'Hata: ' + error.message, false);
+                    console.error('Detaylı hata:', error);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Yardımcı fonksiyonlar
         function createUsersSheet(users) {
             const headers = ['Kullanıcı Adı', 'İsim', 'Rol', 'Son Giriş'];
             const rows = [headers];
@@ -102,12 +253,11 @@
         }
 
         function createProgramInfoSheet(userProgram, users, userIndex) {
-            const now = new Date();
             const info = [
                 ['FITNESS PROGRAM BİLGİLERİ'],
                 [],
-                ['Oluşturulma Tarihi:', now.toLocaleDateString('tr-TR')],
-                ['Oluşturulma Saati:', now.toLocaleTimeString('tr-TR')],
+                ['Oluşturulma Tarihi:', new Date().toLocaleString('tr-TR')],
+                ['Oluşturan Kullanıcı:', 'mustafaakbs'],
                 [],
                 ['PROGRAM ÖZETİ'],
                 [],
@@ -152,103 +302,52 @@
             }
 
             const ws = XLSX.utils.aoa_to_sheet(sheetData);
-
-            // Stil ayarları
             ws['!cols'] = [{wch: 15}, {wch: 30}, {wch: 50}];
-            
             return ws;
         }
 
-        function convertExcelToJson() {
-            const file = document.getElementById('excelFile').files[0];
-            if (!file) {
-                alert('Lütfen bir Excel dosyası seçin');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    
-                    // JSON yapısını oluştur
-                    const result = {
-                        activeUsers: {},
-                        userPrograms: []
-                    };
-
-                    // Kullanıcılar sayfasını işle
-                    if (workbook.Sheets['Kullanıcılar']) {
-                        const users = XLSX.utils.sheet_to_json(workbook.Sheets['Kullanıcılar']);
-                        users.forEach(user => {
-                            result.activeUsers[user['Kullanıcı Adı']] = {
-                                name: user['İsim'],
-                                role: user['Rol'],
-                                lastLogin: new Date(user['Son Giriş']).toISOString()
-                            };
-                        });
-                    }
-
-                    // Program sayfalarını işle
-                    const userSheets = {};
-                    workbook.SheetNames.forEach(sheetName => {
-                        if (sheetName.startsWith('Kullanıcı')) {
-                            const [userPart, dayPart] = sheetName.split('_');
-                            const userIndex = parseInt(userPart.replace('Kullanıcı', '')) - 1;
-                            
-                            if (!userSheets[userIndex]) {
-                                userSheets[userIndex] = {};
-                                result.userPrograms[userIndex] = {};
-                            }
-
-                            if (dayPart && dayPart !== 'Bilgi') {
-                                const sheet = workbook.Sheets[sheetName];
-                                const dayData = parseDaySheet(sheet);
-                                result.userPrograms[userIndex][dayPart.toLowerCase()] = dayData;
-                            }
-                        }
-                    });
-
-                    document.getElementById('jsonOutput').value = JSON.stringify(result, null, 2);
-                } catch (error) {
-                    alert('Excel Dönüştürme Hatası: ' + error.message);
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
         function parseDaySheet(sheet) {
-            const data = XLSX.utils.sheet_to_json(sheet, {header: 1});
+            const data = XLSX.utils.sheet_to_json(sheet, {header: 1, raw: false});
             const dayData = {
                 title: '',
                 exercises: []
             };
 
             let currentExercise = null;
-            data.forEach(row => {
-                if (!row.length) return;
-                
-                if (row[0].includes('PROGRAMI')) {
-                    dayData.title = row[0].replace(' PROGRAMI', '');
-                } else if (row[0].startsWith('Egzersiz')) {
+
+            for(let i = 0; i < data.length; i++) {
+                const row = data[i];
+                if (!row || row.length === 0) continue;
+
+                const firstCell = String(row[0] || '');
+
+                if (firstCell.includes('PROGRAMI')) {
+                    dayData.title = firstCell.replace(' PROGRAMI', '');
+                } 
+                else if (firstCell.startsWith('Program Adı:')) {
+                    dayData.title = row[1] || '';
+                }
+                else if (firstCell.startsWith('Egzersiz')) {
                     currentExercise = {
-                        name: row[0].split(': ')[1],
+                        name: firstCell.split(': ')[1] || '',
                         sets: [],
                         videoUrl: ''
                     };
                     dayData.exercises.push(currentExercise);
-                } else if (row[0] === 'Set No' && currentExercise) {
-                    // Set başlığı, işlem yapma
-                } else if (currentExercise && !isNaN(row[0])) {
+                } 
+                else if (firstCell === 'Set No' && currentExercise) {
+                    continue;
+                } 
+                else if (currentExercise && !isNaN(Number(firstCell))) {
                     currentExercise.sets.push({
-                        number: parseInt(row[0]),
-                        reps: parseInt(row[1])
+                        number: parseInt(firstCell),
+                        reps: parseInt(row[1] || '0')
                     });
-                } else if (row[0] === 'Video Link:' && currentExercise) {
-                    currentExercise.videoUrl = row[1];
+                } 
+                else if (firstCell === 'Video Link:' && currentExercise) {
+                    currentExercise.videoUrl = row[1] || '';
                 }
-            });
+            }
 
             return dayData;
         }
@@ -256,6 +355,20 @@
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
+
+        function showStatus(elementId, message, isSuccess) {
+            const statusElement = document.getElementById(elementId);
+            statusElement.textContent = message;
+            statusElement.style.display = 'block';
+            statusElement.className = 'status ' + (isSuccess ? 'success' : 'error');
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 3000);
+        }
+
+        // Sayfa yüklendiğinde
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
     </script>
 </body>
 </html>
