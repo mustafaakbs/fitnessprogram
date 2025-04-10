@@ -24,14 +24,21 @@ class AdminPanel {
         }
 
         this.currentAdmin = user;
-        document.getElementById('currentAdmin').innerText = `Current User's Login: ${user.username}\n`;
+        document.getElementById('currentAdmin').innerText = `Kullanıcı: ${user.username}\n`;
     }
 
     updateDateTime() {
         const now = new Date();
-        const formattedDate = now.toISOString().replace('T', ' ').split('.')[0];
-        document.getElementById('currentDateTime').innerText = 
-            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}\n`;
+        const formattedDate = now.toLocaleString('tr-TR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+        document.getElementById('currentDateTime').innerText = `Tarih ve Saat: ${formattedDate}\n`;
     }
 
     async loadUsers() {
@@ -59,8 +66,8 @@ class AdminPanel {
                     </td>
                     <td>
                         <select class="table-input" data-field="role">
-                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
-                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>Kullanıcı</option>
+                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Yönetici</option>
                         </select>
                     </td>
                     <td>
@@ -104,7 +111,7 @@ class AdminPanel {
                 tbody.appendChild(programRow);
             }
         } catch (error) {
-            console.error('Error loading users:', error);
+            console.error('Kullanıcılar yüklenirken hata:', error);
         }
     }
 
@@ -121,7 +128,7 @@ class AdminPanel {
             await set(ref(db, `users/${userId}`), userData);
             alert('Kullanıcı başarıyla güncellendi');
         } catch (error) {
-            console.error('Error saving user:', error);
+            console.error('Kullanıcı kaydetme hatası:', error);
             alert('Kullanıcı güncellenirken bir hata oluştu');
         }
     }
@@ -135,7 +142,7 @@ class AdminPanel {
             await this.loadUsers();
             alert('Kullanıcı başarıyla silindi');
         } catch (error) {
-            console.error('Error deleting user:', error);
+            console.error('Kullanıcı silme hatası:', error);
             alert('Kullanıcı silinirken bir hata oluştu');
         }
     }
@@ -178,7 +185,7 @@ class AdminPanel {
                 });
             }
         } catch (error) {
-            console.error('Error loading program:', error);
+            console.error('Program yükleme hatası:', error);
         }
     }
 
@@ -318,7 +325,7 @@ class AdminPanel {
             await set(ref(db, `userPrograms/${userId}/${this.currentDay}`), programData);
             alert('Program başarıyla kaydedildi');
         } catch (error) {
-            console.error('Error saving program:', error);
+            console.error('Program kaydetme hatası:', error);
             alert('Program kaydedilirken bir hata oluştu');
         }
     }
@@ -340,30 +347,53 @@ class AdminPanel {
                 const program = programs[day];
                 const exercises = program.exercises || [];
                 
+                // Maksimum set sayısını bul
+                const maxSets = Math.max(...exercises.map(ex => ex.sets?.length || 0), 1);
+                
+                // Başlık satırları
                 const wsData = [
                     ['Program Adı:', program.title || ''],
                     [''],
-                    ['Egzersiz Adı', 'Video URL', 'Set Bilgileri']
+                    ['Egzersiz Adı', 'Video URL']
                 ];
 
+                // Set başlıklarını ekle
+                const headerRow = wsData[2];
+                for (let i = 0; i < maxSets; i++) {
+                    headerRow.push(`Set ${i + 1}`);
+                }
+
+                // Egzersiz verilerini ekle
                 exercises.forEach(exercise => {
-                    const setInfo = exercise.sets
-                        .map(set => `Set ${set.number}: ${set.reps} tekrar`)
-                        .join(', ');
-                    
-                    wsData.push([
+                    const row = [
                         exercise.name || '',
-                        exercise.videoUrl || '',
-                        setInfo
-                    ]);
+                        exercise.videoUrl || ''
+                    ];
+
+                    // Her set için ayrı sütun
+                    for (let i = 0; i < maxSets; i++) {
+                        const set = exercise.sets[i];
+                        row.push(set ? `${set.reps} tekrar` : '');
+                    }
+                    
+                    wsData.push(row);
                 });
 
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
-                ws['!cols'] = [{width: 30}, {width: 40}, {width: 50}];
+
+                // Sütun genişliklerini ayarla
+                ws['!cols'] = [
+                    {width: 30},  // Egzersiz adı
+                    {width: 40},  // Video URL
+                    ...Array(maxSets).fill({width: 15})  // Set sütunları
+                ];
+
                 XLSX.utils.book_append_sheet(wb, ws, day);
             }
 
-            XLSX.writeFile(wb, `program_${userId}.xlsx`);
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('tr-TR').replace(/\./g, '-');
+            XLSX.writeFile(wb, `antrenman_programi_${dateStr}.xlsx`);
             alert('Program başarıyla Excel dosyasına aktarıldı');
 
         } catch (error) {
@@ -390,20 +420,31 @@ class AdminPanel {
                         const programTitle = sheetData[0][1] || '';
                         const exercises = [];
 
+                        // Başlık satırından sonraki satırları işle (3. satırdan başla)
                         for (let i = 3; i < sheetData.length; i++) {
                             const row = sheetData[i];
                             if (!row[0]) continue;
 
-                            const setInfoStr = row[2] || '';
-                            const sets = setInfoStr.split(',').map((setStr, index) => {
-                                const reps = parseInt(setStr.match(/\d+(?=\s*tekrar)/)) || 12;
-                                return { number: index + 1, reps };
-                            });
+                            const sets = [];
+                            // 3. sütundan itibaren set bilgileri var
+                            for (let j = 2; j < row.length; j++) {
+                                if (row[j]) {
+                                    const reps = parseInt(row[j].match(/\d+/) || 12);
+                                    sets.push({
+                                        number: sets.length + 1,
+                                        reps: reps
+                                    });
+                                }
+                            }
+
+                            if (sets.length === 0) {
+                                sets.push({ number: 1, reps: 12 });
+                            }
 
                             exercises.push({
                                 name: row[0],
                                 videoUrl: row[1] || '',
-                                sets: sets.length > 0 ? sets : [{ number: 1, reps: 12 }]
+                                sets: sets
                             });
                         }
 
@@ -444,8 +485,8 @@ class AdminPanel {
                 <td><input type="text" class="table-input" value="" data-field="name"></td>
                 <td>
                     <select class="table-input" data-field="role">
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
+                        <option value="user">Kullanıcı</option>
+                        <option value="admin">Yönetici</option>
                     </select>
                 </td>
                 <td>
