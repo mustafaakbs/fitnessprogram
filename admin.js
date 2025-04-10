@@ -24,7 +24,7 @@ class AdminPanel {
         }
 
         this.currentAdmin = user;
-        document.getElementById('currentAdmin').innerText = `Kullanıcı: ${user.username}\n`;
+        document.getElementById('currentAdmin').innerText = `Giriş Yapan Kullanıcı: ${user.username}`;
     }
 
     updateDateTime() {
@@ -38,7 +38,7 @@ class AdminPanel {
             second: '2-digit',
             hour12: false
         });
-        document.getElementById('currentDateTime').innerText = `Tarih ve Saat: ${formattedDate}\n`;
+        document.getElementById('currentDateTime').innerText = `Tarih ve Saat: ${formattedDate}`;
     }
 
     async loadUsers() {
@@ -197,10 +197,12 @@ class AdminPanel {
         let setsHtml = '';
         if (exercise.sets) {
             exercise.sets.forEach((set, setIndex) => {
+                const reps = set.reps === 'max' ? 'max' : set.reps;
                 setsHtml += `
                     <div class="set-item">
                         <span>Set ${set.number}:</span>
-                        <input type="number" class="set-input" value="${set.reps}" min="1">
+                        <input type="text" class="set-input" value="${reps}"
+                               onchange="this.value = this.value.toLowerCase() === 'max' ? 'max' : (parseInt(this.value) || 'max')">
                         <span>tekrar</span>
                         <button class="action-btn delete-btn" onclick="adminPanel.deleteSet('${userId}', ${index}, ${setIndex})">Set Sil</button>
                     </div>
@@ -215,7 +217,7 @@ class AdminPanel {
             </div>
             <input type="text" class="video-url" value="${exercise.videoUrl || ''}" placeholder="Video URL">
             <div class="exercise-actions">
-                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${index})">Set Ekle</button>
+                <button class="action-btn" onclick="adminPanel.addSet('${userId}', ${index})">Set Ekle (Maks: 10)</button>
                 <button class="action-btn delete-btn" onclick="adminPanel.deleteExercise('${userId}', ${index})">Egzersizi Sil</button>
             </div>
         `;
@@ -237,11 +239,17 @@ class AdminPanel {
             const setsContainer = exerciseCard.querySelector('.sets-container');
             const currentSets = setsContainer.querySelectorAll('.set-item').length;
             
+            if (currentSets >= 10) {
+                alert('Maksimum set sayısına ulaşıldı (10)!');
+                return;
+            }
+
             const newSetDiv = document.createElement('div');
             newSetDiv.className = 'set-item';
             newSetDiv.innerHTML = `
                 <span>Set ${currentSets + 1}:</span>
-                <input type="number" class="set-input" value="12" min="1">
+                <input type="text" class="set-input" value="max"
+                       onchange="this.value = this.value.toLowerCase() === 'max' ? 'max' : (parseInt(this.value) || 'max')">
                 <span>tekrar</span>
                 <button class="action-btn delete-btn" onclick="adminPanel.deleteSet('${userId}', ${exerciseIndex}, ${currentSets})">Set Sil</button>
             `;
@@ -291,7 +299,7 @@ class AdminPanel {
         
         const exercise = {
             name: '',
-            sets: [{number: 1, reps: 12}],
+            sets: [{number: 1, reps: 'max'}],
             videoUrl: ''
         };
 
@@ -305,10 +313,13 @@ class AdminPanel {
             const exerciseCards = container.querySelectorAll('.exercise-card');
             
             const exercises = Array.from(exerciseCards).map(card => {
-                const sets = Array.from(card.querySelectorAll('.set-item')).map((setItem, index) => ({
-                    number: index + 1,
-                    reps: parseInt(setItem.querySelector('.set-input').value) || 12
-                }));
+                const sets = Array.from(card.querySelectorAll('.set-item')).map((setItem, index) => {
+                    const value = setItem.querySelector('.set-input').value;
+                    return {
+                        number: index + 1,
+                        reps: value.toLowerCase() === 'max' ? 'max' : (parseInt(value) || 'max')
+                    };
+                });
                 
                 return {
                     name: card.querySelector('.exercise-name').value,
@@ -347,33 +358,28 @@ class AdminPanel {
                 const program = programs[day];
                 const exercises = program.exercises || [];
                 
-                // Maksimum set sayısını bul
                 const maxSets = Math.max(...exercises.map(ex => ex.sets?.length || 0), 1);
                 
-                // Başlık satırları
                 const wsData = [
                     ['Program Adı:', program.title || ''],
                     [''],
                     ['Egzersiz Adı', 'Video URL']
                 ];
 
-                // Set başlıklarını ekle
                 const headerRow = wsData[2];
                 for (let i = 0; i < maxSets; i++) {
                     headerRow.push(`Set ${i + 1}`);
                 }
 
-                // Egzersiz verilerini ekle
                 exercises.forEach(exercise => {
                     const row = [
                         exercise.name || '',
                         exercise.videoUrl || ''
                     ];
 
-                    // Her set için ayrı sütun
                     for (let i = 0; i < maxSets; i++) {
                         const set = exercise.sets[i];
-                        row.push(set ? `${set.reps} tekrar` : '');
+                        row.push(set ? (set.reps === 'max' ? 'max' : `${set.reps} tekrar`) : '');
                     }
                     
                     wsData.push(row);
@@ -381,11 +387,10 @@ class AdminPanel {
 
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-                // Sütun genişliklerini ayarla
                 ws['!cols'] = [
-                    {width: 30},  // Egzersiz adı
-                    {width: 40},  // Video URL
-                    ...Array(maxSets).fill({width: 15})  // Set sütunları
+                    {width: 30},
+                    {width: 40},
+                    ...Array(maxSets).fill({width: 15})
                 ];
 
                 XLSX.utils.book_append_sheet(wb, ws, day);
@@ -420,16 +425,15 @@ class AdminPanel {
                         const programTitle = sheetData[0][1] || '';
                         const exercises = [];
 
-                        // Başlık satırından sonraki satırları işle (3. satırdan başla)
                         for (let i = 3; i < sheetData.length; i++) {
                             const row = sheetData[i];
                             if (!row[0]) continue;
 
                             const sets = [];
-                            // 3. sütundan itibaren set bilgileri var
                             for (let j = 2; j < row.length; j++) {
                                 if (row[j]) {
-                                    const reps = parseInt(row[j].match(/\d+/) || 12);
+                                    const repsText = row[j].toLowerCase();
+                                    let reps = repsText === 'max' ? 'max' : (parseInt(repsText.match(/\d+/)) || 'max');
                                     sets.push({
                                         number: sets.length + 1,
                                         reps: reps
@@ -438,7 +442,7 @@ class AdminPanel {
                             }
 
                             if (sets.length === 0) {
-                                sets.push({ number: 1, reps: 12 });
+                                sets.push({ number: 1, reps: 'max' });
                             }
 
                             exercises.push({
