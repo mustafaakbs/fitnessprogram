@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Yönetici Paneli</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2964/2964514.png" type="image/png">
     <link rel="stylesheet" href="admin-style.css">
-    <!-- Monospace font için Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+    <!-- Excel işlemleri için XLSX kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <header class="admin-header">
         <div class="header-content">
-            <h1>Admin Panel</h1>
+            <h1>Yönetici Paneli</h1>
             <div class="admin-info">
-                <!-- pre etiketi ile formatlı gösterim -->
                 <pre id="currentDateTime" class="info-text"></pre>
                 <pre id="currentAdmin" class="info-text"></pre>
                 <button id="logoutBtn" class="action-btn">Çıkış Yap</button>
@@ -44,11 +44,11 @@
             </table>
         </div>
     </main>
-                <!-- Alt etiket -->
-        <footer class="footer">
-            <p>Tasarım ve Kodlama: Mustafa Akbaş</p>
-        </footer>
-    </div>
+
+    <footer class="footer">
+        <p>Tasarım ve Kodlama: Mustafa Akbaş</p>
+    </footer>
+
     <script type="module" src="admin.js"></script>
 </body>
 </html>
