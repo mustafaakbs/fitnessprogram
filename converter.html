@@ -18,21 +18,9 @@
             padding: 15px;
             border-radius: 4px;
             margin-bottom: 20px;
-        }
-        .header-item {
-            display: flex;
-            align-items: center;
-            margin: 5px 0;
-            font-size: 14px;
-        }
-        .header-label {
-            font-weight: 500;
-            margin-right: 10px;
-            color: #9e9e9e;
-        }
-        .header-value {
-            color: #fff;
             font-family: monospace;
+            font-size: 14px;
+            line-height: 1.6;
         }
         .container {
             background: white;
@@ -107,14 +95,8 @@
 </head>
 <body>
     <div class="header">
-        <div class="header-item">
-            <span class="header-label">Tarih ve Saat:</span>
-            <span class="header-value" id="currentDateTime"></span>
-        </div>
-        <div class="header-item">
-            <span class="header-label">Kullanıcı:</span>
-            <span class="header-value" id="currentUser">mustafaakbs</span>
-        </div>
+        <div id="currentDateTime">Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-04-10 07:52:20</div>
+        <div id="currentUser">Current User's Login: mustafaakbs</div>
     </div>
 
     <div class="container">
@@ -152,6 +134,81 @@
                 .trim() || 'empty';
         }
 
+        // JSON'dan Excel'e dönüştürme
+        function convertJsonToExcel() {
+            try {
+                const data = JSON.parse(document.getElementById('jsonInput').value);
+                const wb = XLSX.utils.book_new();
+
+                // Metadata sayfası
+                const metadataSheet = XLSX.utils.aoa_to_sheet([
+                    ['METADATA'],
+                    [],
+                    ['Son Güncelleme:', new Date().toLocaleString('tr-TR')],
+                    ['Güncelleyen:', 'mustafaakbs'],
+                    []
+                ]);
+                XLSX.utils.book_append_sheet(wb, metadataSheet, "Metadata");
+
+                // Kullanıcılar sayfası
+                const usersData = [['Kullanıcı Adı', 'İsim', 'Şifre', 'Rol']];
+                
+                // activeUsers ya da users'dan veriyi al
+                const usersList = data.activeUsers || data.users || {};
+                
+                Object.entries(usersList).forEach(([username, user]) => {
+                    if (user && typeof user === 'object') {
+                        usersData.push([
+                            username,
+                            user.name || user.displayName || '',
+                            user.password || '',
+                            user.role || 'user'
+                        ]);
+                    }
+                });
+                
+                const usersSheet = XLSX.utils.aoa_to_sheet(usersData);
+                XLSX.utils.book_append_sheet(wb, usersSheet, "Kullanıcılar");
+
+                // Program sayfaları
+                const programs = data.userPrograms || data.programs || [];
+                
+                if (Array.isArray(programs)) {
+                    // Array format (eski format)
+                    programs.forEach((program, index) => {
+                        if (program) {
+                            Object.entries(program).forEach(([day, dayData]) => {
+                                if (dayData && dayData.title) {
+                                    const sheetName = `Program_${index + 1}_${day}`;
+                                    const daySheet = createDaySheet(dayData);
+                                    XLSX.utils.book_append_sheet(wb, daySheet, sheetName);
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    // Object format (yeni format)
+                    Object.entries(programs).forEach(([programId, program]) => {
+                        if (program && program.days) {
+                            Object.entries(program.days).forEach(([day, dayData]) => {
+                                if (dayData && dayData.title) {
+                                    const sheetName = `Program_${programId}_${day}`;
+                                    const daySheet = createDaySheet(dayData);
+                                    XLSX.utils.book_append_sheet(wb, daySheet, sheetName);
+                                }
+                            });
+                        }
+                    });
+                }
+
+                XLSX.writeFile(wb, 'fitness_program.xlsx');
+                showStatus('jsonStatus', 'Excel dosyası başarıyla oluşturuldu!', true);
+            } catch (error) {
+                showStatus('jsonStatus', 'Hata: ' + error.message, false);
+                console.error('Detaylı hata:', error);
+            }
+        }
+
         // Excel'den JSON'a dönüştürme
         function convertExcelToJson() {
             const file = document.getElementById('excelFile').files[0];
@@ -166,7 +223,6 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
                     
-                    // Firebase uyumlu JSON yapısı
                     const result = {
                         metadata: {
                             lastUpdate: new Date().toISOString(),
@@ -254,73 +310,38 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // JSON'dan Excel'e dönüştürme
-        function convertJsonToExcel() {
-            try {
-                const data = JSON.parse(document.getElementById('jsonInput').value);
-                const wb = XLSX.utils.book_new();
-
-                // Metadata sayfası
-                const metadataSheet = XLSX.utils.aoa_to_sheet([
-                    ['METADATA'],
-                    [],
-                    ['Son Güncelleme:', new Date().toLocaleString('tr-TR')],
-                    ['Güncelleyen:', data.metadata?.updatedBy || 'mustafaakbs'],
-                    []
-                ]);
-                XLSX.utils.book_append_sheet(wb, metadataSheet, "Metadata");
-
-                // Kullanıcılar sayfası
-                if (data.users) {
-                    const usersData = [['Kullanıcı Adı', 'İsim', 'Şifre', 'Rol']];
-                    Object.entries(data.users).forEach(([username, user]) => {
-                        usersData.push([
-                            username,
-                            user.name,
-                            user.password,
-                            user.role
-                        ]);
-                    });
-                    const usersSheet = XLSX.utils.aoa_to_sheet(usersData);
-                    XLSX.utils.book_append_sheet(wb, usersSheet, "Kullanıcılar");
-                }
-
-                // Program sayfaları
-                if (data.programs) {
-                    Object.entries(data.programs).forEach(([programId, program]) => {
-                        Object.entries(program.days).forEach(([day, dayData]) => {
-                            const sheetName = `Program_${programId}_${day}`;
-                            const daySheet = createDaySheet(dayData);
-                            XLSX.utils.book_append_sheet(wb, daySheet, sheetName);
-                        });
-                    });
-                }
-
-                XLSX.writeFile(wb, 'fitness_program.xlsx');
-                showStatus('jsonStatus', 'Excel dosyası başarıyla oluşturuldu!', true);
-            } catch (error) {
-                showStatus('jsonStatus', 'Hata: ' + error.message, false);
-            }
-        }
-
         // Gün sayfası oluştur
         function createDaySheet(dayData) {
+            if (!dayData) return XLSX.utils.aoa_to_sheet([['Veri bulunamadı']]);
+
             const sheetData = [
                 ['GÜNLÜK PROGRAM'],
                 [],
-                ['Program Adı:', dayData.title],
+                ['Program Adı:', dayData.title || 'DİNLENME'],
                 []
             ];
 
-            if (dayData.exercises?.length > 0) {
+            if (dayData.exercises && Array.isArray(dayData.exercises)) {
                 dayData.exercises.forEach((exercise, index) => {
-                    sheetData.push(
-                        [`Egzersiz ${index + 1}: ${exercise.name}`],
-                        ['Set No', 'Tekrar Sayısı'],
-                        ...exercise.sets.map(set => [set.number, set.reps]),
-                        ['Video Link:', exercise.videoUrl],
-                        []
-                    );
+                    if (exercise) {
+                        sheetData.push(
+                            [`Egzersiz ${index + 1}: ${exercise.name || ''}`],
+                            ['Set No', 'Tekrar Sayısı']
+                        );
+
+                        if (exercise.sets && Array.isArray(exercise.sets)) {
+                            exercise.sets.forEach(set => {
+                                if (set) {
+                                    sheetData.push([set.number || 0, set.reps || 0]);
+                                }
+                            });
+                        }
+
+                        sheetData.push(
+                            ['Video Link:', exercise.videoUrl || ''],
+                            []
+                        );
+                    }
                 });
             }
 
@@ -387,17 +408,11 @@
         // Tarih güncelleme
         function updateDateTime() {
             const now = new Date();
-            const trTime = new Intl.DateTimeFormat('tr-TR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            }).format(now);
-
-            document.getElementById('currentDateTime').textContent = trTime;
+            const formattedDate = now.toISOString().replace('T', ' ').split('.')[0];
+            document.getElementById('currentDateTime').textContent = 
+                `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}`;
+            document.getElementById('currentUser').textContent = 
+                `Current User's Login: mustafaakbs`;
         }
 
         // Sayfa yüklendiğinde
