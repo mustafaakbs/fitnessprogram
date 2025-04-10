@@ -65,166 +65,133 @@
     </div>
 
     <div class="container">
-        <h2>JSON'dan CSV'ye Dönüştür</h2>
+        <h2>JSON'dan Excel'e Dönüştür</h2>
         <textarea id="jsonInput" placeholder="JSON verilerini buraya yapıştırın..."></textarea>
-        <button onclick="convertJsonToCsv()">CSV'ye Dönüştür</button>
+        <button onclick="convertJsonToExcel()">Excel'e Dönüştür</button>
     </div>
 
     <div class="container">
-        <h2>CSV'den JSON'a Dönüştür</h2>
+        <h2>Excel'den JSON'a Dönüştür</h2>
         <div class="file-input">
-            <input type="file" id="csvFile" accept=".csv" />
+            <input type="file" id="excelFile" accept=".xlsx" />
         </div>
         <textarea id="jsonOutput" readonly placeholder="Dönüştürülen JSON burada görünecek..."></textarea>
         <button onclick="convertCsvToJson()">JSON'a Dönüştür</button>
     </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
-        function convertJsonToCsv() {
+        function convertJsonToExcel() {
             try {
-                // Excel için başlık satırları
-                let csv = "Program Bilgileri\n";
-                csv += "\nProgram Detayları\n";
-                
-                // Tarih ve kullanıcı bilgisi
-                const now = new Date();
-                const formattedDate = now.toLocaleDateString('tr-TR', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit'
-                });
-                const formattedTime = now.toLocaleTimeString('tr-TR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    second: '2-digit'
-                });
-                
-                csv += "Tarih,Saat,Kullanıcı\n";
-                csv += `${formattedDate},${formattedTime},mustafaakbs\n\n`;
-                
-                // Program tablosu başlıkları
-                csv += "Gün,Program Adı,Egzersiz Adı,Set,Tekrar,Video Linki\n";
-
-                // JSON verisini parse et
                 const data = JSON.parse(document.getElementById('jsonInput').value);
-                
-                // userPrograms dizisini işle
-                if (Array.isArray(data.userPrograms)) {
-                    data.userPrograms.forEach((userProgram, index) => {
-                        Object.entries(userProgram).forEach(([day, dayData]) => {
-                            if (dayData.exercises) {
-                                dayData.exercises.forEach(exercise => {
-                                    exercise.sets.forEach(set => {
-                                        // Her satır için Türkçe gün adını kullan
-                                        const turkishDay = day.charAt(0).toUpperCase() + day.slice(1);
-                                        csv += `${turkishDay},${dayData.title},${exercise.name},${set.number},${set.reps},${exercise.videoUrl}\n`;
-                                    });
-                                });
-                            } else if (dayData.title) {
-                                const turkishDay = day.charAt(0).toUpperCase() + day.slice(1);
-                                csv += `${turkishDay},${dayData.title},,,,\n`;
-                            }
-                        });
-                        
-                        // Her kullanıcı arasına boş satır ekle
-                        csv += "\n";
-                    });
-                }
+                const wb = XLSX.utils.book_new();
 
-                // Excel için UTF-8 BOM ekle
-                const BOM = "\uFEFF";
-                csv = BOM + csv;
+                // Program Bilgileri sayfası
+                const programInfoSheet = createProgramInfoSheet(data);
+                XLSX.utils.book_append_sheet(wb, programInfoSheet, "Program Bilgileri");
 
-                // Dosyayı indir
-                downloadFile(csv, 'fitness_program.csv');
+                // Her gün için ayrı sayfa
+                const days = ['pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi', 'pazar'];
+                days.forEach(day => {
+                    const daySheet = createDaySheet(data, day);
+                    XLSX.utils.book_append_sheet(wb, daySheet, capitalizeFirstLetter(day));
+                });
+
+                // Excel dosyasını indir
+                XLSX.writeFile(wb, 'fitness_program.xlsx');
             } catch (error) {
                 alert('Hata: ' + error.message);
             }
         }
 
-        // CSV'den JSON'a dönüştürme fonksiyonu güncellendi
-        function convertCsvToJson() {
-            const file = document.getElementById('csvFile').files[0];
-            if (!file) {
-                alert('Lütfen bir CSV dosyası seçin');
-                return;
+        function createProgramInfoSheet(data) {
+            // Başlık ve genel bilgiler
+            const info = [
+                ['FITNESS PROGRAM BİLGİLERİ'],
+                [],
+                ['Oluşturulma Tarihi:', new Date().toLocaleDateString('tr-TR')],
+                ['Oluşturulma Saati:', new Date().toLocaleTimeString('tr-TR')],
+                ['Kullanıcı:', 'mustafaakbs'],
+                [],
+                ['PROGRAM ÖZETİ'],
+                [],
+                ['Gün', 'Program Adı', 'Egzersiz Sayısı']
+            ];
+
+            // Program özetini ekle
+            if (data.userPrograms && data.userPrograms[0]) {
+                Object.entries(data.userPrograms[0]).forEach(([day, dayData]) => {
+                    const exerciseCount = dayData.exercises ? dayData.exercises.length : 0;
+                    info.push([
+                        capitalizeFirstLetter(day),
+                        dayData.title,
+                        exerciseCount
+                    ]);
+                });
             }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const text = e.target.result.replace(/^\uFEFF/, ''); // BOM'u kaldır
-                    const lines = text.split('\n');
-                    
-                    // Başlık bilgilerini atla ve program verilerini al
-                    let dataStartIndex = 0;
-                    for (let i = 0; i < lines.length; i++) {
-                        if (lines[i].startsWith('Gün,Program')) {
-                            dataStartIndex = i + 1;
-                            break;
-                        }
-                    }
-
-                    const result = { userPrograms: [{}] };
-                    const currentProgram = result.userPrograms[0];
-
-                    for (let i = dataStartIndex; i < lines.length; i++) {
-                        const line = lines[i].trim();
-                        if (!line) continue;
-
-                        const [day, title, exerciseName, setNumber, reps, videoUrl] = line.split(',');
-                        
-                        if (!currentProgram[day.toLowerCase()]) {
-                            currentProgram[day.toLowerCase()] = {
-                                title: title,
-                                exercises: []
-                            };
-                        }
-
-                        if (exerciseName) {
-                            let exercise = currentProgram[day.toLowerCase()].exercises.find(e => e.name === exerciseName);
-                            if (!exercise) {
-                                exercise = {
-                                    name: exerciseName,
-                                    sets: [],
-                                    videoUrl: videoUrl
-                                };
-                                currentProgram[day.toLowerCase()].exercises.push(exercise);
-                            }
-                            
-                            exercise.sets.push({
-                                number: parseInt(setNumber),
-                                reps: parseInt(reps)
-                            });
-                        }
-                    }
-
-                    const jsonOutput = document.getElementById('jsonOutput');
-                    const formattedJson = JSON.stringify(result, null, 2);
-                    jsonOutput.value = formattedJson;
-                    downloadFile(formattedJson, 'program.json', 'application/json');
-
-                } catch (error) {
-                    alert('CSV Dönüştürme Hatası: ' + error.message);
-                }
-            };
-            reader.readAsText(file);
+            return XLSX.utils.aoa_to_sheet(info);
         }
 
-        function downloadFile(content, filename, type = 'text/csv') {
-            const blob = new Blob([content], { type: type + ';charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        function createDaySheet(data, day) {
+            if (!data.userPrograms || !data.userPrograms[0] || !data.userPrograms[0][day]) {
+                return XLSX.utils.aoa_to_sheet([['Bu gün için program bulunmamaktadır.']]);
+            }
+
+            const dayData = data.userPrograms[0][day];
+            const sheetData = [
+                [capitalizeFirstLetter(day) + ' PROGRAMI'],
+                [],
+                ['Program Adı:', dayData.title],
+                []
+            ];
+
+            if (dayData.exercises) {
+                dayData.exercises.forEach((exercise, index) => {
+                    sheetData.push(
+                        [`Egzersiz ${index + 1}: ${exercise.name}`],
+                        ['Set No', 'Tekrar Sayısı'],
+                        ...exercise.sets.map(set => [set.number, set.reps]),
+                        ['Video Link:', exercise.videoUrl],
+                        []
+                    );
+                });
+            }
+
+            const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+            // Stil ayarları
+            ws['!cols'] = [
+                {wch: 15}, // A sütunu
+                {wch: 30}, // B sütunu
+                {wch: 50}  // C sütunu
+            ];
+
+            // Başlık hücrelerini birleştir
+            if (!ws['!merges']) ws['!merges'] = [];
+            ws['!merges'].push(
+                {s: {r: 0, c: 0}, e: {r: 0, c: 2}} // İlk satırı birleştir
+            );
+
+            return ws;
         }
 
-        // Sayfa yüklendiğinde tarih güncelleme
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        // Tarih güncelleme
+        function updateDateTime() {
+            const now = new Date();
+            const formattedDate = now.toISOString().replace('T', ' ').split('.')[0];
+            document.getElementById('currentDateTime').innerText = 
+                `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}`;
+            document.getElementById('currentUser').innerText = 
+                `Current User's Login: mustafaakbs`;
+        }
+
         updateDateTime();
         setInterval(updateDateTime, 1000);
     </script>
 </body>
 </html>
-   
