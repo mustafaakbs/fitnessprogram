@@ -415,3 +415,24 @@ input[type="file"] {
     background: transparent;
     border: none;
 }
+.set-input {
+    width: 60px;
+    text-align: center;
+    text-transform: lowercase;
+}
+
+.set-item {
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Maksimum set sayısına yaklaşıldığında uyarı rengi */
+.sets-container:has(.set-item:nth-child(8)) ~ .exercise-actions button:first-child {
+    background-color: #ffa500;
+}
+
+.sets-container:has(.set-item:nth-child(9)) ~ .exercise-actions button:first-child {
+    background-color: #ff6b6b;
+}
