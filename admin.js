@@ -27,19 +27,38 @@ class AdminPanel {
         document.getElementById('currentAdmin').innerText = `Giriş Yapan Kullanıcı: ${user.username}`;
     }
 
-    updateDateTime() {
-        const now = new Date();
-        const formattedDate = now.toLocaleString('tr-TR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        });
-        document.getElementById('currentDateTime').innerText = `Tarih ve Saat: ${formattedDate}`;
+updateDateTime() {
+    const now = new Date();
+    const formattedDate = now.toLocaleString('tr-TR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZone: 'UTC'
+    }).replace(/\./g, '-');
+    
+    document.getElementById('currentDateTime').innerText = `Tarih ve Saat: ${formattedDate}`;
+}
+
+checkAdminAccess() {
+    const userJson = sessionStorage.getItem('currentUser');
+    if (!userJson) {
+        window.location.href = 'index.html';
+        return;
     }
+
+    const user = JSON.parse(userJson);
+    if (user.role !== 'admin') {
+        window.location.href = 'dashboard.html';
+        return;
+    }
+
+    this.currentAdmin = user;
+    document.getElementById('currentAdmin').innerText = `Giriş Yapan Kullanıcı: ${user.username}`;
+}
 
     async loadUsers() {
         try {
