@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitness Program Dönüştürücü</title>
+    <title>Program Dönüştürücü</title>
     <style>
         body { 
             padding: 20px; 
-            font-family: Arial; 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             max-width: 1200px; 
             margin: 0 auto; 
             background: #f5f5f5;
@@ -18,8 +18,21 @@
             padding: 15px;
             border-radius: 4px;
             margin-bottom: 20px;
-            font-family: monospace;
+        }
+        .header-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
             font-size: 14px;
+        }
+        .header-label {
+            font-weight: 500;
+            margin-right: 10px;
+            color: #9e9e9e;
+        }
+        .header-value {
+            color: #fff;
+            font-family: monospace;
         }
         .container {
             background: white;
@@ -34,6 +47,10 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+        h2, h3 {
+            color: #333;
+            margin-top: 0;
+        }
         textarea { 
             width: 100%; 
             height: 300px; 
@@ -43,6 +60,7 @@
             border-radius: 4px;
             font-family: monospace;
             font-size: 14px;
+            resize: vertical;
         }
         .file-input {
             margin: 10px 0;
@@ -50,6 +68,10 @@
             border: 1px dashed #ddd;
             border-radius: 4px;
             background: #f9f9f9;
+        }
+        .file-input input[type="file"] {
+            display: block;
+            margin: 10px 0;
         }
         button { 
             padding: 10px 20px; 
@@ -60,6 +82,7 @@
             cursor: pointer; 
             margin: 5px;
             font-size: 14px;
+            transition: background-color 0.3s;
         }
         button:hover {
             background: #45a049;
@@ -84,12 +107,18 @@
 </head>
 <body>
     <div class="header">
-        <div id="currentDateTime">Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-04-10 07:25:01</div>
-        <div id="currentUser">Current User's Login: mustafaakbs</div>
+        <div class="header-item">
+            <span class="header-label">Tarih ve Saat:</span>
+            <span class="header-value" id="currentDateTime"></span>
+        </div>
+        <div class="header-item">
+            <span class="header-label">Kullanıcı:</span>
+            <span class="header-value" id="currentUser">mustafaakbs</span>
+        </div>
     </div>
 
     <div class="container">
-        <h2>Fitness Program Dönüştürücü</h2>
+        <h2>Program Dönüştürücü</h2>
         
         <div class="section">
             <h3>JSON'dan Excel'e</h3>
@@ -99,8 +128,9 @@
         </div>
 
         <div class="section">
-            <h3>Excel'den JSON'a (Firebase Uyumlu)</h3>
+            <h3>Excel'den JSON'a</h3>
             <div class="file-input">
+                <div>Excel dosyanızı seçin (.xlsx)</div>
                 <input type="file" id="excelFile" accept=".xlsx" />
             </div>
             <button onclick="convertExcelToJson()">Firebase JSON'a Dönüştür</button>
@@ -111,61 +141,18 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
-        // Firebase uyumlu path temizleme
+        // Firebase path temizleme
         function cleanFirebasePath(str) {
-            if (!str) return '';
-            return str.replace(/[.$#\[\]\/]/g, '_')
-                     .replace(/\s+/g, ' ')
-                     .trim();
+            if (!str) return 'empty';
+            return str
+                .replace(/[.$#\[\]\/]/g, '_')
+                .replace(/\s+/g, '_')
+                .replace(/[^a-zA-Z0-9_-]/g, '')
+                .replace(/^[^a-zA-Z]+/, 'key_')
+                .trim() || 'empty';
         }
 
-        // JSON'dan Excel'e dönüştürme
-        function convertJsonToExcel() {
-            try {
-                const data = JSON.parse(document.getElementById('jsonInput').value);
-                const wb = XLSX.utils.book_new();
-
-                // Metadata sayfası
-                const metadataSheet = XLSX.utils.aoa_to_sheet([
-                    ['METADATA'],
-                    [],
-                    ['Oluşturulma Tarihi:', new Date().toLocaleString('tr-TR')],
-                    ['Oluşturan Kullanıcı:', 'mustafaakbs'],
-                    []
-                ]);
-                XLSX.utils.book_append_sheet(wb, metadataSheet, "Metadata");
-
-                // Kullanıcılar sayfası
-                if (data.activeUsers) {
-                    const usersSheet = createUsersSheet(data.activeUsers);
-                    XLSX.utils.book_append_sheet(wb, usersSheet, "Kullanıcılar");
-                }
-
-                // Program sayfaları
-                if (data.userPrograms) {
-                    Object.entries(data.userPrograms).forEach(([userId, userProgram]) => {
-                        // Program bilgi sayfası
-                        const infoSheetName = `Program_${userId}_Bilgi`;
-                        const programInfoSheet = createProgramInfoSheet(userProgram);
-                        XLSX.utils.book_append_sheet(wb, programInfoSheet, infoSheetName);
-
-                        // Her gün için sayfa
-                        Object.entries(userProgram).forEach(([day, dayData]) => {
-                            const sheetName = `Program_${userId}_${capitalizeFirstLetter(day)}`;
-                            const daySheet = createDaySheet(dayData);
-                            XLSX.utils.book_append_sheet(wb, daySheet, sheetName);
-                        });
-                    });
-                }
-
-                XLSX.writeFile(wb, 'fitness_program.xlsx');
-                showStatus('jsonStatus', 'Excel dosyası başarıyla oluşturuldu!', true);
-            } catch (error) {
-                showStatus('jsonStatus', 'Hata: ' + error.message, false);
-            }
-        }
-
-        // Excel'den Firebase uyumlu JSON'a dönüştürme
+        // Excel'den JSON'a dönüştürme
         function convertExcelToJson() {
             const file = document.getElementById('excelFile').files[0];
             if (!file) {
@@ -181,41 +168,80 @@
                     
                     // Firebase uyumlu JSON yapısı
                     const result = {
-                        activeUsers: {},
-                        userPrograms: {}
+                        metadata: {
+                            lastUpdate: new Date().toISOString(),
+                            updatedBy: "mustafaakbs"
+                        },
+                        users: {},
+                        programs: {}
                     };
 
                     // Kullanıcılar sayfasını işle
                     if (workbook.Sheets['Kullanıcılar']) {
                         const users = XLSX.utils.sheet_to_json(workbook.Sheets['Kullanıcılar']);
-                        users.forEach(user => {
-                            const username = user['Kullanıcı Adı'];
-                            const safeUsername = cleanFirebasePath(username);
-                            result.activeUsers[safeUsername] = {
-                                name: user['İsim'] || '',
-                                role: user['Rol'] || 'user',
-                                lastLogin: new Date(user['Son Giriş'] || new Date()).toISOString(),
-                                username: safeUsername
-                            };
+                        users.forEach((user, index) => {
+                            if (user['Kullanıcı Adı'] && user['İsim']) {
+                                const username = cleanFirebasePath(user['Kullanıcı Adı']);
+                                result.users[username] = {
+                                    name: user['İsim'],
+                                    password: user['Şifre'] || `user${index + 1}123`,
+                                    role: user['Rol'] || 'user',
+                                    username: username,
+                                    lastLogin: new Date().toISOString()
+                                };
+                            }
                         });
                     }
 
                     // Program sayfalarını işle
                     workbook.SheetNames.forEach(sheetName => {
                         if (sheetName.startsWith('Program_')) {
-                            const [_, userId, dayPart] = sheetName.split('_');
+                            const [_, programId, dayPart] = sheetName.split('_');
+                            const programKey = `program_${programId}`;
                             
-                            if (!result.userPrograms[userId]) {
-                                result.userPrograms[userId] = {};
+                            if (!result.programs[programKey]) {
+                                const userKeys = Object.keys(result.users);
+                                const ownerUsername = userKeys[parseInt(programId) - 1] || userKeys[0] || 'admin';
+                                
+                                result.programs[programKey] = {
+                                    owner: ownerUsername,
+                                    createdAt: new Date().toISOString(),
+                                    days: {}
+                                };
                             }
 
                             if (dayPart && dayPart !== 'Bilgi') {
                                 const sheet = workbook.Sheets[sheetName];
                                 const dayData = parseDaySheet(sheet);
-                                const dayName = dayPart.toLowerCase();
-                                result.userPrograms[userId][dayName] = dayData;
+                                const dayKey = cleanFirebasePath(dayPart.toLowerCase());
+                                
+                                result.programs[programKey].days[dayKey] = {
+                                    title: dayData.title || 'Dinlenme',
+                                    exercises: dayData.exercises?.map((exercise, index) => ({
+                                        id: `exercise_${index + 1}`,
+                                        name: cleanFirebasePath(exercise.name),
+                                        videoUrl: exercise.videoUrl || '',
+                                        sets: exercise.sets?.map(set => ({
+                                            number: set.number || 0,
+                                            reps: set.reps || 0
+                                        })) || []
+                                    })) || []
+                                };
                             }
                         }
+                    });
+
+                    // Boş günleri ekle
+                    const days = ['pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi', 'pazar'];
+                    Object.keys(result.programs).forEach(programKey => {
+                        days.forEach(day => {
+                            if (!result.programs[programKey].days[day]) {
+                                result.programs[programKey].days[day] = {
+                                    title: 'DİNLENME',
+                                    exercises: []
+                                };
+                            }
+                        });
                     });
 
                     document.getElementById('jsonOutput').value = JSON.stringify(result, null, 2);
@@ -228,46 +254,56 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // Yardımcı fonksiyonlar
-        function createUsersSheet(users) {
-            const headers = ['Kullanıcı Adı', 'İsim', 'Rol', 'Son Giriş'];
-            const rows = [headers];
+        // JSON'dan Excel'e dönüştürme
+        function convertJsonToExcel() {
+            try {
+                const data = JSON.parse(document.getElementById('jsonInput').value);
+                const wb = XLSX.utils.book_new();
 
-            Object.entries(users).forEach(([username, userData]) => {
-                rows.push([
-                    username,
-                    userData.name,
-                    userData.role,
-                    new Date(userData.lastLogin).toLocaleString('tr-TR')
+                // Metadata sayfası
+                const metadataSheet = XLSX.utils.aoa_to_sheet([
+                    ['METADATA'],
+                    [],
+                    ['Son Güncelleme:', new Date().toLocaleString('tr-TR')],
+                    ['Güncelleyen:', data.metadata?.updatedBy || 'mustafaakbs'],
+                    []
                 ]);
-            });
+                XLSX.utils.book_append_sheet(wb, metadataSheet, "Metadata");
 
-            return XLSX.utils.aoa_to_sheet(rows);
+                // Kullanıcılar sayfası
+                if (data.users) {
+                    const usersData = [['Kullanıcı Adı', 'İsim', 'Şifre', 'Rol']];
+                    Object.entries(data.users).forEach(([username, user]) => {
+                        usersData.push([
+                            username,
+                            user.name,
+                            user.password,
+                            user.role
+                        ]);
+                    });
+                    const usersSheet = XLSX.utils.aoa_to_sheet(usersData);
+                    XLSX.utils.book_append_sheet(wb, usersSheet, "Kullanıcılar");
+                }
+
+                // Program sayfaları
+                if (data.programs) {
+                    Object.entries(data.programs).forEach(([programId, program]) => {
+                        Object.entries(program.days).forEach(([day, dayData]) => {
+                            const sheetName = `Program_${programId}_${day}`;
+                            const daySheet = createDaySheet(dayData);
+                            XLSX.utils.book_append_sheet(wb, daySheet, sheetName);
+                        });
+                    });
+                }
+
+                XLSX.writeFile(wb, 'fitness_program.xlsx');
+                showStatus('jsonStatus', 'Excel dosyası başarıyla oluşturuldu!', true);
+            } catch (error) {
+                showStatus('jsonStatus', 'Hata: ' + error.message, false);
+            }
         }
 
-        function createProgramInfoSheet(userProgram) {
-            const info = [
-                ['PROGRAM BİLGİLERİ'],
-                [],
-                ['Oluşturulma Tarihi:', new Date().toLocaleString('tr-TR')],
-                [],
-                ['PROGRAM ÖZETİ'],
-                [],
-                ['Gün', 'Program Adı', 'Egzersiz Sayısı']
-            ];
-
-            Object.entries(userProgram).forEach(([day, dayData]) => {
-                const exerciseCount = dayData.exercises ? dayData.exercises.length : 0;
-                info.push([
-                    capitalizeFirstLetter(day),
-                    dayData.title,
-                    exerciseCount
-                ]);
-            });
-
-            return XLSX.utils.aoa_to_sheet(info);
-        }
-
+        // Gün sayfası oluştur
         function createDaySheet(dayData) {
             const sheetData = [
                 ['GÜNLÜK PROGRAM'],
@@ -276,7 +312,7 @@
                 []
             ];
 
-            if (dayData.exercises) {
+            if (dayData.exercises?.length > 0) {
                 dayData.exercises.forEach((exercise, index) => {
                     sheetData.push(
                         [`Egzersiz ${index + 1}: ${exercise.name}`],
@@ -293,6 +329,7 @@
             return ws;
         }
 
+        // Gün verilerini parse et
         function parseDaySheet(sheet) {
             const data = XLSX.utils.sheet_to_json(sheet, {header: 1, raw: false});
             const dayData = {
@@ -336,10 +373,7 @@
             return dayData;
         }
 
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
-
+        // Durum mesajı göster
         function showStatus(elementId, message, isSuccess) {
             const statusElement = document.getElementById(elementId);
             statusElement.textContent = message;
@@ -350,13 +384,20 @@
             }, 3000);
         }
 
+        // Tarih güncelleme
         function updateDateTime() {
             const now = new Date();
-            const formattedDate = now.toISOString().replace('T', ' ').split('.')[0];
-            document.getElementById('currentDateTime').textContent = 
-                `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}`;
-            document.getElementById('currentUser').textContent = 
-                `Current User's Login: mustafaakbs`;
+            const trTime = new Intl.DateTimeFormat('tr-TR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).format(now);
+
+            document.getElementById('currentDateTime').textContent = trTime;
         }
 
         // Sayfa yüklendiğinde
