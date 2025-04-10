@@ -1,3 +1,6 @@
+import { db } from './firebase-config.js';
+import { ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
 class AdminPanel {
     constructor() {
         this.currentAdmin = null;
@@ -21,37 +24,162 @@ class AdminPanel {
         }
 
         this.currentAdmin = user;
-        document.getElementById('currentAdmin').innerText = `Aktif Kullanıcı: ${user.username}`;
+        document.getElementById('currentAdmin').innerText = `Current User's Login: ${user.username}\n`;
     }
 
-    initializeInterface() {
-        document.getElementById('addUserBtn').addEventListener('click', () => {
-            const tbody = document.querySelector('.users-table tbody');
-            const tr = document.createElement('tr');
-            const userId = 'new-' + Date.now();
-            
-            tr.innerHTML = `
-                <td><input type="text" class="table-input" value="" data-field="username"></td>
-                <td><input type="password" class="table-input" value="" data-field="password"></td>
-                <td><input type="text" class="table-input" value="" data-field="name"></td>
-                <td>
-                    <select class="table-input" data-field="role">
-                        <option value="user">Kullanıcı</option>
-                        <option value="admin">Yönetici</option>
-                    </select>
-                </td>
-                <td>
-                    <button class="action-btn save-btn" onclick="adminPanel.saveUser('${userId}', this)">Kaydet</button>
-                </td>
-            `;
-            
-            tbody.insertBefore(tr, tbody.firstChild);
-        });
+    updateDateTime() {
+        const now = new Date();
+        const formattedDate = now.toISOString().replace('T', ' ').split('.')[0];
+        document.getElementById('currentDateTime').innerText = 
+            `Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): ${formattedDate}\n`;
+    }
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            sessionStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
-        });
+    async loadUsers() {
+        try {
+            const usersRef = ref(db, 'users');
+            const snapshot = await get(usersRef);
+            const users = snapshot.val();
+
+            const tbody = document.querySelector('.users-table tbody');
+            tbody.innerHTML = '';
+
+            for (const userId in users) {
+                const user = users[userId];
+                const tr = document.createElement('tr');
+                
+                tr.innerHTML = `
+                    <td>
+                        <input type="text" class="table-input" value="${user.username}" data-field="username">
+                    </td>
+                    <td>
+                        <input type="password" class="table-input" value="${user.password}" data-field="password">
+                    </td>
+                    <td>
+                        <input type="text" class="table-input" value="${user.name || ''}" data-field="name">
+                    </td>
+                    <td>
+                        <select class="table-input" data-field="role">
+                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="action-btn save-btn" onclick="adminPanel.saveUser('${userId}', this)">Kaydet</button>
+                        <button class="action-btn delete-btn" onclick="adminPanel.deleteUser('${userId}')">Sil</button>
+                        <button class="action-btn program-btn" onclick="adminPanel.toggleProgram('${userId}')">Program</button>
+                    </td>
+                `;
+
+                const programRow = document.createElement('tr');
+                programRow.className = 'program-row';
+                programRow.id = `program-${userId}`;
+                programRow.innerHTML = `
+                    <td colspan="5">
+                        <div class="program-container">
+                            <div class="program-header">
+                                <select class="day-select" onchange="adminPanel.dayChanged('${userId}', this.value)">
+                                    <option value="pazartesi">Pazartesi</option>
+                                    <option value="sali">Salı</option>
+                                    <option value="carsamba">Çarşamba</option>
+                                    <option value="persembe">Perşembe</option>
+                                    <option value="cuma">Cuma</option>
+                                    <option value="cumartesi">Cumartesi</option>
+                                    <option value="pazar">Pazar</option>
+                                </select>
+                                <input type="text" class="program-title-input" placeholder="Program Adı" value="Cardio">
+                            </div>
+                            <div class="exercises-container"></div>
+                            <div class="program-actions">
+                                <button class="action-btn" onclick="adminPanel.addExercise('${userId}')">Yeni Egzersiz</button>
+                                <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">Programı Kaydet</button>
+                                <button class="action-btn excel-btn" onclick="adminPanel.exportToExcel('${userId}')">Excel'e Aktar</button>
+                                <input type="file" id="excel-upload-${userId}" style="display: none" accept=".xlsx" onchange="adminPanel.importFromExcel('${userId}', this)">
+                                <button class="action-btn excel-btn" onclick="document.getElementById('excel-upload-${userId}').click()">Excel'den Yükle</button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+                tbody.appendChild(programRow);
+            }
+        } catch (error) {
+            console.error('Error loading users:', error);
+        }
+    }
+
+    async saveUser(userId, button) {
+        try {
+            const tr = button.closest('tr');
+            const inputs = tr.querySelectorAll('.table-input');
+            const userData = {};
+
+            inputs.forEach(input => {
+                userData[input.dataset.field] = input.value;
+            });
+
+            await set(ref(db, `users/${userId}`), userData);
+            alert('Kullanıcı başarıyla güncellendi');
+        } catch (error) {
+            console.error('Error saving user:', error);
+            alert('Kullanıcı güncellenirken bir hata oluştu');
+        }
+    }
+
+    async deleteUser(userId) {
+        if (!confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) return;
+
+        try {
+            await remove(ref(db, `users/${userId}`));
+            await remove(ref(db, `userPrograms/${userId}`));
+            await this.loadUsers();
+            alert('Kullanıcı başarıyla silindi');
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            alert('Kullanıcı silinirken bir hata oluştu');
+        }
+    }
+
+    async toggleProgram(userId) {
+        const programRow = document.getElementById(`program-${userId}`);
+        const isVisible = programRow.style.display === 'table-row';
+        
+        if (!isVisible) {
+            document.querySelectorAll('.program-row').forEach(row => {
+                row.style.display = 'none';
+            });
+            
+            programRow.style.display = 'table-row';
+            await this.loadUserProgram(userId);
+        } else {
+            programRow.style.display = 'none';
+        }
+    }
+
+    async loadUserProgram(userId) {
+        try {
+            const programRef = ref(db, `userPrograms/${userId}/${this.currentDay}`);
+            const snapshot = await get(programRef);
+            const program = snapshot.val();
+
+            const container = document.getElementById(`program-${userId}`);
+            const titleInput = container.querySelector('.program-title-input');
+            const exercisesContainer = container.querySelector('.exercises-container');
+            
+            exercisesContainer.innerHTML = '';
+
+            if (program && program.title) {
+                titleInput.value = program.title;
+            }
+
+            if (program && program.exercises) {
+                program.exercises.forEach((exercise, index) => {
+                    this.createExerciseCard(exercisesContainer, exercise, index, userId);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading program:', error);
+        }
     }
 
     createExerciseCard(container, exercise, index, userId) {
@@ -85,34 +213,121 @@ class AdminPanel {
             </div>
         `;
 
-        const programActionsDiv = container.querySelector('.program-actions') || document.createElement('div');
-        if (!container.querySelector('.program-actions')) {
-            programActionsDiv.className = 'program-actions';
-            programActionsDiv.innerHTML = `
-                <button class="action-btn" onclick="adminPanel.addExercise('${userId}')">Yeni Egzersiz</button>
-                <button class="action-btn save-btn" onclick="adminPanel.saveProgram('${userId}')">Programı Kaydet</button>
-                <button class="action-btn excel-btn" onclick="adminPanel.exportToExcel('${userId}')">Excel'e Aktar</button>
-                <input type="file" id="excel-upload-${userId}" style="display: none" accept=".xlsx" onchange="adminPanel.importFromExcel('${userId}', this)">
-                <button class="action-btn excel-btn" onclick="document.getElementById('excel-upload-${userId}').click()">Excel'den Yükle</button>
-            `;
-            container.appendChild(programActionsDiv);
-        }
-
-        container.insertBefore(exerciseCard, programActionsDiv);
+        container.appendChild(exerciseCard);
     }
 
-    // ... (diğer mevcut metodlar aynen kalacak)
+    dayChanged(userId, day) {
+        this.currentDay = day;
+        this.loadUserProgram(userId);
+    }
 
-    // Excel ile ilgili metodlar buraya eklenecek
+    addSet(userId, exerciseIndex) {
+        const container = document.getElementById(`program-${userId}`);
+        const exerciseCards = container.querySelectorAll('.exercise-card');
+        const exerciseCard = exerciseCards[exerciseIndex];
+        
+        if (exerciseCard) {
+            const setsContainer = exerciseCard.querySelector('.sets-container');
+            const currentSets = setsContainer.querySelectorAll('.set-item').length;
+            
+            const newSetDiv = document.createElement('div');
+            newSetDiv.className = 'set-item';
+            newSetDiv.innerHTML = `
+                <span>Set ${currentSets + 1}:</span>
+                <input type="number" class="set-input" value="12" min="1">
+                <span>tekrar</span>
+                <button class="action-btn delete-btn" onclick="adminPanel.deleteSet('${userId}', ${exerciseIndex}, ${currentSets})">Set Sil</button>
+            `;
+            
+            setsContainer.appendChild(newSetDiv);
+        }
+    }
+
+    deleteSet(userId, exerciseIndex, setIndex) {
+        const container = document.getElementById(`program-${userId}`);
+        const exerciseCards = container.querySelectorAll('.exercise-card');
+        const exerciseCard = exerciseCards[exerciseIndex];
+        
+        if (exerciseCard) {
+            const setsContainer = exerciseCard.querySelector('.sets-container');
+            const setItems = setsContainer.querySelectorAll('.set-item');
+            
+            if (setItems.length > 1) {
+                setItems[setIndex].remove();
+                
+                const remainingSets = setsContainer.querySelectorAll('.set-item');
+                remainingSets.forEach((set, idx) => {
+                    const setNumber = set.querySelector('span:first-child');
+                    setNumber.textContent = `Set ${idx + 1}:`;
+                });
+            } else {
+                alert('En az bir set bulunmalıdır!');
+            }
+        }
+    }
+
+    deleteExercise(userId, exerciseIndex) {
+        if (!confirm('Bu egzersizi silmek istediğinize emin misiniz?')) return;
+
+        const container = document.getElementById(`program-${userId}`);
+        const exerciseCards = container.querySelectorAll('.exercise-card');
+        const exerciseCard = exerciseCards[exerciseIndex];
+        
+        if (exerciseCard) {
+            exerciseCard.remove();
+        }
+    }
+
+    addExercise(userId) {
+        const container = document.getElementById(`program-${userId}`);
+        const exercisesContainer = container.querySelector('.exercises-container');
+        
+        const exercise = {
+            name: '',
+            sets: [{number: 1, reps: 12}],
+            videoUrl: ''
+        };
+
+        this.createExerciseCard(exercisesContainer, exercise, exercisesContainer.children.length, userId);
+    }
+
+    async saveProgram(userId) {
+        try {
+            const container = document.getElementById(`program-${userId}`);
+            const titleInput = container.querySelector('.program-title-input');
+            const exerciseCards = container.querySelectorAll('.exercise-card');
+            
+            const exercises = Array.from(exerciseCards).map(card => {
+                const sets = Array.from(card.querySelectorAll('.set-item')).map((setItem, index) => ({
+                    number: index + 1,
+                    reps: parseInt(setItem.querySelector('.set-input').value) || 12
+                }));
+                
+                return {
+                    name: card.querySelector('.exercise-name').value,
+                    sets: sets,
+                    videoUrl: card.querySelector('.video-url').value
+                };
+            });
+            
+            const programData = {
+                title: titleInput.value,
+                exercises: exercises
+            };
+            
+            await set(ref(db, `userPrograms/${userId}/${this.currentDay}`), programData);
+            alert('Program başarıyla kaydedildi');
+        } catch (error) {
+            console.error('Error saving program:', error);
+            alert('Program kaydedilirken bir hata oluştu');
+        }
+    }
+
     async exportToExcel(userId) {
         try {
             const programs = {};
             const days = ['pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi', 'pazar'];
             
-            const userRef = ref(db, `users/${userId}`);
-            const userSnapshot = await get(userRef);
-            const userName = userSnapshot.val()?.name || userId;
-
             for (const day of days) {
                 const programRef = ref(db, `userPrograms/${userId}/${day}`);
                 const snapshot = await get(programRef);
@@ -126,11 +341,9 @@ class AdminPanel {
                 const exercises = program.exercises || [];
                 
                 const wsData = [
-                    ['Program Sahibi:', userName],
-                    ['Program Günü:', day.charAt(0).toUpperCase() + day.slice(1)],
                     ['Program Adı:', program.title || ''],
                     [''],
-                    ['Egzersiz Adı', 'Video Bağlantısı', 'Set Detayları']
+                    ['Egzersiz Adı', 'Video URL', 'Set Bilgileri']
                 ];
 
                 exercises.forEach(exercise => {
@@ -150,7 +363,7 @@ class AdminPanel {
                 XLSX.utils.book_append_sheet(wb, ws, day);
             }
 
-            XLSX.writeFile(wb, `${userName}_antrenman_programi.xlsx`);
+            XLSX.writeFile(wb, `program_${userId}.xlsx`);
             alert('Program başarıyla Excel dosyasına aktarıldı');
 
         } catch (error) {
@@ -174,10 +387,10 @@ class AdminPanel {
                         const worksheet = workbook.Sheets[sheetName];
                         const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-                        const programTitle = sheetData[2][1] || '';
+                        const programTitle = sheetData[0][1] || '';
                         const exercises = [];
 
-                        for (let i = 5; i < sheetData.length; i++) {
+                        for (let i = 3; i < sheetData.length; i++) {
                             const row = sheetData[i];
                             if (!row[0]) continue;
 
@@ -199,7 +412,7 @@ class AdminPanel {
                             exercises
                         };
 
-                        await set(ref(db, `userPrograms/${userId}/${sheetName.toLowerCase()}`), programData);
+                        await set(ref(db, `userPrograms/${userId}/${sheetName}`), programData);
                     }
 
                     await this.loadUserProgram(userId);
@@ -218,7 +431,39 @@ class AdminPanel {
             alert('Excel dosyası yüklenirken bir hata oluştu');
         }
     }
+
+    initializeInterface() {
+        document.getElementById('addUserBtn').addEventListener('click', () => {
+            const tbody = document.querySelector('.users-table tbody');
+            const tr = document.createElement('tr');
+            const userId = 'new-' + Date.now();
+            
+            tr.innerHTML = `
+                <td><input type="text" class="table-input" value="" data-field="username"></td>
+                <td><input type="password" class="table-input" value="" data-field="password"></td>
+                <td><input type="text" class="table-input" value="" data-field="name"></td>
+                <td>
+                    <select class="table-input" data-field="role">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="action-btn save-btn" onclick="adminPanel.saveUser('${userId}', this)">Kaydet</button>
+                </td>
+            `;
+            
+            tbody.insertBefore(tr, tbody.firstChild);
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
+
+        this.updateDateTime();
+        setInterval(() => this.updateDateTime(), 1000);
+    }
 }
 
-// Global AdminPanel nesnesini oluştur
 window.adminPanel = new AdminPanel();
