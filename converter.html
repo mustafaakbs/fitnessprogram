@@ -3,49 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Program Düzenleyici</title>
+    <title>Hızlı Program Oluşturucu</title>
     <style>
         body { 
             padding: 20px; 
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: system-ui;
             max-width: 1200px; 
             margin: 0 auto; 
-            background: #f5f5f5;
-        }
-        .header {
-            background: #1a1a1a;
-            color: #fff;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            font-family: monospace;
         }
         .container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .panel {
             background: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .section {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        textarea {
+        select, input {
             width: 100%;
-            height: 400px;
-            margin: 10px 0;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 14px;
+            padding: 8px;
+            margin: 5px 0;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
         button {
-            padding: 10px 20px;
             background: #4CAF50;
             color: white;
+            padding: 10px 20px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -54,135 +41,123 @@
         button:hover {
             background: #45a049;
         }
-        .status {
-            padding: 10px;
+        textarea {
+            width: 100%;
+            height: 200px;
             margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            display: none;
+            font-family: monospace;
         }
-        .success { background: #dff0d8; color: #3c763d; }
-        .error { background: #f2dede; color: #a94442; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div>Tarih ve Saat (UTC): <span id="currentDateTime"></span></div>
-        <div>Kullanıcı: <span id="currentUser">mustafaakbs</span></div>
-    </div>
-
     <div class="container">
-        <div class="section">
-            <h3>Program Düzenleyici</h3>
-            <div>
-                <button onclick="formatJson()">JSON Formatla</button>
-                <button onclick="validateData()">Veriyi Doğrula</button>
-                <button onclick="saveChanges()">Değişiklikleri Kaydet</button>
-            </div>
-            <textarea id="jsonEditor" placeholder="JSON verilerini buraya yapıştırın..."></textarea>
-            <div id="status" class="status"></div>
+        <!-- Program Şablonu -->
+        <div class="panel">
+            <h3>1. Program Şablonu Seç</h3>
+            <select id="programTemplate">
+                <option value="baslangic">Başlangıç Programı</option>
+                <option value="orta">Orta Seviye Program</option>
+                <option value="ileri">İleri Seviye Program</option>
+            </select>
+            <button onclick="loadTemplate()">Şablonu Yükle</button>
+            <textarea id="templateData" placeholder="Program şablonu burada görünecek..."></textarea>
+        </div>
+
+        <!-- Kullanıcı Listesi -->
+        <div class="panel">
+            <h3>2. Kullanıcıları Ekle</h3>
+            <textarea id="userList" placeholder="Her satıra bir kullanıcı adı yazın..."></textarea>
+            <button onclick="generatePrograms()">Programları Oluştur</button>
+        </div>
+
+        <!-- Sonuç -->
+        <div class="panel" style="grid-column: 1 / -1;">
+            <h3>3. Oluşturulan Programlar</h3>
+            <textarea id="result" readonly></textarea>
+            <button onclick="saveToFirebase()">Firebase'e Kaydet</button>
         </div>
     </div>
 
     <script>
-        // Tarih güncelleme
-        function updateDateTime() {
-            const now = new Date();
-            const utcString = now.toISOString().replace('T', ' ').split('.')[0];
-            document.getElementById('currentDateTime').textContent = utcString;
-        }
-
-        // JSON formatlama
-        function formatJson() {
-            try {
-                const editor = document.getElementById('jsonEditor');
-                const data = JSON.parse(editor.value);
-                editor.value = JSON.stringify(data, null, 2);
-                showStatus('Veri başarıyla formatlandı', true);
-            } catch (error) {
-                showStatus('Hata: Geçersiz JSON formatı - ' + error.message, false);
-            }
-        }
-
-        // Veri doğrulama
-        function validateData() {
-            try {
-                const data = JSON.parse(document.getElementById('jsonEditor').value);
-                const errors = [];
-
-                // Programs kontrolü
-                if (!data.programs) {
-                    errors.push("'programs' alanı bulunamadı");
-                } else {
-                    Object.entries(data.programs).forEach(([programId, program]) => {
-                        if (!program.days) {
-                            errors.push(`Program ${programId}: 'days' alanı eksik`);
-                        } else {
-                            Object.entries(program.days).forEach(([day, dayData]) => {
-                                if (!dayData.title) {
-                                    errors.push(`Program ${programId}, ${day}: 'title' alanı eksik`);
-                                }
-                                if (!Array.isArray(dayData.exercises)) {
-                                    errors.push(`Program ${programId}, ${day}: 'exercises' dizisi eksik`);
-                                } else {
-                                    dayData.exercises.forEach((exercise, index) => {
-                                        if (!exercise.name) {
-                                            errors.push(`Program ${programId}, ${day}, Egzersiz ${index + 1}: 'name' alanı eksik`);
-                                        }
-                                        if (!Array.isArray(exercise.sets)) {
-                                            errors.push(`Program ${programId}, ${day}, Egzersiz ${index + 1}: 'sets' dizisi eksik`);
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
+        // Program şablonları
+        const templates = {
+            baslangic: {
+                days: {
+                    pazartesi: {
+                        title: "GÖĞÜS + TRICEPS",
+                        exercises: [
+                            {
+                                id: "exercise_1",
+                                name: "Bench Press",
+                                sets: [
+                                    { number: 1, reps: 12 },
+                                    { number: 2, reps: 12 },
+                                    { number: 3, reps: 12 }
+                                ]
+                            }
+                            // ... diğer egzersizler
+                        ]
+                    }
+                    // ... diğer günler
                 }
-
-                // Users kontrolü
-                if (!data.users) {
-                    errors.push("'users' alanı bulunamadı");
-                } else {
-                    Object.entries(data.users).forEach(([username, user]) => {
-                        if (!user.name) errors.push(`Kullanıcı ${username}: 'name' alanı eksik`);
-                        if (!user.role) errors.push(`Kullanıcı ${username}: 'role' alanı eksik`);
-                    });
-                }
-
-                if (errors.length > 0) {
-                    showStatus('Hatalar bulundu:\n' + errors.join('\n'), false);
-                } else {
-                    showStatus('Veri yapısı geçerli', true);
-                }
-            } catch (error) {
-                showStatus('Hata: ' + error.message, false);
+            },
+            orta: {
+                // Orta seviye program şablonu
+            },
+            ileri: {
+                // İleri seviye program şablonu
             }
+        };
+
+        // Şablon yükleme
+        function loadTemplate() {
+            const template = document.getElementById('programTemplate').value;
+            document.getElementById('templateData').value = 
+                JSON.stringify(templates[template], null, 2);
         }
 
-        // Değişiklikleri kaydet
-        function saveChanges() {
-            try {
-                const data = JSON.parse(document.getElementById('jsonEditor').value);
-                // Burada Firebase güncelleme işlemi yapılacak
-                showStatus('Değişiklikler kaydedildi', true);
-            } catch (error) {
-                showStatus('Hata: ' + error.message, false);
-            }
+        // Program oluşturma
+        function generatePrograms() {
+            const template = JSON.parse(document.getElementById('templateData').value);
+            const users = document.getElementById('userList').value
+                .split('\n')
+                .filter(user => user.trim());
+
+            const result = {
+                programs: {},
+                users: {}
+            };
+
+            users.forEach((username, index) => {
+                // Kullanıcı bilgisi
+                result.users[username] = {
+                    name: username,
+                    password: `user${index + 1}123`,
+                    role: 'user',
+                    username: username
+                };
+
+                // Program bilgisi
+                result.programs[`user_${index + 1}`] = {
+                    ...template,
+                    owner: username
+                };
+            });
+
+            document.getElementById('result').value = 
+                JSON.stringify(result, null, 2);
         }
 
-        // Durum mesajı gösterme
-        function showStatus(message, isSuccess) {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.style.display = 'block';
-            status.className = 'status ' + (isSuccess ? 'success' : 'error');
-            if (isSuccess) {
-                setTimeout(() => status.style.display = 'none', 3000);
-            }
+        // Firebase'e kaydetme
+        function saveToFirebase() {
+            const data = JSON.parse(document.getElementById('result').value);
+            console.log('Firebase\'e kaydedilecek:', data);
+            // Firebase kayıt işlemi burada yapılacak
+            alert('Programlar başarıyla oluşturuldu!');
         }
-
-        // Sayfa yüklendiğinde
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
     </script>
 </body>
 </html>
