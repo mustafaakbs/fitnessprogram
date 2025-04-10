@@ -1,0 +1,3449 @@
+{
+  "activeUsers": {
+    "Admin": {
+      "lastLogin": "2025-03-10T09:32:43.240Z",
+      "name": "Admin",
+      "role": "admin",
+      "username": "Admin"
+    },
+    "mustafaa": {
+      "lastLogin": "2025-03-10T08:37:20.206Z",
+      "name": "Mustafa Akbaş",
+      "role": "user",
+      "username": "mustafaa"
+    }
+  },
+  "userPrograms": [
+    {
+      "carsamba": {
+        "title": "DİNLENME"
+      },
+      "cuma": {
+        "exercises": [
+          {
+            "name": "Incline Barbell Bench Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              },
+              {
+                "number": 5,
+                "reps": 6
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/J73fJNS4A0I?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Flat Dumbbell Chest Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/Yv41b8GLTIw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Dumbbell Pull Overs",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/j5rUI97Slzw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Cable Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/9AODjutglP4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Bent Over Barbell Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/1U_lZuKUTzU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Facepulls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/OPmSZ6g29a4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Weighted Pull Ups",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/PC76k5VfPss?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Dumbbell Rear Delt Raise",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/TN8HB4JyMkA?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "GÖĞÜS - SIRT"
+      },
+      "cumartesi": {
+        "title": "DİNLENME"
+      },
+      "pazar": {
+        "title": "DİNLENME"
+      },
+      "pazartesi": {
+        "exercises": [
+          {
+            "name": "Barbell Bench Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              },
+              {
+                "number": 5,
+                "reps": 6
+              },
+              {
+                "number": 6,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2KTA9fLY2PU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Incline Dumbbell Chest Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/8f5av3ay48A?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Chest Dips",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/Sri-rcwua3s?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": " Cable Crossovers",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              },
+              {
+                "number": 5,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/MOFfOeCRCT8?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Barbell Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              },
+              {
+                "number": 5,
+                "reps": 6
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/jH1fMl85Zc0?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Narrow Grip EZ Bar Preacher Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 8
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/k1Eg7QpNcC4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "High Cable Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/GIROVVeVR4U?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Palms Up Barbell Wrist Curls Over A Bench",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 15
+              },
+              {
+                "number": 2,
+                "reps": 15
+              },
+              {
+                "number": 3,
+                "reps": 15
+              },
+              {
+                "number": 4,
+                "reps": 15
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/UplU1tgNadQ?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "GÖGÜS + BİCEPS"
+      },
+      "persembe": {
+        "exercises": [
+          {
+            "name": "Barbell Squats",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 15
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              },
+              {
+                "number": 5,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/ZJ2zFacHxXg?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Leg Extension",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 8
+              },
+              {
+                "number": 5,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/vw7VJ-EBnfM?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Leg Curl",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/joImLSPyQWQ?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Barbell Deadlifts",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 8
+              },
+              {
+                "number": 2,
+                "reps": 8
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/DkyG4gqBijw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": " Tricep Extension (Rope)",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/gg-31qQfOag?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Single-Arm Dumbbell Triceps Extension",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2i2UkUYb_Iw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Narrow Grip EZ Bar Overhead Tricep Extensions",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/tXa-RoJvTDk?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "BACAK - TRİCEPS"
+      },
+      "sali": {
+        "exercises": [
+          {
+            "name": "Wide Grip Lat Pulldown",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              },
+              {
+                "number": 5,
+                "reps": 6
+              },
+              {
+                "number": 6,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2x9E_reM8cU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Landmine T Bar Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 8
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/MB3oPmpbumE?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Straight Arm Pulldowns Rope",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 8
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/Jo0qijIK6TM?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Dumbbell Shoulder Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              },
+              {
+                "number": 5,
+                "reps": 6
+              },
+              {
+                "number": 6,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/U9PvhniBdv4?autoplay=0&modestbranding=1& "
+          },
+          {
+            "name": "Standing Dumbbell Lat Raises",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/3WPwYJ3QAbs?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Alternating Front Raise",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/CI_BzDmlte4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Upright Barbell Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/lFUCKRWeDRg?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Dumbbell Shrugs",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/bXKx7DK6Dp0?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "SIRT - OMUZ"
+      }
+    },
+    {
+      "carsamba": {
+        "title": "DİNLENME"
+      },
+      "cuma": {
+        "exercises": [
+          {
+            "name": "Incline Barbell Bench Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              },
+              {
+                "number": 5,
+                "reps": 6
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/J73fJNS4A0I?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Flat Dumbbell Chest Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/Yv41b8GLTIw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Dumbbell Pull Overs",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/j5rUI97Slzw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Cable Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/9AODjutglP4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Bent Over Barbell Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/1U_lZuKUTzU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Facepulls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/OPmSZ6g29a4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Weighted Pull Ups",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/PC76k5VfPss?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Dumbbell Rear Delt Raise",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/TN8HB4JyMkA?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "GÖĞÜS - SIRT"
+      },
+      "cumartesi": {
+        "title": "DİNLENME"
+      },
+      "pazar": {
+        "title": "DİNLENME"
+      },
+      "pazartesi": {
+        "exercises": [
+          {
+            "name": "Barbell Bench Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              },
+              {
+                "number": 5,
+                "reps": 6
+              },
+              {
+                "number": 6,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2KTA9fLY2PU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Incline Dumbbell Chest Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/8f5av3ay48A?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Chest Dips",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/Sri-rcwua3s?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": " Cable Crossovers",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              },
+              {
+                "number": 5,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/MOFfOeCRCT8?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Barbell Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              },
+              {
+                "number": 5,
+                "reps": 6
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/jH1fMl85Zc0?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Narrow Grip EZ Bar Preacher Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 8
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/k1Eg7QpNcC4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "High Cable Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/GIROVVeVR4U?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Palms Up Barbell Wrist Curls Over A Bench",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 15
+              },
+              {
+                "number": 2,
+                "reps": 15
+              },
+              {
+                "number": 3,
+                "reps": 15
+              },
+              {
+                "number": 4,
+                "reps": 15
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/UplU1tgNadQ?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "GÖGÜS + BİCEPS"
+      },
+      "persembe": {
+        "exercises": [
+          {
+            "name": "Barbell Squats",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 15
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              },
+              {
+                "number": 5,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/ZJ2zFacHxXg?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Leg Extension",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 8
+              },
+              {
+                "number": 5,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/vw7VJ-EBnfM?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Leg Curl",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/joImLSPyQWQ?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Barbell Deadlifts",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 8
+              },
+              {
+                "number": 2,
+                "reps": 8
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/DkyG4gqBijw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": " Tricep Extension (Rope)",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/gg-31qQfOag?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Single-Arm Dumbbell Triceps Extension",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2i2UkUYb_Iw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Narrow Grip EZ Bar Overhead Tricep Extensions",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/tXa-RoJvTDk?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "BACAK - TRİCEPS"
+      },
+      "sali": {
+        "exercises": [
+          {
+            "name": "Wide Grip Lat Pulldown",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              },
+              {
+                "number": 5,
+                "reps": 6
+              },
+              {
+                "number": 6,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2x9E_reM8cU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Landmine T Bar Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 8
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/MB3oPmpbumE?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Straight Arm Pulldowns Rope",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 8
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 6
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/Jo0qijIK6TM?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Dumbbell Shoulder Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              },
+              {
+                "number": 5,
+                "reps": 6
+              },
+              {
+                "number": 6,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/U9PvhniBdv4?autoplay=0&modestbranding=1& "
+          },
+          {
+            "name": "Standing Dumbbell Lat Raises",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/3WPwYJ3QAbs?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Alternating Front Raise",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/CI_BzDmlte4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Upright Barbell Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/lFUCKRWeDRg?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Dumbbell Shrugs",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/bXKx7DK6Dp0?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "SIRT - OMUZ"
+      }
+    },
+    {
+      "carsamba": {
+        "title": "DİNLENME"
+      },
+      "cuma": {
+        "title": "Bacak + Omuz"
+      },
+      "cumartesi": {
+        "title": "Karın + Cardio"
+      },
+      "pazar": {
+        "exercises": [
+          {
+            "name": "Barbell Bench Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2KTA9fLY2PU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": " Incline Dumbbell Chest Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/8f5av3ay48A?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Chest Dips",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/Sri-rcwua3s?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Cable Crossovers",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/MOFfOeCRCT8?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Bent-Arm Dumbbell Pullover",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/QI2wOrMCzwc?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Tricep Extension (Rope)",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/gg-31qQfOag?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Dumbbell Overhead Tricep Extension",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/s-FoAbMyHTc?autoplay=0&modestbranding=1& "
+          },
+          {
+            "name": "Dumbbell One-Arm Triceps Extension",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/66UFfKV0-B0?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "GÖĞÜS - TRİCEPS"
+      },
+      "pazartesi": {
+        "exercises": [
+          {
+            "name": "Squat",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/watch?v=ultWZbUMPL8",
+            "weight": 80
+          }
+        ],
+        "title": "Bacak"
+      },
+      "persembe": {
+        "exercises": [
+          {
+            "name": "Barbell Squats",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/ZJ2zFacHxXg?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Leg Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/7IjrQj2sxqA?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Leg Curl",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/joImLSPyQWQ?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Leg Extension",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/vw7VJ-EBnfM?autoplay=0&modestbranding=1& "
+          },
+          {
+            "name": "Seated Calf Raise Machine",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 15
+              },
+              {
+                "number": 2,
+                "reps": 15
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/EVF_inqTYTk?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Dumbbell Shoulder Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/U9PvhniBdv4"
+          },
+          {
+            "name": "Standing Dumbbell Lat Raises",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/3WPwYJ3QAbs?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Alternating Front Raise",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/CI_BzDmlte4?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "BACAK - OMUZ"
+      },
+      "sali": {
+        "exercises": [
+          {
+            "name": "Barbell Deadlifts",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/DkyG4gqBijw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Wide Grip Lat Pulldown",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2x9E_reM8cU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Bent Over Barbell Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/1U_lZuKUTzU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": " Seated Cable Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/9AODjutglP4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Lying T Bar Row",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/EOFZfYZYAO8?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Facepulls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/OPmSZ6g29a4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Barbell Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/jH1fMl85Zc0?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Alternate Hammer Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2-b8MSjcWTg?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "SIRT - BICEPS"
+      }
+    },
+    {
+      "carsamba": {
+        "title": "DİNLENME"
+      },
+      "cuma": {
+        "exercises": [
+          {
+            "name": "Incline Barbell Bench Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              },
+              {
+                "number": 5,
+                "reps": 6
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/J73fJNS4A0I?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Flat Dumbbell Chest Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/Yv41b8GLTIw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Dumbbell Pull Overs",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/j5rUI97Slzw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Cable Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/9AODjutglP4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Bent Over Barbell Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 8
+              },
+              {
+                "number": 4,
+                "reps": 8
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/1U_lZuKUTzU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Facepulls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/OPmSZ6g29a4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Weighted Pull Ups",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/PC76k5VfPss?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Dumbbell Rear Delt Raise",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/TN8HB4JyMkA?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "GÖĞÜS - SIRT"
+      },
+      "cumartesi": {
+        "title": "DİNLENME"
+      },
+      "pazar": {
+        "title": "DİNLENME"
+      },
+      "pazartesi": {
+        "exercises": [
+          {
+            "name": "Barbell Bench Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2KTA9fLY2PU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Incline Dumbbell Chest Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/8f5av3ay48A?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": " Cable Crossovers",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/MOFfOeCRCT8?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Decline Dumbbell Chest Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/qJ1yr8Fnngo?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Tricep Extension (Rope)",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/gg-31qQfOag?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Single Arm Dumbbell Tricep Extensions ",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/5FbpgroXpEg?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Tricep Dips",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/6ff1rKCvslw?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "GÖGÜS ARKA KOL"
+      },
+      "persembe": {
+        "exercises": [
+          {
+            "name": "Seated Dumbbell Shoulder Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/U9PvhniBdv4"
+          },
+          {
+            "name": "Standing Dumbbell Lat Raises",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/3WPwYJ3QAbs?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Rear Delt Flyes Head Against Bench",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/K4O29g8r9q0?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Alternating Front Raise",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/CI_BzDmlte4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Barbell Squats",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/ZJ2zFacHxXg?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Leg Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/7IjrQj2sxqA?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Leg Curl",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/joImLSPyQWQ?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Calf Raise Machine",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/EVF_inqTYTk?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "OMUZ - BACAK"
+      },
+      "sali": {
+        "exercises": [
+          {
+            "name": "Barbell Deadlifts",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/DkyG4gqBijw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Wide Grip Lat Pulldown",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2x9E_reM8cU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Bent Over Barbell Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/1U_lZuKUTzU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Cable Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/9AODjutglP4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Lying T Bar Row",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/EOFZfYZYAO8?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Facepulls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/OPmSZ6g29a4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Barbell Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/jH1fMl85Zc0?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Alternate Hammer Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2-b8MSjcWTg?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "SIRT - ÖN KOL"
+      }
+    },
+    {
+      "carsamba": {
+        "title": "DİNLENME"
+      },
+      "cuma": {
+        "exercises": [
+          {
+            "name": "KOŞU BANDI - 20 dk",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 1
+              }
+            ],
+            "videoUrl": ""
+          },
+          {
+            "name": "TWİST",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 40
+              },
+              {
+                "number": 2,
+                "reps": 40
+              },
+              {
+                "number": 3,
+                "reps": 40
+              },
+              {
+                "number": 4,
+                "reps": 40
+              },
+              {
+                "number": 5,
+                "reps": 40
+              }
+            ],
+            "videoUrl": ""
+          },
+          {
+            "name": "UZAY YÜRÜYÜŞÜ - 10 dk",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 1
+              }
+            ],
+            "videoUrl": ""
+          },
+          {
+            "name": "MEKİK",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 15
+              },
+              {
+                "number": 2,
+                "reps": 15
+              },
+              {
+                "number": 3,
+                "reps": 15
+              }
+            ],
+            "videoUrl": ""
+          },
+          {
+            "name": "BİSİKLET - 10 dk",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 1
+              }
+            ],
+            "videoUrl": ""
+          }
+        ],
+        "title": "CARDİO"
+      },
+      "cumartesi": {
+        "title": "DİNLENME"
+      },
+      "pazar": {
+        "title": "DİNLENME"
+      },
+      "pazartesi": {
+        "exercises": [
+          {
+            "name": "Barbell Bench Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2KTA9fLY2PU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Incline Dumbbell Chest Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/8f5av3ay48A?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Cable Crossovers",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/MOFfOeCRCT8?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Decline Dumbbell Chest Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/qJ1yr8Fnngo?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Tricep Extension (Rope)",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/gg-31qQfOag?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Single Arm Dumbbell Tricep Extensions ",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/6ff1rKCvslw?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Tricep Dips",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/6ff1rKCvslw?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "GÖĞÜS - ARKA KOL"
+      },
+      "persembe": {
+        "exercises": [
+          {
+            "name": "Wide Grip Lat Pulldown",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2x9E_reM8cU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": " Seated Row Machine (Neutral Grip)",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/FAbWKi1PF4o?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Bent Over Barbell Rows",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/1U_lZuKUTzU?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Pull Ups (Neutral Grip)",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/bxovgJoP3GY?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Barbell Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/jH1fMl85Zc0?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Standing Alternate Hammer Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/2-b8MSjcWTg?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Dumbbell Concentration Curls",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/16xyJr1Foas?autoplay=0&modestbranding=1&"
+          }
+        ],
+        "title": "SIRT - ÖN KOL"
+      },
+      "sali": {
+        "exercises": [
+          {
+            "name": "Seated Dumbbell Shoulder Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/U9PvhniBdv4"
+          },
+          {
+            "name": "Standing Dumbbell Lat Raises",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/3WPwYJ3QAbs?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": " Standing Rear Delt Flyes Head Against Bench",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/K4O29g8r9q0?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Alternating Front Raise",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 10
+              },
+              {
+                "number": 2,
+                "reps": 10
+              },
+              {
+                "number": 3,
+                "reps": 10
+              },
+              {
+                "number": 4,
+                "reps": 10
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/CI_BzDmlte4?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Barbell Squats",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/ZJ2zFacHxXg?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Leg Press",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/7IjrQj2sxqA?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Leg Curl",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/joImLSPyQWQ?autoplay=0&modestbranding=1&"
+          },
+          {
+            "name": "Seated Calf Raise Machine",
+            "sets": [
+              {
+                "number": 1,
+                "reps": 12
+              },
+              {
+                "number": 2,
+                "reps": 12
+              },
+              {
+                "number": 3,
+                "reps": 12
+              },
+              {
+                "number": 4,
+                "reps": 12
+              }
+            ],
+            "videoUrl": "https://www.youtube.com/embed/EVF_inqTYTk"
+          }
+        ],
+        "title": "OMUZ - BACAK"
+      }
+    }
+  ],
+  "users": [
+    {
+      "name": "Mustafa Akbaş",
+      "password": "ma123456",
+      "role": "user",
+      "username": "mustafaa"
+    },
+    {
+      "name": "Seydoş Bingöl",
+      "password": "sb123456",
+      "role": "user",
+      "username": "seydosb"
+    },
+    null,
+    {
+      "name": "Sadullah Demir",
+      "password": "sd123456",
+      "role": "user",
+      "username": "sadod"
+    },
+    {
+      "name": "Zeki Akson",
+      "password": "za123456",
+      "role": "user",
+      "username": "zekia"
+    },
+    {
+      "name": "Admin",
+      "password": "admin123",
+      "role": "admin",
+      "username": "Admin"
+    }
+  ]
+}
